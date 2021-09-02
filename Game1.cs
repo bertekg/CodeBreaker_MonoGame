@@ -11,6 +11,7 @@ namespace CodeBreaker_MonoGame
 
         SpriteFont gameFont;
         SpriteFont debugFont;
+        SpriteFont historyFont;
         Texture2D frameSprite;
         int frameIndex = 0;
         float framePosition = 0.0f;
@@ -19,9 +20,14 @@ namespace CodeBreaker_MonoGame
         bool leftReleased = true;
         bool upRelesed = true;
         bool downRelesed = true;
+        bool spaceRelesed = true;
 
-        int codeLength = 4;
+        int codeLength = 5;
         GameLogic gameLogic;
+
+        Vector2 textPlace;
+
+        string debugAns = "Nothing";
 
         public Game1()
         {
@@ -43,6 +49,7 @@ namespace CodeBreaker_MonoGame
 
             gameFont = Content.Load<SpriteFont>("spaceFont");
             debugFont = Content.Load<SpriteFont>("debugFont");
+            historyFont = Content.Load<SpriteFont>("historyFont");
             frameSprite = Content.Load<Texture2D>("frame");
         }
 
@@ -79,7 +86,7 @@ namespace CodeBreaker_MonoGame
             {
                 leftReleased = true;
             }
-            framePosition = 85.0f + (frameIndex * 100.0f);
+            framePosition = 35.0f + (frameIndex * 100.0f);
 
             if (keyboardState.IsKeyDown(Keys.Up) && upRelesed == true)
             {
@@ -109,6 +116,24 @@ namespace CodeBreaker_MonoGame
                 downRelesed = true;
             }
 
+            if (keyboardState.IsKeyDown(Keys.Space) && spaceRelesed == true)
+            {
+                bool isCodeCorrect = gameLogic.TryCode();
+                if (isCodeCorrect)
+                {
+                    debugAns = "YES";
+                }
+                else
+                {
+                    debugAns = "no";
+                }
+                spaceRelesed = false;
+            }
+            else if (keyboardState.IsKeyUp(Keys.Space) && spaceRelesed == false)
+            {
+                spaceRelesed = true;
+            }            
+
             base.Update(gameTime);
         }
 
@@ -119,14 +144,43 @@ namespace CodeBreaker_MonoGame
             _spriteBatch.Begin();
             for (int i = 0; i < codeLength; i++)
             {
-                _spriteBatch.DrawString(gameFont, gameLogic.currentCode[i].ToString(), new Vector2(100 + i * 100, 100), Color.White);
+                _spriteBatch.DrawString(gameFont, gameLogic.currentCode[i].ToString(), new Vector2(50 + (100 * i), 80), Color.White);
             }
-            _spriteBatch.Draw(frameSprite, new Vector2(framePosition, 100), Color.White);
+            _spriteBatch.Draw(frameSprite, new Vector2(framePosition, 80), Color.White);
             _spriteBatch.DrawString(debugFont, "Frame idex: " + frameIndex.ToString() + ", Frame pos: " + framePosition.ToString(), new Vector2(3, 3), Color.White);            
             _spriteBatch.DrawString(debugFont, "Current code: " + gameLogic.CurrentCodeString(), new Vector2(3, 25), Color.White);
+            _spriteBatch.DrawString(debugFont, "Debug answere: " + debugAns, new Vector2(3, 50), Color.White);
+            for (int i = 0; i < gameLogic.rowCount; i++)
+            {
+                _spriteBatch.DrawString(historyFont, (i + 1).ToString() +":", new Vector2(550, 50 + (i * 50)), Color.White);
+            }
+            foreach (SingleDigit singleDigit in gameLogic.guessCodeHistory)
+            {
+                textPlace = new Vector2(600 + (singleDigit.column * 40),50 + (singleDigit.row * 50));
+                _spriteBatch.DrawString(historyFont, singleDigit.value.ToString(), textPlace, DecodeColor(singleDigit.digitState));
+            }
             _spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+        private Color DecodeColor(DigitState digitState)
+        {
+            Color colorDecoded = new Color();
+            switch (digitState)
+            {
+                case DigitState.Good:
+                    colorDecoded = Color.Green;
+                    break;
+                case DigitState.Bad:
+                    colorDecoded = Color.Red;
+                    break;
+                case DigitState.Diffrent:
+                    colorDecoded = Color.Blue;
+                    break;
+                default:
+                    break;
+            }
+            return colorDecoded;
         }
     }
 }

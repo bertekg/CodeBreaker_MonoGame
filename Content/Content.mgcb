@@ -32,6 +32,13 @@
 /processorParam:TextureFormat=Color
 /build:frame.png
 
+#begin historyFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:historyFont.spritefont
+
 #begin spaceFont.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
