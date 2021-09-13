@@ -8,14 +8,16 @@ namespace CodeBreaker_MonoGame
     {
         public int[] goodCode { get; set; }
         public int[] currentCode { get; set; }
-        public List<SingleDigit> guessCodeHistory { get; set; }
-        public int rowCount { get; set; }
-        public GameLogic(int codeLength)
+        public List<List<SingleDigit>> guessCodeHistory;
+        int maxHistoryLength;
+        public int numberOfAttempts { get; set; }
+        public GameLogic(int codeLength, int maxNumberOfHints)
         {
-            RandomCode(codeLength);
-            guessCodeHistory = new List<SingleDigit>();
+            InitRandomCode(codeLength);
+            guessCodeHistory = new List<List<SingleDigit>>();
+            maxHistoryLength = maxNumberOfHints;
         }
-        public void RandomCode(int codeLength)
+        public void InitRandomCode(int codeLength)
         {
             goodCode = new int[codeLength];
             List<int> possibleDigits = new List<int>();
@@ -32,7 +34,7 @@ namespace CodeBreaker_MonoGame
                 possibleDigits.RemoveAt(indexDigit);
             }
             currentCode = new int[codeLength];
-            rowCount = 0;
+            numberOfAttempts = 0;
         }
         public string CurrentCodeString()
         {
@@ -47,11 +49,10 @@ namespace CodeBreaker_MonoGame
         {
             bool correctCode = true;
             Random random = new Random();
+            List<SingleDigit> rowDigits = new List<SingleDigit>();
             for (int i = 0; i < currentCode.Length; i++)
             {
                 SingleDigit singleDigit = new SingleDigit();
-                singleDigit.row = rowCount;
-                singleDigit.column = i;
                 singleDigit.value = currentCode[i];
                 if (currentCode[i] == goodCode[i])
                 {
@@ -67,9 +68,14 @@ namespace CodeBreaker_MonoGame
                     singleDigit.digitState = DigitState.Bad;
                     correctCode = false;
                 }
-                guessCodeHistory.Add(singleDigit);
+                rowDigits.Add(singleDigit);
             }
-            rowCount++;
+            if (guessCodeHistory.Count >= maxHistoryLength)
+            {
+                guessCodeHistory.RemoveAt(0);
+            }
+            guessCodeHistory.Add(rowDigits);
+            numberOfAttempts++;
             return correctCode;
         }
     }

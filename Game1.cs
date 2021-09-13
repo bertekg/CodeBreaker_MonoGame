@@ -22,12 +22,15 @@ namespace CodeBreaker_MonoGame
         bool downRelesed = true;
         bool spaceRelesed = true;
 
-        int codeLength = 5;
+        int codeLength = 4;
         GameLogic gameLogic;
 
         Vector2 textPlace;
 
         string debugAns = "Nothing";
+        bool isDebugMode = true;
+
+        int maxNumberOfHints = 7;
 
         public Game1()
         {
@@ -38,7 +41,7 @@ namespace CodeBreaker_MonoGame
 
         protected override void Initialize()
         {
-            gameLogic = new GameLogic(codeLength);
+            gameLogic = new GameLogic(codeLength, maxNumberOfHints);
 
             base.Initialize();
         }
@@ -144,20 +147,25 @@ namespace CodeBreaker_MonoGame
             _spriteBatch.Begin();
             for (int i = 0; i < codeLength; i++)
             {
-                _spriteBatch.DrawString(gameFont, gameLogic.currentCode[i].ToString(), new Vector2(50 + (100 * i), 80), Color.White);
+                _spriteBatch.DrawString(gameFont, gameLogic.currentCode[i].ToString(), new Vector2(50 + (100 * i), 100), Color.White);
             }
-            _spriteBatch.Draw(frameSprite, new Vector2(framePosition, 80), Color.White);
-            _spriteBatch.DrawString(debugFont, "Frame idex: " + frameIndex.ToString() + ", Frame pos: " + framePosition.ToString(), new Vector2(3, 3), Color.White);            
-            _spriteBatch.DrawString(debugFont, "Current code: " + gameLogic.CurrentCodeString(), new Vector2(3, 25), Color.White);
-            _spriteBatch.DrawString(debugFont, "Debug answere: " + debugAns, new Vector2(3, 50), Color.White);
-            for (int i = 0; i < gameLogic.rowCount; i++)
+            _spriteBatch.Draw(frameSprite, new Vector2(framePosition, 100), Color.White);
+
+            if (isDebugMode)
             {
-                _spriteBatch.DrawString(historyFont, (i + 1).ToString() +":", new Vector2(550, 50 + (i * 50)), Color.White);
-            }
-            foreach (SingleDigit singleDigit in gameLogic.guessCodeHistory)
+                _spriteBatch.DrawString(debugFont, "Frame index: " + frameIndex.ToString() + ", Frame pos: " + framePosition.ToString(), new Vector2(3, 3), Color.White);
+                _spriteBatch.DrawString(debugFont, "Current code: " + gameLogic.CurrentCodeString(), new Vector2(3, 25), Color.White);
+                _spriteBatch.DrawString(debugFont, "Debug answere: " + debugAns, new Vector2(3, 50), Color.White);
+            }            
+
+            _spriteBatch.DrawString(historyFont, "Number of attempts: " + gameLogic.numberOfAttempts.ToString(), new Vector2(320, 40), Color.White);
+            for (int i = 0; i < gameLogic.guessCodeHistory.Count; i++)
             {
-                textPlace = new Vector2(600 + (singleDigit.column * 40),50 + (singleDigit.row * 50));
-                _spriteBatch.DrawString(historyFont, singleDigit.value.ToString(), textPlace, DecodeColor(singleDigit.digitState));
+                for (int j = 0; j < gameLogic.guessCodeHistory[i].Count; j++)
+                {
+                    textPlace = new Vector2(600 + (j * 40), (i + 2) * 50);
+                    _spriteBatch.DrawString(historyFont, gameLogic.guessCodeHistory[i][j].value.ToString(), textPlace, DecodeColor(gameLogic.guessCodeHistory[i][j].digitState));
+                }
             }
             _spriteBatch.End();
 
