@@ -13,7 +13,10 @@ namespace CodeBreaker_MonoGame
         SpriteFont gameFont;
         SpriteFont debugFont;
         SpriteFont historyFont;
+        SpriteFont menuFont;
         Texture2D frameSprite;
+        Texture2D menuMarkerSprite;
+
         int frameIndex = 0;
         float framePosition = 0.0f;
 
@@ -25,7 +28,7 @@ namespace CodeBreaker_MonoGame
         bool escapeReleased = true;
         bool enterReleased = true;
 
-        int codeLength = 3;
+        int codeLength = 4;
         GameLogic gameLogic;
 
         Vector2 textPlace;
@@ -40,8 +43,16 @@ namespace CodeBreaker_MonoGame
 
         double playingTime;
         string endGameInfo;
+        Color endGameColor;
         double remainingTime;
+        double limitTime = 30;
         bool isTimeLimit;
+
+        bool isAttempsLimit;
+        int limitAttemps = 7;
+
+        int menuMarkerIndex = 0;
+        float menuMarkerPosition = 0.0f;
 
         public Game1()
         {
@@ -52,8 +63,8 @@ namespace CodeBreaker_MonoGame
 
         protected override void Initialize()
         {
-            StartNewGame();
-            gameState = GameState.FinishGame;
+            //StartNewGame();
+            GoToMainMenu();
             base.Initialize();
         }
 
@@ -64,7 +75,10 @@ namespace CodeBreaker_MonoGame
             gameFont = Content.Load<SpriteFont>("spaceFont");
             debugFont = Content.Load<SpriteFont>("debugFont");
             historyFont = Content.Load<SpriteFont>("historyFont");
+            menuFont = Content.Load<SpriteFont>("historyFont");
+            menuFont = Content.Load<SpriteFont>("menuFont");
             frameSprite = Content.Load<Texture2D>("frame");
+            menuMarkerSprite = Content.Load<Texture2D>("menuMarker");
         }
 
         protected override void Update(GameTime gameTime)
@@ -75,7 +89,7 @@ namespace CodeBreaker_MonoGame
             {
                 if (gameState == GameState.InGame || gameState == GameState.FinishGame)
                 {
-                    gameState = GameState.Menu;
+                    GoToMainMenu();
                 }
                 else
                 {
@@ -110,7 +124,39 @@ namespace CodeBreaker_MonoGame
                     {
                         frameIndex = 0;
                     }
-                }                    
+                }
+                else if (gameState == GameState.Menu)
+                {
+                    switch (menuMarkerIndex)
+                    {
+                        case 0:
+                            if (codeLength < 5)
+                            {
+                                codeLength++;
+                            }
+                            break;
+                        case 1:
+                            isAttempsLimit = true;
+                            break;
+                        case 2:
+                            if (limitAttemps < 15)
+                            {
+                                limitAttemps++;
+                            }
+                            break;
+                        case 3:
+                            isTimeLimit = true;
+                            break;
+                        case 4:
+                            if (limitTime < 150)
+                            {
+                                limitTime += 10;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
                 rightReleased = false;
             }
             else if(keyboardState.IsKeyUp(Keys.Right) && rightReleased == false)
@@ -127,7 +173,39 @@ namespace CodeBreaker_MonoGame
                     {
                         frameIndex = codeLength - 1;
                     }
-                }                   
+                }
+                else if (gameState == GameState.Menu)
+                {
+                    switch (menuMarkerIndex)
+                    {
+                        case 0:
+                            if (codeLength > 3 )
+                            {
+                                codeLength--;
+                            }
+                            break;
+                        case 1:
+                            isAttempsLimit = false;
+                            break;
+                        case 2:
+                            if (limitAttemps > 3)
+                            {
+                                limitAttemps--;
+                            }
+                            break;
+                        case 3:
+                            isTimeLimit = false;
+                            break;
+                        case 4:
+                            if (limitTime > 10)
+                            {
+                                limitTime -= 10;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
                 leftReleased = false;
             }
             else if (keyboardState.IsKeyUp(Keys.Left) && leftReleased == false)
@@ -146,7 +224,15 @@ namespace CodeBreaker_MonoGame
                     {
                         gameLogic.currentCode[frameIndex] = 0;
                     }
-                }                
+                }
+                else if (gameState == GameState.Menu)
+                {
+                    menuMarkerIndex--;
+                    if (menuMarkerIndex < 0)
+                    {
+                        menuMarkerIndex = 4;
+                    }
+                }
                 upRelesed = false;
             }
             else if (keyboardState.IsKeyUp(Keys.Up) && upRelesed == false)
@@ -163,7 +249,15 @@ namespace CodeBreaker_MonoGame
                     {
                         gameLogic.currentCode[frameIndex] = 9;
                     }
-                }                
+                }
+                else if (gameState == GameState.Menu)
+                {
+                    menuMarkerIndex++;
+                    if (menuMarkerIndex > 4)
+                    {
+                        menuMarkerIndex = 0;
+                    }
+                }
                 downRelesed = false;
             }
             else if (keyboardState.IsKeyUp(Keys.Down) && downRelesed == false)
@@ -171,12 +265,14 @@ namespace CodeBreaker_MonoGame
                 downRelesed = true;
             }
 
+            menuMarkerPosition = 195.0f + (menuMarkerIndex * 50.0f);
+
             if (keyboardState.IsKeyDown(Keys.Space) && spaceRelesed == true)
             {
                 if (gameState == GameState.InGame)
                 {
                     bool isCodeCorrect = gameLogic.TryCode();
-                    if (isCodeCorrect)
+                    if (isCodeCorrect || ((gameLogic.numberOfAttempts >= limitAttemps) && isAttempsLimit))
                     {
                         debugAns = "YES";
                         gameState = GameState.FinishGame;
@@ -234,7 +330,14 @@ namespace CodeBreaker_MonoGame
                     _spriteBatch.DrawString(debugFont, "Debug answere: " + debugAns, new Vector2(3, 410), Color.White);
                 }
 
-                _spriteBatch.DrawString(historyFont, "Number of Attempts: " + gameLogic.numberOfAttempts.ToString(), new Vector2(320, 40), Color.White);
+                if (isAttempsLimit)
+                {
+                    _spriteBatch.DrawString(historyFont, "Remainig Attempts: " + (limitAttemps - gameLogic.numberOfAttempts).ToString(), new Vector2(320, 40), Color.White);
+                }
+                else
+                {
+                    _spriteBatch.DrawString(historyFont, "Number of Attempts: " + gameLogic.numberOfAttempts.ToString(), new Vector2(320, 40), Color.White);
+                }
                 for (int i = 0; i < gameLogic.guessCodeHistory.Count; i++)
                 {
                     for (int j = 0; j < gameLogic.guessCodeHistory[i].Count; j++)
@@ -256,7 +359,8 @@ namespace CodeBreaker_MonoGame
             else if (gameState == GameState.FinishGame)
             {
                 endGameInfo = gameLogic.guessedCode ? "You WIN!!!" : "You LOSE!!!";
-                _spriteBatch.DrawString(historyFont, endGameInfo, new Vector2(280, 40), Color.White);
+                endGameColor = gameLogic.guessedCode ? Color.Green : Color.Red;
+                _spriteBatch.DrawString(historyFont, endGameInfo, new Vector2(280, 40), endGameColor);
                 if (isTimeLimit)
                 {
                     _spriteBatch.DrawString(historyFont, string.Format("Remainig time {0:N3} secounds", remainingTime), new Vector2(100, 100), Color.White);
@@ -265,7 +369,14 @@ namespace CodeBreaker_MonoGame
                 {
                     _spriteBatch.DrawString(historyFont, string.Format("Playing time {0:N3} secounds", playingTime), new Vector2(100, 100), Color.White);
                 }
-                _spriteBatch.DrawString(historyFont, "Number of Attempts: " + gameLogic.numberOfAttempts.ToString(), new Vector2(200, 160), Color.White);
+                if (isAttempsLimit)
+                {
+                    _spriteBatch.DrawString(historyFont, "Remainig Attempts: " + (limitAttemps - gameLogic.numberOfAttempts).ToString(), new Vector2(200, 160), Color.White);
+                }
+                else
+                {
+                    _spriteBatch.DrawString(historyFont, "Number of Attempts: " + gameLogic.numberOfAttempts.ToString(), new Vector2(200, 160), Color.White);
+                }
                 _spriteBatch.DrawString(historyFont, "Correct code: " + gameLogic.CorrectCodeString(), new Vector2(220, 220), Color.White);
                 _spriteBatch.DrawString(historyFont, "Press [Enter] to Start Game again", new Vector2(80, 360), Color.White);
                 _spriteBatch.DrawString(historyFont, "Press [Esc] to go back Main Menu", new Vector2(75, 420), Color.White);
@@ -273,7 +384,14 @@ namespace CodeBreaker_MonoGame
             else
             {
                 _spriteBatch.DrawString(historyFont, "Code Breaker - MonoGame", new Vector2(120, 40), Color.White);
-                _spriteBatch.DrawString(historyFont, "Press [Enter] to Start Game", new Vector2(120, 100), Color.White);
+                _spriteBatch.DrawString(menuFont, "Press [Enter] to Start Game", new Vector2(190, 100), Color.White);
+                _spriteBatch.DrawString(menuFont, "Press [Esc] to Exit", new Vector2(270, 140), Color.White);
+                _spriteBatch.DrawString(menuFont, codeLength.ToString() + ": Code length", new Vector2(180, 205), Color.White);
+                _spriteBatch.DrawString(menuFont, isAttempsLimit.ToString() + ": Is limit attemps", new Vector2(180, 255), Color.White);
+                _spriteBatch.DrawString(menuFont, limitAttemps.ToString() + ": Limit attemps", new Vector2(180, 305), Color.White);
+                _spriteBatch.DrawString(menuFont, isTimeLimit.ToString() + ": Is limit time", new Vector2(180, 355), Color.White);
+                _spriteBatch.DrawString(menuFont, limitTime.ToString() + ": Limit time", new Vector2(180, 405), Color.White);
+                _spriteBatch.Draw(menuMarkerSprite, new Vector2(150, menuMarkerPosition), Color.White);
             }
 
             _spriteBatch.End();
@@ -304,9 +422,13 @@ namespace CodeBreaker_MonoGame
             gameLogic = new GameLogic(codeLength, maxNumberOfHints);
             frameIndex = 0;
             playingTime = 0;
-            remainingTime = 10;
-            isTimeLimit = false;
+            remainingTime = limitTime;
             gameState = GameState.InGame;
+        }
+        private void GoToMainMenu()
+        {
+            menuMarkerIndex = 0;
+            gameState = GameState.Menu;
         }
     }
 }
