@@ -11,11 +11,13 @@ namespace CodeBreaker_MonoGame
         public List<List<SingleDigit>> guessCodeHistory;
         int maxHistoryLength;
         public int numberOfAttempts { get; set; }
+        public bool guessedCode { get; set; }
         public GameLogic(int codeLength, int maxNumberOfHints)
         {
             InitRandomCode(codeLength);
             guessCodeHistory = new List<List<SingleDigit>>();
             maxHistoryLength = maxNumberOfHints;
+            guessedCode = false;
         }
         public void InitRandomCode(int codeLength)
         {
@@ -44,6 +46,15 @@ namespace CodeBreaker_MonoGame
                 currentCodeString += "[" + goodCode[i].ToString() + "] ";
             }
             return currentCodeString;
+        }
+        public string CorrectCodeString()
+        {
+            string correctCodeString = "";
+            for (int i = 0; i < goodCode.Length; i++)
+            {
+                correctCodeString += goodCode[i].ToString();
+            }
+            return correctCodeString;
         }
         public bool TryCode()
         {
@@ -76,6 +87,7 @@ namespace CodeBreaker_MonoGame
             }
             guessCodeHistory.Add(rowDigits);
             numberOfAttempts++;
+            guessedCode = correctCode;
             return correctCode;
         }
     }
