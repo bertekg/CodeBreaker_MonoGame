@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Audio;
 
 namespace CodeBreaker_MonoGame
 {
@@ -17,11 +16,6 @@ namespace CodeBreaker_MonoGame
         SpriteFont menuFont;
         Texture2D frameSprite;
         Texture2D menuMarkerSprite;
-        SoundEffect clickSoundEffect;
-        SoundEffect clickSideSoundEffect;
-        SoundEffect menuSoundEffect;
-        SoundEffect unlockedSoundEffect;
-        SoundEffect sitllLockedSoundEffect;
 
         int frameIndex = 0;
         float framePosition = 0.0f;
@@ -85,12 +79,6 @@ namespace CodeBreaker_MonoGame
             menuFont = Content.Load<SpriteFont>("menuFont");
             frameSprite = Content.Load<Texture2D>("frame");
             menuMarkerSprite = Content.Load<Texture2D>("menuMarker");
-            clickSoundEffect = Content.Load<SoundEffect>("ClickSound");
-            clickSideSoundEffect = Content.Load<SoundEffect>("ClickSideSound");
-            menuSoundEffect = Content.Load<SoundEffect>("MenuSound");
-            unlockedSoundEffect = Content.Load<SoundEffect>("Unlocked");
-            sitllLockedSoundEffect = Content.Load<SoundEffect>("StillLocked");
-            base.LoadContent();
         }
 
         protected override void Update(GameTime gameTime)
@@ -136,7 +124,6 @@ namespace CodeBreaker_MonoGame
                     {
                         frameIndex = 0;
                     }
-                    clickSideSoundEffect.Play(1f, 0.5f, 0f);
                 }
                 else if (gameState == GameState.Menu)
                 {
@@ -186,7 +173,6 @@ namespace CodeBreaker_MonoGame
                     {
                         frameIndex = codeLength - 1;
                     }
-                    clickSideSoundEffect.Play(1f, 0.5f, 0f);
                 }
                 else if (gameState == GameState.Menu)
                 {
@@ -238,7 +224,6 @@ namespace CodeBreaker_MonoGame
                     {
                         gameLogic.currentCode[frameIndex] = 0;
                     }
-                    clickSoundEffect.Play(1f, 0.5f, 0f);
                 }
                 else if (gameState == GameState.Menu)
                 {
@@ -247,7 +232,6 @@ namespace CodeBreaker_MonoGame
                     {
                         menuMarkerIndex = 4;
                     }
-                    menuSoundEffect.Play(1f, 0.5f, 0f);
                 }
                 upRelesed = false;
             }
@@ -265,7 +249,6 @@ namespace CodeBreaker_MonoGame
                     {
                         gameLogic.currentCode[frameIndex] = 9;
                     }
-                    clickSoundEffect.Play(1f, 0.5f, 0f);
                 }
                 else if (gameState == GameState.Menu)
                 {
@@ -274,7 +257,6 @@ namespace CodeBreaker_MonoGame
                     {
                         menuMarkerIndex = 0;
                     }
-                    menuSoundEffect.Play(1f, 0.5f, 0f);
                 }
                 downRelesed = false;
             }
@@ -292,14 +274,12 @@ namespace CodeBreaker_MonoGame
                     bool isCodeCorrect = gameLogic.TryCode();
                     if (isCodeCorrect || ((gameLogic.numberOfAttempts >= limitAttemps) && isAttempsLimit))
                     {
-                        unlockedSoundEffect.Play(1f, 0.5f, 0f);
                         debugAns = "YES";
                         gameState = GameState.FinishGame;
                     }
                     else
                     {
                         debugAns = "no";
-                        sitllLockedSoundEffect.Play(1f, 0.5f, 0f);
                     }
                 }                
                 spaceRelesed = false;
