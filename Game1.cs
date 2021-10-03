@@ -33,7 +33,6 @@ namespace CodeBreaker_MonoGame
         bool spaceRelesed = true;
         bool escapeReleased = true;
         bool enterReleased = true;
-        bool sReleased = true;
 
         int codeLength = 4;
         GameLogic gameLogic;
@@ -61,8 +60,6 @@ namespace CodeBreaker_MonoGame
         int menuMarkerIndex = 0;
         float menuMarkerPosition = 0.0f;
 
-        string saveDataPath = System.IO.Path.Combine(System.Environment.CurrentDirectory, "SaveData.xml");
-
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -74,7 +71,6 @@ namespace CodeBreaker_MonoGame
         {
             //StartNewGame();
             GoToMainMenu();
-            ReadSaveData();
             base.Initialize();
         }
 
@@ -330,17 +326,6 @@ namespace CodeBreaker_MonoGame
                 }
             }
 
-            if (keyboardState.IsKeyDown(Keys.S) && sReleased == true)
-            {
-                WriteSaveData();
-
-                sReleased = false;
-            }
-            else if (keyboardState.IsKeyUp(Keys.S) && escapeReleased == false)
-            {
-                sReleased = true;
-            }
-
             base.Update(gameTime);
         }
 
@@ -386,10 +371,10 @@ namespace CodeBreaker_MonoGame
                 {
                     _spriteBatch.DrawString(historyFont, string.Format("Remainig Time: {0:N1}", remainingTime), new Vector2(50, 280), Color.White);
                 }
-                //else
-                //{
-                //    _spriteBatch.DrawString(historyFont, string.Format("Playing Time: {0:N1}", playingTime), new Vector2(50, 280), Color.White);
-                //}
+                else
+                {
+                    _spriteBatch.DrawString(historyFont, string.Format("Playing Time: {0:N1}", playingTime), new Vector2(50, 280), Color.White);
+                }
             }
             else if (gameState == GameState.FinishGame)
             {
@@ -464,43 +449,6 @@ namespace CodeBreaker_MonoGame
         {
             menuMarkerIndex = 0;
             gameState = GameState.Menu;
-        }
-        private void ReadSaveData()
-        { 
-            if(System.IO.File.Exists(saveDataPath))
-            {
-                System.Xml.Serialization.XmlSerializer reader = new System.Xml.Serialization.XmlSerializer(typeof(SaveData));
-
-                System.IO.StreamReader file = new System.IO.StreamReader(saveDataPath);
-                SaveData saveData = (SaveData)reader.Deserialize(file);
-                file.Close();
-                codeLength = saveData.codeLength;
-                isAttempsLimit = saveData.isAttempsLimit;
-                limitAttemps = saveData.limitAttemps;
-                isTimeLimit = saveData.isTimeLimit;
-                limitTime = saveData.limitTime;
-            }
-        }
-        protected override void EndRun()
-        {
-            WriteSaveData();
-            base.EndRun();
-        }
-        private void WriteSaveData()
-        {
-            SaveData saveData = new SaveData();
-            saveData.codeLength = codeLength;
-            saveData.isAttempsLimit = isAttempsLimit;
-            saveData.limitAttemps = limitAttemps;
-            saveData.isTimeLimit = isTimeLimit;
-            saveData.limitTime = limitTime;
-
-            System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(SaveData));
-
-
-            System.IO.FileStream file = System.IO.File.Create(saveDataPath);
-            writer.Serialize(file, saveData);
-            file.Close();
         }
     }
 }
