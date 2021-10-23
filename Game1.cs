@@ -40,9 +40,9 @@ namespace CodeBreaker_MonoGame
         Vector2 textPlace;
 
         string debugAns = "Nothing";
-        bool isDebugMode = true;
+        bool isDebugMode = false;
 
-        int maxNumberOfHints = 7;
+        int maxNumberOfHints = 8;
 
         //bool inGame = false;
         GameState gameState = GameState.Menu;
@@ -54,8 +54,8 @@ namespace CodeBreaker_MonoGame
         double limitTime = 30;
         bool isTimeLimit;
 
-        bool isAttempsLimit;
-        int limitAttemps = 7;
+        bool isAttempsLimit = false;
+        int limitAttemps = 8;
 
         int menuMarkerIndex = 0;
         float menuMarkerPosition = 0.0f;
@@ -74,6 +74,8 @@ namespace CodeBreaker_MonoGame
             //StartNewGame();
             GoToMainMenu();
             ReadSaveData();
+            _graphics.PreferredBackBufferHeight = 550;
+            _graphics.ApplyChanges();
             base.Initialize();
         }
 
@@ -351,24 +353,36 @@ namespace CodeBreaker_MonoGame
             {
                 for (int i = 0; i < codeLength; i++)
                 {
-                    _spriteBatch.DrawString(gameFont, gameLogic.currentCode[i].ToString(), new Vector2(50 + (100 * i), 100), Color.White);
+                    _spriteBatch.DrawString(gameFont, gameLogic.currentCode[i].ToString(), new Vector2(50 + (100 * i), 110), Color.White);
                 }
-                _spriteBatch.Draw(frameSprite, new Vector2(framePosition, 100), Color.White);
+                _spriteBatch.Draw(frameSprite, new Vector2(framePosition, 110), Color.White);
 
-                if (isDebugMode)
+                if(!isDebugMode)
                 {
-                    _spriteBatch.DrawString(debugFont, "Frame index: " + frameIndex.ToString() + ", Frame pos: " + framePosition.ToString(), new Vector2(3, 350), Color.White);
-                    _spriteBatch.DrawString(debugFont, "Current code: " + gameLogic.CurrentCodeString(), new Vector2(3, 380), Color.White);
-                    _spriteBatch.DrawString(debugFont, "Debug answere: " + debugAns, new Vector2(3, 410), Color.White);
+                    _spriteBatch.DrawString(debugFont, "[Left],[Right] - Move the cursor in the code", new Vector2(5, 270), Color.White);
+                    _spriteBatch.DrawString(debugFont, "[Up],[Down] - Change the value of the indicated digit", new Vector2(5, 300), Color.White);
+                    _spriteBatch.DrawString(debugFont, "[Space] - Check current code", new Vector2(5, 330), Color.White);
+                    _spriteBatch.DrawString(debugFont, "[Esc] - Return to main menu", new Vector2(5, 360), Color.White);
+                    _spriteBatch.DrawString(debugFont, "A single digit can occur only once in the code!", new Vector2(5, 390), Color.White);
+                    _spriteBatch.DrawString(debugFont, "Color codes for individual digits:", new Vector2(5, 420), Color.White);
+                    _spriteBatch.DrawString(debugFont, "[RED] - Not present in the code", new Vector2(5, 450), Color.White);
+                    _spriteBatch.DrawString(debugFont, "[BLUE] - Appears in the code in a different position", new Vector2(5, 480), Color.White);
+                    _spriteBatch.DrawString(debugFont, "[GREEN] - Is in the correct position", new Vector2(5, 510), Color.White);
+                }
+                else
+                {
+                    _spriteBatch.DrawString(debugFont, "Frame index: " + frameIndex.ToString() + ", Frame pos: " + framePosition.ToString(), new Vector2(10, 350), Color.White);
+                    _spriteBatch.DrawString(debugFont, "Current code: " + gameLogic.CurrentCodeString(), new Vector2(10, 380), Color.White);
+                    _spriteBatch.DrawString(debugFont, "Debug answere: " + debugAns, new Vector2(10, 410), Color.White);
                 }
 
                 if (isAttempsLimit)
                 {
-                    _spriteBatch.DrawString(historyFont, "Remainig Attempts: " + (limitAttemps - gameLogic.numberOfAttempts).ToString(), new Vector2(320, 40), Color.White);
+                    _spriteBatch.DrawString(historyFont, "Remainig Attempts:\n" + (limitAttemps - gameLogic.numberOfAttempts).ToString(), new Vector2(360, 10), Color.White);
                 }
                 else
                 {
-                    _spriteBatch.DrawString(historyFont, "Number of Attempts: " + gameLogic.numberOfAttempts.ToString(), new Vector2(320, 40), Color.White);
+                    _spriteBatch.DrawString(historyFont, "Number of Attempts:\n" + gameLogic.numberOfAttempts.ToString(), new Vector2(360, 10), Color.White);
                 }
                 for (int i = 0; i < gameLogic.guessCodeHistory.Count; i++)
                 {
@@ -381,7 +395,7 @@ namespace CodeBreaker_MonoGame
 
                 if (isTimeLimit)
                 {
-                    _spriteBatch.DrawString(historyFont, string.Format("Remainig Time: {0:N1}", remainingTime), new Vector2(50, 280), Color.White);
+                    _spriteBatch.DrawString(historyFont, string.Format("Remainig Time:\n{0:N1}", remainingTime), new Vector2(10, 10), Color.White);
                 }
                 //else
                 //{
