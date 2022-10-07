@@ -44,7 +44,6 @@ namespace CodeBreaker_MonoGame
 
         int maxNumberOfHints = 8;
 
-        //bool inGame = false;
         GameState gameState = GameState.Menu;
 
         double playingTime;
@@ -52,9 +51,10 @@ namespace CodeBreaker_MonoGame
         Color endGameColor;
         double remainingTime;
         double limitTime = 30;
-        bool isTimeLimit;
+        bool isLimitTime;
+        bool isPlaySoundEffect;
 
-        bool isAttempsLimit = false;
+        bool isLimitAttemps = false;
         int limitAttemps = 8;
 
         int menuMarkerIndex = 0;
@@ -140,7 +140,10 @@ namespace CodeBreaker_MonoGame
                     {
                         frameIndex = 0;
                     }
-                    clickSideSoundEffect.Play(1f, 0.5f, 0f);
+                    if (isPlaySoundEffect)
+                    {
+                        clickSideSoundEffect.Play(1f, 0.5f, 0f);
+                    }
                 }
                 else if (gameState == GameState.Menu)
                 {
@@ -153,7 +156,7 @@ namespace CodeBreaker_MonoGame
                             }
                             break;
                         case 1:
-                            isAttempsLimit = true;
+                            isLimitAttemps = true;
                             break;
                         case 2:
                             if (limitAttemps < 15)
@@ -162,13 +165,16 @@ namespace CodeBreaker_MonoGame
                             }
                             break;
                         case 3:
-                            isTimeLimit = true;
+                            isLimitTime = true;
                             break;
                         case 4:
                             if (limitTime < 150)
                             {
                                 limitTime += 10;
                             }
+                            break;
+                        case 5:
+                            isPlaySoundEffect = true;
                             break;
                         default:
                             break;
@@ -190,7 +196,10 @@ namespace CodeBreaker_MonoGame
                     {
                         frameIndex = codeLength - 1;
                     }
-                    clickSideSoundEffect.Play(1f, 0.5f, 0f);
+                    if (isPlaySoundEffect)
+                    {
+                        clickSideSoundEffect.Play(1f, 0.5f, 0f);
+                    }
                 }
                 else if (gameState == GameState.Menu)
                 {
@@ -203,7 +212,7 @@ namespace CodeBreaker_MonoGame
                             }
                             break;
                         case 1:
-                            isAttempsLimit = false;
+                            isLimitAttemps = false;
                             break;
                         case 2:
                             if (limitAttemps > 3)
@@ -212,13 +221,16 @@ namespace CodeBreaker_MonoGame
                             }
                             break;
                         case 3:
-                            isTimeLimit = false;
+                            isLimitTime = false;
                             break;
                         case 4:
                             if (limitTime > 10)
                             {
                                 limitTime -= 10;
                             }
+                            break;
+                        case 5:
+                            isPlaySoundEffect = false;
                             break;
                         default:
                             break;
@@ -242,16 +254,27 @@ namespace CodeBreaker_MonoGame
                     {
                         gameLogic.currentCode[frameIndex] = 0;
                     }
-                    clickSoundEffect.Play(1f, 0.5f, 0f);
+                    if (isPlaySoundEffect)
+                    {
+                        clickSoundEffect.Play(1f, 0.5f, 0f);
+                    }                    
                 }
                 else if (gameState == GameState.Menu)
                 {
                     menuMarkerIndex--;
                     if (menuMarkerIndex < 0)
                     {
-                        menuMarkerIndex = 4;
+                        menuMarkerIndex = 5;
                     }
-                    menuSoundEffect.Play(1f, 0.5f, 0f);
+                    if ((menuMarkerIndex == 4 && isLimitTime == false) ||
+                        (menuMarkerIndex == 2 && isLimitAttemps == false))
+                    {
+                        menuMarkerIndex--;
+                    }
+                    if (isPlaySoundEffect)
+                    {
+                        menuSoundEffect.Play(1f, 0.5f, 0f);
+                    }
                 }
                 upRelesed = false;
             }
@@ -269,16 +292,27 @@ namespace CodeBreaker_MonoGame
                     {
                         gameLogic.currentCode[frameIndex] = 9;
                     }
-                    clickSoundEffect.Play(1f, 0.5f, 0f);
+                    if (isPlaySoundEffect)
+                    {
+                        clickSoundEffect.Play(1f, 0.5f, 0f);
+                    }
                 }
                 else if (gameState == GameState.Menu)
                 {
                     menuMarkerIndex++;
-                    if (menuMarkerIndex > 4)
+                    if (menuMarkerIndex > 5)
                     {
                         menuMarkerIndex = 0;
                     }
-                    menuSoundEffect.Play(1f, 0.5f, 0f);
+                    if ((menuMarkerIndex == 4 && isLimitTime == false) ||
+                       (menuMarkerIndex == 2 && isLimitAttemps == false))
+                    {
+                        menuMarkerIndex++;
+                    }
+                    if (isPlaySoundEffect)
+                    {
+                        menuSoundEffect.Play(1f, 0.5f, 0f);
+                    }
                 }
                 downRelesed = false;
             }
@@ -294,7 +328,7 @@ namespace CodeBreaker_MonoGame
                 if (gameState == GameState.InGame)
                 {
                     bool isCodeCorrect = gameLogic.TryCode();
-                    if (isCodeCorrect || ((gameLogic.numberOfAttempts >= limitAttemps) && isAttempsLimit))
+                    if (isCodeCorrect || ((gameLogic.numberOfAttempts >= limitAttemps) && isLimitAttemps))
                     {
                         debugAns = "YES";
                         gameState = GameState.FinishGame;
@@ -302,7 +336,10 @@ namespace CodeBreaker_MonoGame
                     else
                     {
                         debugAns = "no";
-                        unlockedSoundEffect.Play(1f, 0.5f, 0f);
+                        if (isPlaySoundEffect)
+                        {
+                            unlockedSoundEffect.Play(1f, 0.5f, 0f);
+                        }
                     }
                 }                
                 spaceRelesed = false;
@@ -314,7 +351,7 @@ namespace CodeBreaker_MonoGame
 
             if (gameState == GameState.InGame)
             {
-                if (isTimeLimit)
+                if (isLimitTime)
                 {
                     remainingTime -= gameTime.ElapsedGameTime.TotalSeconds;
                     if (remainingTime <= 0)
@@ -359,26 +396,26 @@ namespace CodeBreaker_MonoGame
 
                 if(!isDebugMode)
                 {
-                    _spriteBatch.DrawString(debugFont, "[Left],[Right] - Move the cursor in the code", new Vector2(5, 270), Color.White);
-                    _spriteBatch.DrawString(debugFont, "[Up],[Down] - Change the value of the indicated digit", new Vector2(5, 300), Color.White);
-                    _spriteBatch.DrawString(debugFont, "[Space] - Check current code", new Vector2(5, 330), Color.White);
-                    _spriteBatch.DrawString(debugFont, "[Esc] - Return to main menu", new Vector2(5, 360), Color.White);
+                    _spriteBatch.DrawString(debugFont, "[Left],[Right] - Move the cursor in the code.", new Vector2(5, 270), Color.White);
+                    _spriteBatch.DrawString(debugFont, "[Up],[Down] - Change the value of the indicated digit.", new Vector2(5, 300), Color.White);
+                    _spriteBatch.DrawString(debugFont, "[Space] - Check current code.", new Vector2(5, 330), Color.White);
+                    _spriteBatch.DrawString(debugFont, "[Esc] - Return to main menu.", new Vector2(5, 360), Color.White);
                     _spriteBatch.DrawString(debugFont, "A single digit can occur only once in the code!", new Vector2(5, 390), Color.White);
                     _spriteBatch.DrawString(debugFont, "Color codes for individual digits:", new Vector2(5, 420), Color.White);
-                    _spriteBatch.DrawString(debugFont, "[RED] - Not present in the code", new Vector2(5, 450), Color.White);
-                    _spriteBatch.DrawString(debugFont, "[BLUE] - Appears in the code in a different position", new Vector2(5, 480), Color.White);
-                    _spriteBatch.DrawString(debugFont, "[GREEN] - Is in the correct position", new Vector2(5, 510), Color.White);
+                    _spriteBatch.DrawString(debugFont, "[RED] - Not present in the code.", new Vector2(5, 450), Color.White);
+                    _spriteBatch.DrawString(debugFont, "[BLUE] - Appears in the code in a different position.", new Vector2(5, 480), Color.White);
+                    _spriteBatch.DrawString(debugFont, "[GREEN] - Is in the correct position.", new Vector2(5, 510), Color.White);
                 }
                 else
                 {
                     _spriteBatch.DrawString(debugFont, "Frame index: " + frameIndex.ToString() + ", Frame pos: " + framePosition.ToString(), new Vector2(10, 350), Color.White);
                     _spriteBatch.DrawString(debugFont, "Current code: " + gameLogic.CurrentCodeString(), new Vector2(10, 380), Color.White);
-                    _spriteBatch.DrawString(debugFont, "Debug answere: " + debugAns, new Vector2(10, 410), Color.White);
+                    _spriteBatch.DrawString(debugFont, "Debug answer: " + debugAns, new Vector2(10, 410), Color.White);
                 }
 
-                if (isAttempsLimit)
+                if (isLimitAttemps)
                 {
-                    _spriteBatch.DrawString(historyFont, "Remainig Attempts:\n" + (limitAttemps - gameLogic.numberOfAttempts).ToString(), new Vector2(360, 10), Color.White);
+                    _spriteBatch.DrawString(historyFont, "Remaining Attempts:\n" + (limitAttemps - gameLogic.numberOfAttempts).ToString(), new Vector2(360, 10), Color.White);
                 }
                 else
                 {
@@ -393,31 +430,27 @@ namespace CodeBreaker_MonoGame
                     }
                 }
 
-                if (isTimeLimit)
+                if (isLimitTime)
                 {
-                    _spriteBatch.DrawString(historyFont, string.Format("Remainig Time:\n{0:N1}", remainingTime), new Vector2(10, 10), Color.White);
+                    _spriteBatch.DrawString(historyFont, string.Format("Remaining Time:\n{0:N1}", remainingTime), new Vector2(10, 10), Color.White);
                 }
-                //else
-                //{
-                //    _spriteBatch.DrawString(historyFont, string.Format("Playing Time: {0:N1}", playingTime), new Vector2(50, 280), Color.White);
-                //}
             }
             else if (gameState == GameState.FinishGame)
             {
                 endGameInfo = gameLogic.guessedCode ? "You WIN!!!" : "You LOSE!!!";
                 endGameColor = gameLogic.guessedCode ? Color.Green : Color.Red;
                 _spriteBatch.DrawString(historyFont, endGameInfo, new Vector2(280, 40), endGameColor);
-                if (isTimeLimit)
+                if (isLimitTime)
                 {
-                    _spriteBatch.DrawString(historyFont, string.Format("Remainig time {0:N3} secounds", remainingTime), new Vector2(100, 100), Color.White);
+                    _spriteBatch.DrawString(historyFont, string.Format("Remaining time {0:N3} seconds", remainingTime), new Vector2(100, 100), Color.White);
                 }
                 else
                 {
-                    _spriteBatch.DrawString(historyFont, string.Format("Playing time {0:N3} secounds", playingTime), new Vector2(100, 100), Color.White);
+                    _spriteBatch.DrawString(historyFont, string.Format("Playing time {0:N3} seconds", playingTime), new Vector2(100, 100), Color.White);
                 }
-                if (isAttempsLimit)
+                if (isLimitAttemps)
                 {
-                    _spriteBatch.DrawString(historyFont, "Remainig Attempts: " + (limitAttemps - gameLogic.numberOfAttempts).ToString(), new Vector2(200, 160), Color.White);
+                    _spriteBatch.DrawString(historyFont, "Remaining Attempts: " + (limitAttemps - gameLogic.numberOfAttempts).ToString(), new Vector2(200, 160), Color.White);
                 }
                 else
                 {
@@ -432,12 +465,13 @@ namespace CodeBreaker_MonoGame
                 _spriteBatch.DrawString(historyFont, "Code Breaker - MonoGame", new Vector2(120, 40), Color.White);
                 _spriteBatch.DrawString(menuFont, "Press [Enter] to Start Game", new Vector2(190, 100), Color.White);
                 _spriteBatch.DrawString(menuFont, "Press [Esc] to Exit", new Vector2(270, 140), Color.White);
-                _spriteBatch.DrawString(menuFont, codeLength.ToString() + ": Code length", new Vector2(180, 205), Color.White);
-                _spriteBatch.DrawString(menuFont, isAttempsLimit.ToString() + ": Is limit attemps", new Vector2(180, 255), Color.White);
-                _spriteBatch.DrawString(menuFont, limitAttemps.ToString() + ": Limit attemps", new Vector2(180, 305), Color.White);
-                _spriteBatch.DrawString(menuFont, isTimeLimit.ToString() + ": Is limit time", new Vector2(180, 355), Color.White);
-                _spriteBatch.DrawString(menuFont, limitTime.ToString() + ": Limit time", new Vector2(180, 405), Color.White);
-                _spriteBatch.Draw(menuMarkerSprite, new Vector2(150, menuMarkerPosition), Color.White);
+                _spriteBatch.DrawString(menuFont, "Code length: " + codeLength.ToString(), new Vector2(200, 205), Color.White);
+                _spriteBatch.DrawString(menuFont, "Is limit attempts: " + isLimitAttemps.ToString(), new Vector2(200, 255), Color.White);
+                _spriteBatch.DrawString(menuFont, "Limit attempts: " + limitAttemps.ToString(), new Vector2(200, 305), isLimitAttemps ? Color.White : Color.Gray);
+                _spriteBatch.DrawString(menuFont, "Is limit time: " + isLimitTime.ToString(), new Vector2(200, 355), Color.White);
+                _spriteBatch.DrawString(menuFont, "Limit time: " + limitTime.ToString(), new Vector2(200, 405), isLimitTime ? Color.White : Color.Gray);
+                _spriteBatch.DrawString(menuFont, "Play sounds effects: " + isPlaySoundEffect.ToString(), new Vector2(200, 455), Color.White);
+                _spriteBatch.Draw(menuMarkerSprite, new Vector2(170, menuMarkerPosition), Color.White);
             }
 
             _spriteBatch.End();
@@ -486,10 +520,11 @@ namespace CodeBreaker_MonoGame
                 SaveData saveData = (SaveData)reader.Deserialize(file);
                 file.Close();
                 codeLength = saveData.codeLength;
-                isAttempsLimit = saveData.isAttempsLimit;
+                isLimitAttemps = saveData.isAttempsLimit;
                 limitAttemps = saveData.limitAttemps;
-                isTimeLimit = saveData.isTimeLimit;
+                isLimitTime = saveData.isTimeLimit;
                 limitTime = saveData.limitTime;
+                isPlaySoundEffect = saveData.isPlaySoundEffect;
             }
         }
         protected override void EndRun()
@@ -501,10 +536,11 @@ namespace CodeBreaker_MonoGame
         {
             SaveData saveData = new SaveData();
             saveData.codeLength = codeLength;
-            saveData.isAttempsLimit = isAttempsLimit;
+            saveData.isAttempsLimit = isLimitAttemps;
             saveData.limitAttemps = limitAttemps;
-            saveData.isTimeLimit = isTimeLimit;
+            saveData.isTimeLimit = isLimitTime;
             saveData.limitTime = limitTime;
+            saveData.isPlaySoundEffect = isPlaySoundEffect;
 
             System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(SaveData));
 

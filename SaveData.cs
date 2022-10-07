@@ -7,5 +7,6 @@
         public int limitAttemps;
         public bool isTimeLimit;
         public double limitTime;
+        public bool isPlaySoundEffect;
     }
 }
