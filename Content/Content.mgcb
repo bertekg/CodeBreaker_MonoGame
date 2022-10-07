@@ -32,6 +32,12 @@
 /processorParam:TextureFormat=Compressed
 /build:debugFont.spritefont
 
+#begin fail.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:fail.wav
+
 #begin frame.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -70,11 +76,23 @@
 /processorParam:TextureFormat=Color
 /build:menuMarker.png
 
+#begin menuSide.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:menuSide.wav
+
 #begin MenuSound.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:MenuSound.wav
+
+#begin return.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:return.wav
 
 #begin spaceFont.spritefont
 /importer:FontDescriptionImporter
@@ -82,6 +100,18 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:spaceFont.spritefont
+
+#begin start.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:start.wav
+
+#begin success.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:success.wav
 
 #begin Unlocked.wav
 /importer:WavImporter
