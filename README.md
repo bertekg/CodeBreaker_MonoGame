@@ -3,7 +3,7 @@ It is a code-breaking puzzle game. A single digit can occur only once in the cod
 
 The game allows you to guess the code in unlimited time and number of attempts. It also has several possible modes to make the game more difficult: limited number of tries or limited time. You can also choose the number of digits the code consists of.
 
-This is my first original game (not based on a tutorial). The game focuses more on game logic, without advanced graphics. This game uses MonoGame framework. 
+This is my first original game (not based on a tutorial). The game focuses more on game logic, without advanced graphics. This game uses the MonoGame framework. 
 
 ## Screenshots
 
