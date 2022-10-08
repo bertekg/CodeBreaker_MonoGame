@@ -29,7 +29,7 @@ namespace CodeBreaker_MonoGame
 
         GameLogic gameLogic;
 
-        const bool IS_DEBUG_MODE = false;
+        const bool IS_DEBUG_MODE = true;
 
         GameState gameState;
 
@@ -50,6 +50,8 @@ namespace CodeBreaker_MonoGame
 
         string _saveDataPath;
 
+        private Lang lang;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -62,8 +64,10 @@ namespace CodeBreaker_MonoGame
             InitializePrivatVariables();
             GoToMainMenu();
             ReadSaveData();
+            _graphics.PreferredBackBufferWidth = 800;
             _graphics.PreferredBackBufferHeight = 550;
             _graphics.ApplyChanges();
+            lang = new Lang(saveData.langID);
 
             base.Initialize();
         }
@@ -185,6 +189,9 @@ namespace CodeBreaker_MonoGame
                         case 6:
                             _backgroundSong.IncVolume();
                             break;
+                        case 7:
+                            lang.IncSelection();
+                            break;
                         default:
                             break;
                     }
@@ -242,6 +249,9 @@ namespace CodeBreaker_MonoGame
                         case 6:
                             _backgroundSong.DecVolume();
                             break;
+                        case 7:
+                            lang.DecSelection();
+                            break;
                         default:
                             break;
                     }
@@ -272,7 +282,7 @@ namespace CodeBreaker_MonoGame
                     _menuMarkerIndex--;
                     if (_menuMarkerIndex < 0)
                     {
-                        _menuMarkerIndex = 6;
+                        _menuMarkerIndex = 7;
                     }
                     if ((_menuMarkerIndex == 2 && saveData.isAttemptsLimit == false) ||
                         (_menuMarkerIndex == 4 && saveData.isTimeLimit == false) ||
@@ -309,7 +319,7 @@ namespace CodeBreaker_MonoGame
                     {
                         _menuMarkerIndex++;
                     }
-                    if (_menuMarkerIndex > 6)
+                    if (_menuMarkerIndex > 7)
                     {
                         _menuMarkerIndex = 0;
                     }
@@ -322,7 +332,7 @@ namespace CodeBreaker_MonoGame
                 _keyDownUp = true;
             }
 
-            menuMarkerPosition = 195.0f + (_menuMarkerIndex * 50.0f);
+            menuMarkerPosition = 195.0f + (_menuMarkerIndex * 40.0f);
 
             if (keyboardState.IsKeyDown(Keys.Space) && _keySpaceUp == true)
             {
@@ -380,17 +390,18 @@ namespace CodeBreaker_MonoGame
             switch (gameState)
             {
                 case GameState.Menu:
-                    _spriteBatch.DrawString(_bigFont, "Code Breaker - MonoGame", new Vector2(100, 40), Color.White);
-                    _spriteBatch.DrawString(_middleFont, "Press [Enter] to Start Game", new Vector2(190, 100), Color.White);
-                    _spriteBatch.DrawString(_middleFont, "Press [Esc] to Exit", new Vector2(270, 140), Color.White);
-                    _spriteBatch.DrawString(_middleFont, "Code length: " + saveData.codeLength.ToString(), new Vector2(200, 205), Color.White);
-                    _spriteBatch.DrawString(_middleFont, "Is limit attempts: " + saveData.isAttemptsLimit.ToString(), new Vector2(200, 255), Color.White);
-                    _spriteBatch.DrawString(_middleFont, "Limit attempts: " + saveData.attemptsLimit.ToString(), new Vector2(200, 305), saveData.isAttemptsLimit ? Color.White : Color.Gray);
-                    _spriteBatch.DrawString(_middleFont, "Is limit time: " + saveData.isTimeLimit.ToString(), new Vector2(200, 355), Color.White);
-                    _spriteBatch.DrawString(_middleFont, "Limit time: " + saveData.timeLimit.ToString(), new Vector2(200, 405), saveData.isTimeLimit ? Color.White : Color.Gray);
-                    _spriteBatch.DrawString(_middleFont, "Play sounds effects: " + _backgroundSong.GetIsSounding().ToString(), new Vector2(200, 455), Color.White);
-                    _spriteBatch.DrawString(_middleFont, "Musci volume: " + _backgroundSong.GetVolumePercentString(), new Vector2(200, 505), _backgroundSong.GetIsSounding() ? Color.White : Color.Gray);
-                    _spriteBatch.Draw(_menuMarkerSprite, new Vector2(170, menuMarkerPosition), Color.White);
+                    _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameTitle), new Vector2(120, 40), Color.White);
+                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.StartGameKey), new Vector2(200, 100), Color.White);
+                    _spriteBatch.DrawString(_middleFont, "Press [Esc] to Exit", new Vector2(280, 140), Color.White);
+                    _spriteBatch.DrawString(_smallFont, "Code length: " + saveData.codeLength.ToString(), new Vector2(250, 200), Color.White);
+                    _spriteBatch.DrawString(_smallFont, "Limited number of attempts: " + saveData.isAttemptsLimit.ToString(), new Vector2(250, 240), Color.White);
+                    _spriteBatch.DrawString(_smallFont, "Number of attempts: " + saveData.attemptsLimit.ToString(), new Vector2(250, 280), saveData.isAttemptsLimit ? Color.White : Color.Gray);
+                    _spriteBatch.DrawString(_smallFont, "Time limitation: " + saveData.isTimeLimit.ToString(), new Vector2(250, 320), Color.White);
+                    _spriteBatch.DrawString(_smallFont, "Time limit: " + saveData.timeLimit.ToString(), new Vector2(250, 360), saveData.isTimeLimit ? Color.White : Color.Gray);
+                    _spriteBatch.DrawString(_smallFont, "Playing sound effects: " + _backgroundSong.GetIsSounding().ToString(), new Vector2(250, 400), Color.White);
+                    _spriteBatch.DrawString(_smallFont, "Volume of music: " + _backgroundSong.GetVolumePercentString(), new Vector2(250, 440), _backgroundSong.GetIsSounding() ? Color.White : Color.Gray);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.LanguageSelected), new Vector2(250, 480), Color.White);
+                    _spriteBatch.Draw(_menuMarkerSprite, new Vector2(225, menuMarkerPosition), Color.White);
                     break;
                 case GameState.InGame:
                     for (int i = 0; i < saveData.codeLength; i++)
@@ -528,6 +539,7 @@ namespace CodeBreaker_MonoGame
                 saveData.timeLimit = 30;
                 saveData.isSounding = true;
                 saveData.musicVolumePercent = 70;
+                saveData.langID = 0;
             }
         }
         protected override void EndRun()
@@ -539,6 +551,7 @@ namespace CodeBreaker_MonoGame
         {
             saveData.isSounding = _backgroundSong.GetIsSounding();
             saveData.musicVolumePercent = _backgroundSong.GetVolumePercent();
+            saveData.langID = lang.GetLangID();
 
             System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(SaveData));
 

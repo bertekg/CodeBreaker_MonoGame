@@ -9,5 +9,6 @@
         public double timeLimit;
         public bool isSounding;
         public sbyte musicVolumePercent;
+        public byte langID;
     }
 }
