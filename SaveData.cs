@@ -3,10 +3,11 @@
     public class SaveData
     {
         public int codeLength;
-        public bool isAttempsLimit;
-        public int limitAttemps;
+        public bool isAttemptsLimit;
+        public int attemptsLimit;
         public bool isTimeLimit;
-        public double limitTime;
-        public bool isPlaySoundEffect;
+        public double timeLimit;
+        public bool isSounding;
+        public sbyte musicVolumePercent;
     }
 }

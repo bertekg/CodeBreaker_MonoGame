@@ -13,6 +13,12 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin audio/music.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:audio/music.mp3
+
 #begin fonts/big.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
