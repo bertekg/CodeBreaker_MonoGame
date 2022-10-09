@@ -13,7 +13,7 @@ namespace CodeBreaker_MonoGame
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        private SpriteFont _largeFont, _bigFont, _middleFont, _smallFont;
+        private SpriteFont _largeFont, _bigFont, _middleFont, _smallFont, _littleFont;
 
         private Texture2D _menuMarkerSprite, _gameMarkerSprite;
 
@@ -52,6 +52,10 @@ namespace CodeBreaker_MonoGame
 
         private Lang lang;
 
+        private string versionText = "1.2 (2022.10.09)";
+
+        private int _menuOptionStartX = 225, _menuOptionStartY = 200, _menuOptionStepY = 40;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -87,6 +91,7 @@ namespace CodeBreaker_MonoGame
             _bigFont = Content.Load<SpriteFont>("fonts/big");
             _middleFont = Content.Load<SpriteFont>("fonts/middle");
             _smallFont = Content.Load<SpriteFont>("fonts/small");
+            _littleFont = Content.Load<SpriteFont>("fonts/little");
 
             _menuMarkerSprite = Content.Load<Texture2D>("sprites/menuMarker");
             _gameMarkerSprite = Content.Load<Texture2D>("sprites/gameMarker");
@@ -390,18 +395,20 @@ namespace CodeBreaker_MonoGame
             switch (gameState)
             {
                 case GameState.Menu:
-                    _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameTitle), new Vector2(120, 40), Color.White);
-                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.StartGameKey), new Vector2(200, 100), Color.White);
-                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.ExitGameKey), new Vector2(280, 140), Color.White);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.CodeLength) + saveData.codeLength.ToString(), new Vector2(250, 200), Color.White);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.IsLimitedAttempts)  + lang.GetBoolInLang(saveData.isAttemptsLimit), new Vector2(250, 240), Color.White);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.NumberAttempts) + saveData.attemptsLimit.ToString(), new Vector2(250, 280), saveData.isAttemptsLimit ? Color.White : Color.Gray);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.IsTimeLimitation) + lang.GetBoolInLang(saveData.isTimeLimit), new Vector2(250, 320), Color.White);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.TimeLimit) + saveData.timeLimit.ToString(), new Vector2(250, 360), saveData.isTimeLimit ? Color.White : Color.Gray);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.PlayingSound) + lang.GetBoolInLang(_backgroundSong.GetIsSounding()), new Vector2(250, 400), Color.White);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.MusicVolume) + _backgroundSong.GetVolumePercentString(), new Vector2(250, 440), _backgroundSong.GetIsSounding() ? Color.White : Color.Gray);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.LanguageSelected), new Vector2(250, 480), Color.White);
-                    _spriteBatch.Draw(_menuMarkerSprite, new Vector2(225, menuMarkerPosition), Color.White);
+                    _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameTitle), new Vector2(120, 30), Color.White);
+                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.StartGameKey), new Vector2(180, 100), Color.White);
+                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.ExitGameKey), new Vector2(180, 140), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.CodeLength) + saveData.codeLength.ToString(), GetManuOptionPosition(0), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.IsLimitedAttempts)  + lang.GetBoolInLang(saveData.isAttemptsLimit), GetManuOptionPosition(1), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.NumberAttempts) + saveData.attemptsLimit.ToString(), GetManuOptionPosition(2), saveData.isAttemptsLimit ? Color.White : Color.Gray);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.IsTimeLimitation) + lang.GetBoolInLang(saveData.isTimeLimit), GetManuOptionPosition(3), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.TimeLimit) + saveData.timeLimit.ToString(), GetManuOptionPosition(4), saveData.isTimeLimit ? Color.White : Color.Gray);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.PlayingSound) + lang.GetBoolInLang(_backgroundSong.GetIsSounding()), GetManuOptionPosition(5), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.MusicVolume) + _backgroundSong.GetVolumePercentString(), GetManuOptionPosition(6), _backgroundSong.GetIsSounding() ? Color.White : Color.Gray);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.LanguageSelected), GetManuOptionPosition(7), Color.White);
+                    _spriteBatch.DrawString(_littleFont, lang.GetLangText(LangKey.CreditsStart) + "Bartłomiej Grywalski", new Vector2(20, 530), Color.White);
+                    _spriteBatch.DrawString(_littleFont, lang.GetLangText(LangKey.VersionInfo) + versionText, new Vector2(600, 530), Color.White);
+                    _spriteBatch.Draw(_menuMarkerSprite, new Vector2(210, menuMarkerPosition), Color.White);
                     break;
                 case GameState.InGame:
                     for (int i = 0; i < saveData.codeLength; i++)
@@ -565,6 +572,10 @@ namespace CodeBreaker_MonoGame
             {
                 soundEffect.Play(1f, 0.5f, 0f);
             }
+        }
+        private Vector2 GetManuOptionPosition(int row)
+        {
+            return new Vector2(_menuOptionStartX, _menuOptionStartY + (row * _menuOptionStepY));
         }
     }
 }

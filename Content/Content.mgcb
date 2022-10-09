@@ -33,6 +33,13 @@
 /processorParam:TextureFormat=Compressed
 /build:fonts/large.spritefont
 
+#begin fonts/little.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/little.spritefont
+
 #begin fonts/middle.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor

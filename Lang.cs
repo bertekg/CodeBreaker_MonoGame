@@ -3,7 +3,7 @@
     public enum LangOption { PL = 1 };
     public enum LangKey { GameTitle, StartGameKey, ExitGameKey,
         CodeLength, IsLimitedAttempts, NumberAttempts, IsTimeLimitation, TimeLimit,
-        PlayingSound, MusicVolume, LanguageSelected };
+        PlayingSound, MusicVolume, LanguageSelected, CreditsStart, VersionInfo };
     internal class Lang
     {
         private LangOption langOption;
@@ -158,10 +158,32 @@
                     switch (langOption)
                     {
                         case LangOption.PL:
-                            returnText = "Jezyk: Polski";
+                            returnText = "Język: Polski";
                             break;
                         default:
                             returnText = "Language: English";
+                            break;
+                    }
+                    break;
+                case LangKey.CreditsStart:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Stworzone przez: ";
+                            break;
+                        default:
+                            returnText = "Developed by: ";
+                            break;
+                    }
+                    break;
+                case LangKey.VersionInfo:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Wersja: ";
+                            break;
+                        default:
+                            returnText = "Version: ";
                             break;
                     }
                     break;
