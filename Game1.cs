@@ -29,7 +29,7 @@ namespace CodeBreaker_MonoGame
 
         GameLogic gameLogic;
 
-        const bool IS_DEBUG_MODE = true;
+        const bool IS_DEBUG_MODE = false;
 
         GameState gameState;
 
@@ -39,7 +39,7 @@ namespace CodeBreaker_MonoGame
         private double _playingTime, _remainingTime;
 
         private int _gameMarkerIndex;
-        private float _gameMarketPosition;
+        private float _gameMarkerPosition;
 
         const int MAX_NUMBER_OF_HINTS = 8;
 
@@ -269,7 +269,7 @@ namespace CodeBreaker_MonoGame
                 _keyLeftUp = true;
             }
 
-            _gameMarketPosition = 35.0f + (_gameMarkerIndex * 100.0f);
+            _gameMarkerPosition = 35.0f + (_gameMarkerIndex * 100.0f);
 
             if (keyboardState.IsKeyDown(Keys.Up) && _keyUpUp == true)
             {
@@ -415,36 +415,39 @@ namespace CodeBreaker_MonoGame
                     {
                         _spriteBatch.DrawString(_largeFont, gameLogic.currentCode[i].ToString(), new Vector2(50 + (100 * i), 110), Color.White);
                     }
-                    _spriteBatch.Draw(_gameMarkerSprite, new Vector2(_gameMarketPosition, 110), Color.White);
+                    _spriteBatch.Draw(_gameMarkerSprite, new Vector2(_gameMarkerPosition, 110), Color.White);
 
                     if (!IS_DEBUG_MODE)
                     {
-                        _spriteBatch.DrawString(_smallFont, "[Left],[Right] - Move the cursor in the code.", new Vector2(5, 270), Color.White);
-                        _spriteBatch.DrawString(_smallFont, "[Up],[Down] - Change the value of the indicated digit.", new Vector2(5, 300), Color.White);
-                        _spriteBatch.DrawString(_smallFont, "[Space] - Check current code.", new Vector2(5, 330), Color.White);
-                        _spriteBatch.DrawString(_smallFont, "[Esc] - Return to main menu.", new Vector2(5, 360), Color.White);
-                        _spriteBatch.DrawString(_smallFont, "A single digit can occur only once in the code!", new Vector2(5, 390), Color.White);
-                        _spriteBatch.DrawString(_smallFont, "Color codes for individual digits:", new Vector2(5, 420), Color.White);
-                        _spriteBatch.DrawString(_smallFont, "[RED] - Not present in the code.", new Vector2(5, 450), Color.White);
-                        _spriteBatch.DrawString(_smallFont, "[BLUE] - Appears in the code in a different position.", new Vector2(5, 480), Color.White);
-                        _spriteBatch.DrawString(_smallFont, "[GREEN] - Is in the correct position.", new Vector2(5, 510), Color.White);
+                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpLeftRight), new Vector2(5, 270), Color.White);
+                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpUpDown), new Vector2(5, 300), Color.White);
+                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpSpace), new Vector2(5, 330), Color.White);
+                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpEsc), new Vector2(5, 360), Color.White);
+                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpSingleDigitOnce), new Vector2(5, 390), Color.White);
+                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorsOption), new Vector2(5, 420), Color.White);
+                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorRed), new Vector2(5, 450), Color.White);
+                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorBlue), new Vector2(5, 480), Color.White);
+                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorGreen), new Vector2(5, 510), Color.White);
                     }
                     else
                     {
-                        _spriteBatch.DrawString(_smallFont, "Frame index: " + _gameMarkerIndex.ToString() + ", Frame pos: " + _gameMarketPosition.ToString(), new Vector2(10, 350), Color.White);
-                        _spriteBatch.DrawString(_smallFont, "Current code: " + gameLogic.CurrentCodeString(), new Vector2(10, 380), Color.White);
+                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.DebugMarkerIndex) + _gameMarkerIndex.ToString() 
+                            + lang.GetLangText(LangKey.DebugMarkerPos) + _gameMarkerPosition.ToString(), new Vector2(10, 350), Color.White);
+                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.DebugCurrentCode) + gameLogic.CurrentCodeString(), new Vector2(10, 380), Color.White);
                     }
+
                     if (saveData.isAttemptsLimit)
                     {
-                        _spriteBatch.DrawString(_bigFont, "Remaining Attempts:\n" + (saveData.attemptsLimit - gameLogic.numberOfAttempts).ToString(), new Vector2(360, 10), Color.White);
+                        _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameRemainingAttempts) + (saveData.attemptsLimit - gameLogic.numberOfAttempts).ToString(), new Vector2(360, 10), Color.White);
                     }
                     else
                     {
-                        _spriteBatch.DrawString(_bigFont, "Number of Attempts:\n" + gameLogic.numberOfAttempts.ToString(), new Vector2(360, 10), Color.White);
+                        _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameNumberOfAttempts) + gameLogic.numberOfAttempts.ToString(), new Vector2(360, 10), Color.White);
                     }
+
                     if (saveData.isTimeLimit)
                     {
-                        _spriteBatch.DrawString(_bigFont, string.Format("Remaining Time:\n{0:N1}", _remainingTime), new Vector2(10, 10), Color.White);
+                        _spriteBatch.DrawString(_bigFont, string.Format(lang.GetLangText(LangKey.GameRemainingTime), _remainingTime), new Vector2(10, 10), Color.White);
                     }
                     for (int i = 0; i < gameLogic.guessCodeHistory.Count; i++)
                     {
@@ -458,33 +461,38 @@ namespace CodeBreaker_MonoGame
                 case GameState.FinishGame:
                     if (gameLogic.codeGuessed)
                     {
-                        _endGameInfo = "You WIN!!!"; _endGameColor = Color.Green;
+                        _endGameInfo = lang.GetLangText(LangKey.FinishWin); _endGameColor = Color.Green;
                     }
                     else
                     {
-                        _endGameInfo = "You LOSE!!!"; _endGameColor = Color.Red;
+                        _endGameInfo = lang.GetLangText(LangKey.FinishLost); _endGameColor = Color.Red;
                     }
 
-                    _spriteBatch.DrawString(_bigFont, _endGameInfo, new Vector2(280, 40), _endGameColor);
+                    _spriteBatch.DrawString(_bigFont, _endGameInfo, new Vector2(200, 40), _endGameColor);
+
                     if (saveData.isTimeLimit)
                     {
-                        _spriteBatch.DrawString(_bigFont, string.Format("Remaining time {0:N3} seconds", _remainingTime), new Vector2(100, 100), Color.White);
+                        _spriteBatch.DrawString(_middleFont, string.Format(lang.GetLangText(LangKey.FinishRemainingTime), _remainingTime), new Vector2(200, 100), Color.White);
                     }
                     else
                     {
-                        _spriteBatch.DrawString(_bigFont, string.Format("Playing time {0:N3} seconds", _playingTime), new Vector2(100, 100), Color.White);
+                        _spriteBatch.DrawString(_middleFont, string.Format(lang.GetLangText(LangKey.FinishPlayingTime), _playingTime), new Vector2(200, 100), Color.White);
                     }
+
                     if (saveData.isAttemptsLimit)
                     {
-                        _spriteBatch.DrawString(_bigFont, "Remaining Attempts: " + (saveData.attemptsLimit - gameLogic.numberOfAttempts).ToString(), new Vector2(200, 160), Color.White);
+                        _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.FinishRemainingAttempts) + (saveData.attemptsLimit - gameLogic.numberOfAttempts).ToString(),
+                            new Vector2(200, 160), Color.White);
                     }
                     else
                     {
-                        _spriteBatch.DrawString(_bigFont, "Number of Attempts: " + gameLogic.numberOfAttempts.ToString(), new Vector2(200, 160), Color.White);
+                        _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.FinishNumberOfAttempts) + gameLogic.numberOfAttempts.ToString(), new Vector2(200, 160), Color.White);
                     }
-                    _spriteBatch.DrawString(_bigFont, "Correct code: " + gameLogic.CorrectCodeString(), new Vector2(220, 220), Color.White);
-                    _spriteBatch.DrawString(_bigFont, "Press [Enter] to Start Game again", new Vector2(80, 360), Color.White);
-                    _spriteBatch.DrawString(_bigFont, "Press [Esc] to go back Main Menu", new Vector2(75, 420), Color.White);
+
+                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.FinishCorrectCode) + gameLogic.CorrectCodeString(), new Vector2(200, 220), Color.White);
+
+                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.FinishPlayAgain), new Vector2(120, 360), Color.White);
+                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.FinishGoBackMenu), new Vector2(120, 400), Color.White);
                     break;
                 default:
                     break;
