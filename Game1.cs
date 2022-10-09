@@ -392,14 +392,14 @@ namespace CodeBreaker_MonoGame
                 case GameState.Menu:
                     _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameTitle), new Vector2(120, 40), Color.White);
                     _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.StartGameKey), new Vector2(200, 100), Color.White);
-                    _spriteBatch.DrawString(_middleFont, "Press [Esc] to Exit", new Vector2(280, 140), Color.White);
-                    _spriteBatch.DrawString(_smallFont, "Code length: " + saveData.codeLength.ToString(), new Vector2(250, 200), Color.White);
-                    _spriteBatch.DrawString(_smallFont, "Limited number of attempts: " + saveData.isAttemptsLimit.ToString(), new Vector2(250, 240), Color.White);
-                    _spriteBatch.DrawString(_smallFont, "Number of attempts: " + saveData.attemptsLimit.ToString(), new Vector2(250, 280), saveData.isAttemptsLimit ? Color.White : Color.Gray);
-                    _spriteBatch.DrawString(_smallFont, "Time limitation: " + saveData.isTimeLimit.ToString(), new Vector2(250, 320), Color.White);
-                    _spriteBatch.DrawString(_smallFont, "Time limit: " + saveData.timeLimit.ToString(), new Vector2(250, 360), saveData.isTimeLimit ? Color.White : Color.Gray);
-                    _spriteBatch.DrawString(_smallFont, "Playing sound effects: " + _backgroundSong.GetIsSounding().ToString(), new Vector2(250, 400), Color.White);
-                    _spriteBatch.DrawString(_smallFont, "Volume of music: " + _backgroundSong.GetVolumePercentString(), new Vector2(250, 440), _backgroundSong.GetIsSounding() ? Color.White : Color.Gray);
+                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.ExitGameKey), new Vector2(280, 140), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.CodeLength) + saveData.codeLength.ToString(), new Vector2(250, 200), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.IsLimitedAttempts)  + lang.GetBoolInLang(saveData.isAttemptsLimit), new Vector2(250, 240), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.NumberAttempts) + saveData.attemptsLimit.ToString(), new Vector2(250, 280), saveData.isAttemptsLimit ? Color.White : Color.Gray);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.IsTimeLimitation) + lang.GetBoolInLang(saveData.isTimeLimit), new Vector2(250, 320), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.TimeLimit) + saveData.timeLimit.ToString(), new Vector2(250, 360), saveData.isTimeLimit ? Color.White : Color.Gray);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.PlayingSound) + lang.GetBoolInLang(_backgroundSong.GetIsSounding()), new Vector2(250, 400), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.MusicVolume) + _backgroundSong.GetVolumePercentString(), new Vector2(250, 440), _backgroundSong.GetIsSounding() ? Color.White : Color.Gray);
                     _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.LanguageSelected), new Vector2(250, 480), Color.White);
                     _spriteBatch.Draw(_menuMarkerSprite, new Vector2(225, menuMarkerPosition), Color.White);
                     break;

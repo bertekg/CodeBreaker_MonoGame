@@ -2,8 +2,8 @@
 {
     public enum LangOption { PL = 1 };
     public enum LangKey { GameTitle, StartGameKey, ExitGameKey,
-        CodeLength, isLimitedAttempts, NumberAttempts, TimeLimitation, TimeLimit,
-        PlayingSound, VolumeMusic, LanguageSelected };
+        CodeLength, IsLimitedAttempts, NumberAttempts, IsTimeLimitation, TimeLimit,
+        PlayingSound, MusicVolume, LanguageSelected };
     internal class Lang
     {
         private LangOption langOption;
@@ -48,7 +48,7 @@
                     switch (langOption)
                     {
                         case LangOption.PL:
-                            returnText = "Lamacz kodu - MonoGame";
+                            returnText = "Łamacz kodów - MonoGame";
                             break;
                         default:
                             returnText = "Code Breaker - MonoGame";
@@ -59,7 +59,7 @@
                     switch (langOption)
                     {
                         case LangOption.PL:
-                            returnText = "Wcisnij [Enter] aby rozpoczac gre";
+                            returnText = "Wciśnij [Enter] aby rozpocząc grę";
                             break;
                         default:
                             returnText = "Press [Enter] to Start Game";
@@ -67,20 +67,92 @@
                     }
                     break;
                 case LangKey.ExitGameKey:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Naciśnij [Esc] aby wyjść z gry";
+                            break;
+                        default:
+                            returnText = "Press [Esc] to Exit";
+                            break;
+                    }
                     break;
                 case LangKey.CodeLength:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Długość kodu: ";
+                            break;
+                        default:
+                            returnText = "Code length: ";
+                            break;
+                    }
                     break;
-                case LangKey.isLimitedAttempts:
+                case LangKey.IsLimitedAttempts:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Ograniczona liczba prób: ";
+                            break;
+                        default:
+                            returnText = "Limited number of attempts: ";
+                            break;
+                    }
                     break;
                 case LangKey.NumberAttempts:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Ilość prób: ";
+                            break;
+                        default:
+                            returnText = "Number of attempts: ";
+                            break;
+                    }
                     break;
-                case LangKey.TimeLimitation:
+                case LangKey.IsTimeLimitation:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Ograniczenie czasowe: ";
+                            break;
+                        default:
+                            returnText = "Time limitation: ";
+                            break;
+                    }
                     break;
                 case LangKey.TimeLimit:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Limit czasu [s]: ";
+                            break;
+                        default:
+                            returnText = "Time limit [s]: ";
+                            break;
+                    }
                     break;
                 case LangKey.PlayingSound:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Muzyka i efekty dźwiękowe: ";
+                            break;
+                        default:
+                            returnText = "Music and sound effects: ";
+                            break;
+                    }
                     break;
-                case LangKey.VolumeMusic:
+                case LangKey.MusicVolume:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Głośność muzyki: ";
+                            break;
+                        default:
+                            returnText = "Music volume: ";
+                            break;
+                    }
                     break;
                 case LangKey.LanguageSelected:
                     switch (langOption)
@@ -97,6 +169,35 @@
                     break;
             }
             return returnText;
+        }
+        public string GetBoolInLang(bool value)
+        {
+            string answer = string.Empty;
+            if (value)
+            {
+                switch (langOption)
+                {
+                    case LangOption.PL:
+                        answer = "Tak";
+                        break;
+                    default:
+                        answer = "Yes";
+                        break;
+                }
+            }
+            else
+            {
+                switch (langOption)
+                {
+                    case LangOption.PL:
+                        answer = "Nie";
+                        break;
+                    default:
+                        answer = "No";
+                        break;
+                }
+            }
+            return answer;
         }
     }
 }
