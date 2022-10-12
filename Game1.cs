@@ -52,7 +52,7 @@ namespace CodeBreaker_MonoGame
 
         private Lang lang;
 
-        private string versionText = "1.2 (2022.10.09)";
+        private string versionText = "1.2.1 (2022.10.12)";
 
         private int _menuOptionStartX = 225, _menuOptionStartY = 200, _menuOptionStepY = 40;
 
@@ -65,6 +65,7 @@ namespace CodeBreaker_MonoGame
 
         protected override void Initialize()
         {
+            Window.Title = "Code Breaker - MonoGame";
             InitializePrivatVariables();
             GoToMainMenu();
             ReadSaveData();
