@@ -1,7 +1,7 @@
 ﻿namespace CodeBreaker_MonoGame
 {
     public enum LangOption { PL = 1 };
-    public enum LangKey { GameTitle, StartGameKey, ExitGameKey,
+    public enum LangKey { GameTitle, StartGameKey, GameInstuctionKey, ExitGameKey,
         CodeLength, IsLimitedAttempts, NumberAttempts, IsTimeLimitation, TimeLimit,
         PlayingSound, MusicVolume, LanguageSelected, CreditsStart, VersionInfo,
         HelpLeftRight, HelpUpDown, HelpSpace, HelpEsc, HelpSingleDigitOnce,
@@ -66,10 +66,21 @@
                     switch (langOption)
                     {
                         case LangOption.PL:
-                            returnText = "Wciśnij [Enter] aby rozpocząc grę";
+                            returnText = "Wciśnij [Enter lub Start] aby rozpocząc grę";
                             break;
                         default:
-                            returnText = "Press [Enter] to Start Game";
+                            returnText = "Press [Enter or Start] to Start Game";
+                            break;
+                    }
+                    break;
+                case LangKey.GameInstuctionKey:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Wciśnij [H lub RightShoulder] aby pokazać instrukcję gry";
+                            break;
+                        default:
+                            returnText = "Press [H or RightShoulder] for Game Instructions";
                             break;
                     }
                     break;
@@ -77,10 +88,10 @@
                     switch (langOption)
                     {
                         case LangOption.PL:
-                            returnText = "Naciśnij [Esc] aby wyjść z gry";
+                            returnText = "Naciśnij [Escape lub Back] aby wyjść z gry";
                             break;
                         default:
-                            returnText = "Press [Esc] to Exit";
+                            returnText = "Press [Escape or Back] to Exit";
                             break;
                     }
                     break;
@@ -220,10 +231,10 @@
                     switch (langOption)
                     {
                         case LangOption.PL:
-                            returnText = "[Spacja] - Sprawdź aktualny kod.";
+                            returnText = "[Spacja lub Przycisk A] - Sprawdź aktualny kod.";
                             break;
                         default:
-                            returnText = "[Space] - Check current code.";
+                            returnText = "[Space or Game Pad A] - Check current code.";
                             break;
                     }
                     break;
@@ -231,10 +242,10 @@
                     switch (langOption)
                     {
                         case LangOption.PL:
-                            returnText = "[Esc] - Powrót do menu głównego.";
+                            returnText = "[Escape lub Back] - Powrót do menu głównego.";
                             break;
                         default:
-                            returnText = "[Esc] - Return to main menu.";
+                            returnText = "[Escape or Back] - Return to main menu.";
                             break;
                     }
                     break;
@@ -440,10 +451,10 @@
                     switch (langOption)
                     {
                         case LangOption.PL:
-                            returnText = "Naciśnij [Enter] aby zagrać ponownie";
+                            returnText = "Naciśnij [Enter lub Start] aby zagrać ponownie";
                             break;
                         default:
-                            returnText = "Press [Enter] to Start Game again";
+                            returnText = "Press [Enter or Back] to Start Game again";
                             break;
                     }
                     break;
@@ -451,10 +462,10 @@
                     switch (langOption)
                     {
                         case LangOption.PL:
-                            returnText = "Naciśnij [Esc] wrócić do głównego menu";
+                            returnText = "Naciśnij [Escape lub Back] aby wrócić do głównego menu";
                             break;
                         default:
-                            returnText = "Press [Esc] to go back Main Menu";
+                            returnText = "Press [Escape or Back] to go back Main Menu";
                             break;
                     }
                     break;

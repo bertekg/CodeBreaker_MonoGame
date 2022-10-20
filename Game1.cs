@@ -3,11 +3,11 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
-using System;
+using System.Diagnostics;
 
 namespace CodeBreaker_MonoGame
 {
-    public enum GameState { Menu, InGame, FinishGame}
+    public enum GameState { Menu, GameInstructions,  InGame, FinishGame}
     public class Game1 : Game
     {
         private GraphicsDeviceManager _graphics;
@@ -25,7 +25,7 @@ namespace CodeBreaker_MonoGame
         private SoundEffect _successSoundEffect, _failSoundEffect;
 
         private bool _keyRightUp, _keyLeftUp, _keyUpUp, _keyDownUp;
-        private bool _keyEnterUp, _keyEscapeUp, _keySpaceUp;
+        private bool _keyEnterUp, _keyHelpUp, _keyEscapeUp, _keySpaceUp;
 
         GameLogic gameLogic;
 
@@ -56,6 +56,8 @@ namespace CodeBreaker_MonoGame
 
         private int _menuOptionStartX = 225, _menuOptionStartY = 200, _menuOptionStepY = 40;
 
+        private int TODELETE_helpButtonPressCount;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -69,7 +71,7 @@ namespace CodeBreaker_MonoGame
             InitializePrivatVariables();
             GoToMainMenu();
             ReadSaveData();
-            _graphics.PreferredBackBufferWidth = 800;
+            _graphics.PreferredBackBufferWidth = 820;
             _graphics.PreferredBackBufferHeight = 550;
             _graphics.ApplyChanges();
             lang = new Lang(saveData.langID);
@@ -81,7 +83,7 @@ namespace CodeBreaker_MonoGame
             _saveDataPath = System.IO.Path.Combine(System.Environment.CurrentDirectory, "SaveData.xml");
 
             _keyRightUp = true; _keyLeftUp = true; _keyUpUp = true; _keyDownUp = true;
-            _keyEnterUp = true; _keyEscapeUp = true; _keySpaceUp = true;
+            _keyEnterUp = true; _keyHelpUp = true; _keyEscapeUp = true; _keySpaceUp = true;
     }
 
         protected override void LoadContent()
@@ -119,6 +121,35 @@ namespace CodeBreaker_MonoGame
             KeyboardState keyboardState = Keyboard.GetState();
             GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
 
+            if ( (keyboardState.IsKeyDown(Keys.Enter) || gamePadState.Buttons.Start == ButtonState.Pressed)
+                && _keyEnterUp == true)
+            {
+                if (gameState == GameState.Menu || gameState == GameState.FinishGame)
+                {
+                    PlaySoundEffect(_startSoundEffect);
+                    StartNewGame();
+                }
+                _keyEnterUp = false;
+            }
+            else if ((keyboardState.IsKeyUp(Keys.Enter) && gamePadState.Buttons.Start == ButtonState.Released)
+                && _keyEnterUp == false)
+            {
+                _keyEnterUp = true;
+            }
+
+            if ( (keyboardState.IsKeyDown(Keys.H) || gamePadState.Buttons.RightShoulder == ButtonState.Pressed)
+                && _keyHelpUp == true)
+            {
+                TODELETE_helpButtonPressCount++;
+                Debug.WriteLine("Press show game instinctual button, count: " + TODELETE_helpButtonPressCount.ToString());
+                _keyHelpUp = false;
+            }
+            else if ((keyboardState.IsKeyUp(Keys.H) && gamePadState.Buttons.RightShoulder == ButtonState.Released)
+                && _keyHelpUp == false)
+            {
+                _keyHelpUp = true;
+            }
+
             if ( (keyboardState.IsKeyDown(Keys.Escape) || gamePadState.Buttons.Back == ButtonState.Pressed)
                 && _keyEscapeUp == true)
             {
@@ -137,22 +168,6 @@ namespace CodeBreaker_MonoGame
                 && _keyEscapeUp == false)
             {
                 _keyEscapeUp = true;
-            }
-
-            if ( (keyboardState.IsKeyDown(Keys.Enter) || gamePadState.Buttons.Start == ButtonState.Pressed)
-                && _keyEnterUp == true)
-            {                
-                if (gameState == GameState.Menu || gameState == GameState.FinishGame)
-                {
-                    PlaySoundEffect(_startSoundEffect);
-                    StartNewGame();
-                }
-                _keyEnterUp = false;
-            }
-            else if ( (keyboardState.IsKeyUp(Keys.Enter) && gamePadState.Buttons.Start == ButtonState.Released)
-                && _keyEnterUp == false)
-            {
-                _keyEnterUp = true;
             }
 
             if ( (keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D) || gamePadState.DPad.Right == ButtonState.Pressed)
@@ -411,9 +426,11 @@ namespace CodeBreaker_MonoGame
             switch (gameState)
             {
                 case GameState.Menu:
-                    _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameTitle), new Vector2(120, 30), Color.White);
-                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.StartGameKey), new Vector2(180, 100), Color.White);
-                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.ExitGameKey), new Vector2(180, 140), Color.White);
+                    _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameTitle), new Vector2(120, 10), Color.White);
+                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.StartGameKey), new Vector2(10, 55), Color.White);
+                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.GameInstuctionKey), new Vector2(10, 90), Color.White);
+                    //_spriteBatch.DrawString(_middleFont, "TODO Option placeholder", new Vector2(10, 125), Color.White);
+                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.ExitGameKey), new Vector2(10, 160), Color.White);
                     _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.CodeLength) + saveData.codeLength.ToString(), GetManuOptionPosition(0), Color.White);
                     _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.IsLimitedAttempts)  + lang.GetBoolInLang(saveData.isAttemptsLimit), GetManuOptionPosition(1), Color.White);
                     _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.NumberAttempts) + saveData.attemptsLimit.ToString(), GetManuOptionPosition(2), saveData.isAttemptsLimit ? Color.White : Color.Gray);
@@ -507,8 +524,8 @@ namespace CodeBreaker_MonoGame
 
                     _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.FinishCorrectCode) + gameLogic.CorrectCodeString(), new Vector2(200, 220), Color.White);
 
-                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.FinishPlayAgain), new Vector2(120, 360), Color.White);
-                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.FinishGoBackMenu), new Vector2(120, 400), Color.White);
+                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.FinishPlayAgain), new Vector2(10, 360), Color.White);
+                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.FinishGoBackMenu), new Vector2(10, 400), Color.White);
                     break;
                 default:
                     break;
