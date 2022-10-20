@@ -52,7 +52,7 @@ namespace CodeBreaker_MonoGame
 
         private Lang lang;
 
-        private string versionText = "1.2.2 (2022.10.20)";
+        private string versionText = "1.2.3 (2022.10.20)";
 
         private int _menuOptionStartX = 225, _menuOptionStartY = 200, _menuOptionStepY = 40;
 
@@ -155,7 +155,7 @@ namespace CodeBreaker_MonoGame
                 _keyEnterUp = true;
             }
 
-            if ( (keyboardState.IsKeyDown(Keys.Right) || gamePadState.DPad.Right == ButtonState.Pressed)
+            if ( (keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D) || gamePadState.DPad.Right == ButtonState.Pressed)
                 && _keyRightUp == true)
             {
                 if (gameState == GameState.InGame)
@@ -211,13 +211,13 @@ namespace CodeBreaker_MonoGame
                 }
                 _keyRightUp = false;
             }
-            else if( (keyboardState.IsKeyUp(Keys.Right) && gamePadState.DPad.Right == ButtonState.Released)
+            else if( (keyboardState.IsKeyUp(Keys.Right) && keyboardState.IsKeyUp(Keys.D) && gamePadState.DPad.Right == ButtonState.Released)
                 && _keyRightUp == false)
             {
                 _keyRightUp = true;
             }
 
-            if ( (keyboardState.IsKeyDown(Keys.Left) || gamePadState.DPad.Left == ButtonState.Pressed)
+            if ( (keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A) || gamePadState.DPad.Left == ButtonState.Pressed)
                 && _keyLeftUp == true)
             {
                 if (gameState == GameState.InGame)
@@ -273,7 +273,7 @@ namespace CodeBreaker_MonoGame
                 }
                 _keyLeftUp = false;
             }
-            else if ( (keyboardState.IsKeyUp(Keys.Left) && gamePadState.DPad.Left == ButtonState.Released)
+            else if ( (keyboardState.IsKeyUp(Keys.Left) && keyboardState.IsKeyUp(Keys.A) && gamePadState.DPad.Left == ButtonState.Released)
                 && _keyLeftUp == false)
             {
                 _keyLeftUp = true;
@@ -281,7 +281,7 @@ namespace CodeBreaker_MonoGame
 
             _gameMarkerPosition = 35.0f + (_gameMarkerIndex * 100.0f);
 
-            if ( (keyboardState.IsKeyDown(Keys.Up) || gamePadState.DPad.Up == ButtonState.Pressed)
+            if ( (keyboardState.IsKeyDown(Keys.Up) || keyboardState.IsKeyDown(Keys.W) || gamePadState.DPad.Up == ButtonState.Pressed)
                 && _keyUpUp == true)
             {
                 if (gameState == GameState.InGame)
@@ -310,13 +310,13 @@ namespace CodeBreaker_MonoGame
                 }
                 _keyUpUp = false;
             }
-            else if ( (keyboardState.IsKeyUp(Keys.Up) && gamePadState.DPad.Up == ButtonState.Released)
+            else if ( (keyboardState.IsKeyUp(Keys.Up) && keyboardState.IsKeyUp(Keys.W) && gamePadState.DPad.Up == ButtonState.Released)
                 && _keyUpUp == false)
             {
                 _keyUpUp = true;
             }
 
-            if ( (keyboardState.IsKeyDown(Keys.Down) || gamePadState.DPad.Down == ButtonState.Pressed)
+            if ( (keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S) || gamePadState.DPad.Down == ButtonState.Pressed)
                 && _keyDownUp == true)
             {
                 if (gameState == GameState.InGame)
@@ -345,7 +345,7 @@ namespace CodeBreaker_MonoGame
                 }
                 _keyDownUp = false;
             }
-            else if ( (keyboardState.IsKeyUp(Keys.Down) && gamePadState.DPad.Down == ButtonState.Released)
+            else if ( (keyboardState.IsKeyUp(Keys.Down) && keyboardState.IsKeyUp(Keys.S) && gamePadState.DPad.Down == ButtonState.Released)
                 && _keyDownUp == false)
             {
                 _keyDownUp = true;
