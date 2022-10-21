@@ -10,7 +10,8 @@
         GameRemainingAttempts, GameNumberOfAttempts, GameRemainingTime,
         FinishWin, FinishLost, FinishRemainingTime, FinishPlayingTime,
         FinishRemainingAttempts, FinishNumberOfAttempts, FinishCorrectCode,
-        FinishPlayAgain, FinishGoBackMenu};
+        FinishPlayAgain, InstrucitonAndFinishGoBackMenu,
+        GameInstuction, ControlsInGame};
     internal class Lang
     {
         private LangOption langOption;
@@ -458,7 +459,7 @@
                             break;
                     }
                     break;
-                case LangKey.FinishGoBackMenu:
+                case LangKey.InstrucitonAndFinishGoBackMenu:
                     switch (langOption)
                     {
                         case LangOption.PL:
@@ -466,6 +467,28 @@
                             break;
                         default:
                             returnText = "Press [Escape or Back] to go back Main Menu";
+                            break;
+                    }
+                    break;
+                case LangKey.GameInstuction:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Instrukcja gry";
+                            break;
+                        default:
+                            returnText = "Game instruction";
+                            break;
+                    }
+                    break;
+                case LangKey.ControlsInGame:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Sterowanie podczas gry:";
+                            break;
+                        default:
+                            returnText = "Controls during the game:";
                             break;
                     }
                     break;

@@ -23,6 +23,7 @@ namespace CodeBreaker_MonoGame
         private SoundEffect _startSoundEffect, _returnMenuSoundEffect;
         private SoundEffect _gameUpDownSoundEffect, _gameSideSoundEffect, _unlockTrySoundEffect;
         private SoundEffect _successSoundEffect, _failSoundEffect;
+        private SoundEffect _menuNaviInstr;
 
         private bool _keyRightUp, _keyLeftUp, _keyUpUp, _keyDownUp;
         private bool _keyEnterUp, _keyHelpUp, _keyEscapeUp, _keySpaceUp;
@@ -52,11 +53,9 @@ namespace CodeBreaker_MonoGame
 
         private Lang lang;
 
-        private string versionText = "1.2.3 (2022.10.20)";
+        private string versionText = "1.3.0 (2022.10.21)";
 
         private int _menuOptionStartX = 225, _menuOptionStartY = 200, _menuOptionStepY = 40;
-
-        private int TODELETE_helpButtonPressCount;
 
         public Game1()
         {
@@ -112,7 +111,9 @@ namespace CodeBreaker_MonoGame
             _unlockTrySoundEffect = Content.Load<SoundEffect>("sounds/unlockTry");
             _successSoundEffect = Content.Load<SoundEffect>("sounds/success");
             _failSoundEffect = Content.Load<SoundEffect>("sounds/fail");
-            
+            _menuNaviInstr = Content.Load<SoundEffect>("sounds/menuNaviInst");
+
+
             base.LoadContent();
         }
 
@@ -140,8 +141,11 @@ namespace CodeBreaker_MonoGame
             if ( (keyboardState.IsKeyDown(Keys.H) || gamePadState.Buttons.RightShoulder == ButtonState.Pressed)
                 && _keyHelpUp == true)
             {
-                TODELETE_helpButtonPressCount++;
-                Debug.WriteLine("Press show game instinctual button, count: " + TODELETE_helpButtonPressCount.ToString());
+                if (gameState == GameState.Menu)
+                {
+                    PlaySoundEffect(_menuNaviInstr);
+                    gameState = GameState.GameInstructions;
+                }   
                 _keyHelpUp = false;
             }
             else if ((keyboardState.IsKeyUp(Keys.H) && gamePadState.Buttons.RightShoulder == ButtonState.Released)
@@ -153,7 +157,7 @@ namespace CodeBreaker_MonoGame
             if ( (keyboardState.IsKeyDown(Keys.Escape) || gamePadState.Buttons.Back == ButtonState.Pressed)
                 && _keyEscapeUp == true)
             {
-                if (gameState == GameState.InGame || gameState == GameState.FinishGame)
+                if (gameState == GameState.InGame || gameState == GameState.GameInstructions || gameState == GameState.FinishGame)
                 {
                     PlaySoundEffect(_returnMenuSoundEffect);
                     GoToMainMenu();
@@ -294,7 +298,7 @@ namespace CodeBreaker_MonoGame
                 _keyLeftUp = true;
             }
 
-            _gameMarkerPosition = 35.0f + (_gameMarkerIndex * 100.0f);
+            _gameMarkerPosition = 30.0f + (_gameMarkerIndex * 100.0f);
 
             if ( (keyboardState.IsKeyDown(Keys.Up) || keyboardState.IsKeyDown(Keys.W) || gamePadState.DPad.Up == ButtonState.Pressed)
                 && _keyUpUp == true)
@@ -432,7 +436,7 @@ namespace CodeBreaker_MonoGame
                     //_spriteBatch.DrawString(_middleFont, "TODO Option placeholder", new Vector2(10, 125), Color.White);
                     _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.ExitGameKey), new Vector2(10, 160), Color.White);
                     _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.CodeLength) + saveData.codeLength.ToString(), GetManuOptionPosition(0), Color.White);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.IsLimitedAttempts)  + lang.GetBoolInLang(saveData.isAttemptsLimit), GetManuOptionPosition(1), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.IsLimitedAttempts) + lang.GetBoolInLang(saveData.isAttemptsLimit), GetManuOptionPosition(1), Color.White);
                     _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.NumberAttempts) + saveData.attemptsLimit.ToString(), GetManuOptionPosition(2), saveData.isAttemptsLimit ? Color.White : Color.Gray);
                     _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.IsTimeLimitation) + lang.GetBoolInLang(saveData.isTimeLimit), GetManuOptionPosition(3), Color.White);
                     _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.TimeLimit) + saveData.timeLimit.ToString(), GetManuOptionPosition(4), saveData.isTimeLimit ? Color.White : Color.Gray);
@@ -443,30 +447,44 @@ namespace CodeBreaker_MonoGame
                     _spriteBatch.DrawString(_littleFont, lang.GetLangText(LangKey.VersionInfo) + versionText, new Vector2(600, 530), Color.White);
                     _spriteBatch.Draw(_menuMarkerSprite, new Vector2(210, menuMarkerPosition), Color.White);
                     break;
+                case GameState.GameInstructions:
+                    _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameInstuction), new Vector2(250, 50), Color.White);
+
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpSingleDigitOnce), new Vector2(50, 120), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorsOption), new Vector2(50, 150), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorRed), new Vector2(50, 180), Color.Red);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorBlue), new Vector2(50, 210), Color.Blue);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorGreen), new Vector2(50, 240), Color.Green);
+
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.ControlsInGame), new Vector2(50, 300), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpLeftRight), new Vector2(50, 330), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpUpDown), new Vector2(50, 360), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpSpace), new Vector2(50, 390), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpEsc), new Vector2(50, 420), Color.White);
+
+                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.InstrucitonAndFinishGoBackMenu), new Vector2(10, 500), Color.White);
+
+                    break;
                 case GameState.InGame:
                     for (int i = 0; i < saveData.codeLength; i++)
                     {
-                        _spriteBatch.DrawString(_largeFont, gameLogic.currentCode[i].ToString(), new Vector2(50 + (100 * i), 110), Color.White);
+                        _spriteBatch.DrawString(_largeFont, gameLogic.currentCode[i].ToString(), new Vector2(50 + (100 * i), 150), Color.White);
                     }
-                    _spriteBatch.Draw(_gameMarkerSprite, new Vector2(_gameMarkerPosition, 110), Color.White);
+                    _spriteBatch.Draw(_gameMarkerSprite, new Vector2(_gameMarkerPosition, 150), Color.White);
 
                     if (!IS_DEBUG_MODE)
                     {
-                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpLeftRight), new Vector2(5, 270), Color.White);
-                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpUpDown), new Vector2(5, 300), Color.White);
-                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpSpace), new Vector2(5, 330), Color.White);
-                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpEsc), new Vector2(5, 360), Color.White);
-                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpSingleDigitOnce), new Vector2(5, 390), Color.White);
-                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorsOption), new Vector2(5, 420), Color.White);
-                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorRed), new Vector2(5, 450), Color.White);
-                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorBlue), new Vector2(5, 480), Color.White);
-                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorGreen), new Vector2(5, 510), Color.White);
+                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpSingleDigitOnce), new Vector2(5, 400), Color.White);
+                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorsOption), new Vector2(5, 430), Color.White);
+                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorRed), new Vector2(5, 460), Color.Red);
+                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorBlue), new Vector2(5, 490), Color.Blue);
+                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorGreen), new Vector2(5, 520), Color.Green);
                     }
                     else
                     {
-                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.DebugMarkerIndex) + _gameMarkerIndex.ToString() 
-                            + lang.GetLangText(LangKey.DebugMarkerPos) + _gameMarkerPosition.ToString(), new Vector2(10, 350), Color.White);
-                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.DebugCurrentCode) + gameLogic.CurrentCodeString(), new Vector2(10, 380), Color.White);
+                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.DebugMarkerIndex) + _gameMarkerIndex.ToString()
+                            + lang.GetLangText(LangKey.DebugMarkerPos) + _gameMarkerPosition.ToString(), new Vector2(10, 400), Color.White);
+                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.DebugCurrentCode) + gameLogic.CurrentCodeString(), new Vector2(10, 430), Color.White);
                     }
 
                     if (saveData.isAttemptsLimit)
@@ -525,7 +543,7 @@ namespace CodeBreaker_MonoGame
                     _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.FinishCorrectCode) + gameLogic.CorrectCodeString(), new Vector2(200, 220), Color.White);
 
                     _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.FinishPlayAgain), new Vector2(10, 360), Color.White);
-                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.FinishGoBackMenu), new Vector2(10, 400), Color.White);
+                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.InstrucitonAndFinishGoBackMenu), new Vector2(10, 400), Color.White);
                     break;
                 default:
                     break;
