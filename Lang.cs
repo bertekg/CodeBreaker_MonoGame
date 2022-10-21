@@ -11,7 +11,7 @@
         FinishWin, FinishLost, FinishRemainingTime, FinishPlayingTime,
         FinishRemainingAttempts, FinishNumberOfAttempts, FinishCorrectCode,
         FinishPlayAgain, InstrucitonAndFinishGoBackMenu,
-        GameInstuction, ControlsInGame};
+        GameInstuction, ControlsInGame, GameOptionKey, GameOption};
     internal class Lang
     {
         private LangOption langOption;
@@ -82,6 +82,17 @@
                             break;
                         default:
                             returnText = "Press [H or RightShoulder] for Game Instructions";
+                            break;
+                    }
+                    break;
+                case LangKey.GameOptionKey:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Wciśnij [O lub LeftShoulder] aby pokazać opcje gry";
+                            break;
+                        default:
+                            returnText = "Press [O or LeftShoulder] for Game Option";
                             break;
                     }
                     break;
@@ -489,6 +500,17 @@
                             break;
                         default:
                             returnText = "Controls during the game:";
+                            break;
+                    }
+                    break;
+                case LangKey.GameOption:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Opcje gry";
+                            break;
+                        default:
+                            returnText = "Game Option";
                             break;
                     }
                     break;

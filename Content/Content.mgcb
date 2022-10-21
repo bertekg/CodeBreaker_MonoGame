@@ -78,6 +78,12 @@
 /processorParam:Quality=Best
 /build:sounds/menuNaviInst.mp3
 
+#begin sounds/menuNaviOption.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sounds/menuNaviOption.mp3
+
 #begin sounds/menuSide.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor

@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace CodeBreaker_MonoGame
 {
-    public enum GameState { Menu, GameInstructions,  InGame, FinishGame}
+    public enum GameState { Menu, GameInstructions, Option,  InGame, FinishGame}
     public class Game1 : Game
     {
         private GraphicsDeviceManager _graphics;
@@ -23,10 +23,10 @@ namespace CodeBreaker_MonoGame
         private SoundEffect _startSoundEffect, _returnMenuSoundEffect;
         private SoundEffect _gameUpDownSoundEffect, _gameSideSoundEffect, _unlockTrySoundEffect;
         private SoundEffect _successSoundEffect, _failSoundEffect;
-        private SoundEffect _menuNaviInstr;
+        private SoundEffect _menuNaviInstr, _menuNaviOption;
 
         private bool _keyRightUp, _keyLeftUp, _keyUpUp, _keyDownUp;
-        private bool _keyEnterUp, _keyHelpUp, _keyEscapeUp, _keySpaceUp;
+        private bool _keyEnterUp, _keyHelpUp, _keyOptionUp, _keyEscapeUp, _keySpaceUp;
 
         GameLogic gameLogic;
 
@@ -82,7 +82,7 @@ namespace CodeBreaker_MonoGame
             _saveDataPath = System.IO.Path.Combine(System.Environment.CurrentDirectory, "SaveData.xml");
 
             _keyRightUp = true; _keyLeftUp = true; _keyUpUp = true; _keyDownUp = true;
-            _keyEnterUp = true; _keyHelpUp = true; _keyEscapeUp = true; _keySpaceUp = true;
+            _keyEnterUp = true; _keyHelpUp = true; _keyOptionUp = true; _keyEscapeUp = true; _keySpaceUp = true;
     }
 
         protected override void LoadContent()
@@ -112,7 +112,7 @@ namespace CodeBreaker_MonoGame
             _successSoundEffect = Content.Load<SoundEffect>("sounds/success");
             _failSoundEffect = Content.Load<SoundEffect>("sounds/fail");
             _menuNaviInstr = Content.Load<SoundEffect>("sounds/menuNaviInst");
-
+            _menuNaviOption = Content.Load<SoundEffect>("sounds/menuNaviOption");
 
             base.LoadContent();
         }
@@ -132,7 +132,7 @@ namespace CodeBreaker_MonoGame
                 }
                 _keyEnterUp = false;
             }
-            else if ((keyboardState.IsKeyUp(Keys.Enter) && gamePadState.Buttons.Start == ButtonState.Released)
+            else if ( (keyboardState.IsKeyUp(Keys.Enter) && gamePadState.Buttons.Start == ButtonState.Released)
                 && _keyEnterUp == false)
             {
                 _keyEnterUp = true;
@@ -148,23 +148,39 @@ namespace CodeBreaker_MonoGame
                 }   
                 _keyHelpUp = false;
             }
-            else if ((keyboardState.IsKeyUp(Keys.H) && gamePadState.Buttons.RightShoulder == ButtonState.Released)
+            else if ( (keyboardState.IsKeyUp(Keys.H) && gamePadState.Buttons.RightShoulder == ButtonState.Released)
                 && _keyHelpUp == false)
             {
                 _keyHelpUp = true;
             }
 
+            if ( (keyboardState.IsKeyDown(Keys.O) || gamePadState.Buttons.LeftShoulder == ButtonState.Pressed)
+                && _keyOptionUp == true)
+            {
+                if (gameState == GameState.Menu)
+                {
+                    PlaySoundEffect(_menuNaviOption);
+                    gameState = GameState.Option;
+                }
+                _keyOptionUp = false;
+            }
+            else if ((keyboardState.IsKeyUp(Keys.O) && gamePadState.Buttons.LeftShoulder == ButtonState.Released)
+                && _keyOptionUp == false)
+            {
+                _keyOptionUp = true;
+            }
+
             if ( (keyboardState.IsKeyDown(Keys.Escape) || gamePadState.Buttons.Back == ButtonState.Pressed)
                 && _keyEscapeUp == true)
             {
-                if (gameState == GameState.InGame || gameState == GameState.GameInstructions || gameState == GameState.FinishGame)
+                if (gameState == GameState.Menu)
                 {
-                    PlaySoundEffect(_returnMenuSoundEffect);
-                    GoToMainMenu();
+                    Exit();
                 }
                 else
                 {
-                    Exit();
+                    PlaySoundEffect(_returnMenuSoundEffect);
+                    GoToMainMenu();
                 }
                 _keyEscapeUp = false;
             }
@@ -431,10 +447,12 @@ namespace CodeBreaker_MonoGame
             {
                 case GameState.Menu:
                     _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameTitle), new Vector2(120, 10), Color.White);
-                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.StartGameKey), new Vector2(10, 55), Color.White);
-                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.GameInstuctionKey), new Vector2(10, 90), Color.White);
-                    //_spriteBatch.DrawString(_middleFont, "TODO Option placeholder", new Vector2(10, 125), Color.White);
-                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.ExitGameKey), new Vector2(10, 160), Color.White);
+
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.StartGameKey), new Vector2(120, 70), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.GameInstuctionKey), new Vector2(120, 100), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.GameOptionKey), new Vector2(120, 130), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.ExitGameKey), new Vector2(120, 160), Color.White);
+
                     _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.CodeLength) + saveData.codeLength.ToString(), GetManuOptionPosition(0), Color.White);
                     _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.IsLimitedAttempts) + lang.GetBoolInLang(saveData.isAttemptsLimit), GetManuOptionPosition(1), Color.White);
                     _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.NumberAttempts) + saveData.attemptsLimit.ToString(), GetManuOptionPosition(2), saveData.isAttemptsLimit ? Color.White : Color.Gray);
@@ -443,6 +461,7 @@ namespace CodeBreaker_MonoGame
                     _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.PlayingSound) + lang.GetBoolInLang(_backgroundSong.GetIsSounding()), GetManuOptionPosition(5), Color.White);
                     _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.MusicVolume) + _backgroundSong.GetVolumePercentString(), GetManuOptionPosition(6), _backgroundSong.GetIsSounding() ? Color.White : Color.Gray);
                     _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.LanguageSelected), GetManuOptionPosition(7), Color.White);
+
                     _spriteBatch.DrawString(_littleFont, lang.GetLangText(LangKey.CreditsStart) + "Bartłomiej Grywalski", new Vector2(20, 530), Color.White);
                     _spriteBatch.DrawString(_littleFont, lang.GetLangText(LangKey.VersionInfo) + versionText, new Vector2(600, 530), Color.White);
                     _spriteBatch.Draw(_menuMarkerSprite, new Vector2(210, menuMarkerPosition), Color.White);
@@ -464,6 +483,11 @@ namespace CodeBreaker_MonoGame
 
                     _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.InstrucitonAndFinishGoBackMenu), new Vector2(10, 500), Color.White);
 
+                    break;
+                case GameState.Option:
+                    _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameOption), new Vector2(300, 50), Color.White);
+
+                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.InstrucitonAndFinishGoBackMenu), new Vector2(10, 500), Color.White);
                     break;
                 case GameState.InGame:
                     for (int i = 0; i < saveData.codeLength; i++)
