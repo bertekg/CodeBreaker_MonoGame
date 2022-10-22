@@ -15,7 +15,7 @@ namespace CodeBreaker_MonoGame
 
         private SpriteFont _largeFont, _bigFont, _middleFont, _smallFont, _littleFont;
 
-        private Texture2D _menuMarkerSprite, _gameMarkerSprite;
+        private Texture2D _menuMarkerSprite, _gameMarkerSprite, _tableBase;
 
         private MusicAndSounds _musicAndSounds;
 
@@ -53,7 +53,7 @@ namespace CodeBreaker_MonoGame
 
         private Lang lang;
 
-        private string versionText = "1.3.3 (2022.10.23)";
+        private string versionText = "1.3.4 (2022.10.23)";
 
         private int _menuMarkerStartX = 225, _menuMarkerStartY = 330, _menuMarkerStepY = 40;
 
@@ -61,6 +61,9 @@ namespace CodeBreaker_MonoGame
         private float _optionMarkerPosition;
 
         private int _optionMarkerStartX = 225, _optionMarkerStartY = 150, _optionMarkerStepY = 40;
+
+        private int _guessHistoryStartX = 600, _guessHistoryStartY = 110, _guessHistroyStepX = 40, _guessHistroyStepY = 50, _guessHistoryThickness = 3;
+        private int _tableOffsetX = -11, tableOffsetY = -3;
 
         public Game1()
         {
@@ -102,6 +105,7 @@ namespace CodeBreaker_MonoGame
 
             _menuMarkerSprite = Content.Load<Texture2D>("sprites/menuMarker");
             _gameMarkerSprite = Content.Load<Texture2D>("sprites/gameMarker");
+            _tableBase = Content.Load<Texture2D>("sprites/tableBase");
 
             Song song = Content.Load<Song>("audio/music");
             _musicAndSounds = new MusicAndSounds(song, saveData);
@@ -587,14 +591,40 @@ namespace CodeBreaker_MonoGame
                     {
                         _spriteBatch.DrawString(_bigFont, string.Format(lang.GetLangText(LangKey.GameRemainingTime), _remainingTime), new Vector2(10, 10), Color.White);
                     }
+                    
                     for (int i = 0; i < gameLogic.guessCodeHistory.Count; i++)
                     {
                         for (int j = 0; j < gameLogic.guessCodeHistory[i].Count; j++)
                         {
-                            _guessCodeHistoryTextPlace = new Vector2(600 + (j * 40), (i + 2) * 50);
+                            _guessCodeHistoryTextPlace = new Vector2(_guessHistoryStartX + (j * _guessHistroyStepX), _guessHistoryStartY + i * _guessHistroyStepY);
                             _spriteBatch.DrawString(_bigFont, gameLogic.guessCodeHistory[i][j].value.ToString(), _guessCodeHistoryTextPlace, DecodeColor(gameLogic.guessCodeHistory[i][j].digitState));
                         }
                     }
+                    //private int _tableOffsetX = 10, tableOffsetY = 5;
+                    if (gameLogic.guessCodeHistory.Count > 0)
+                    {
+                        for (int i = 0; i < gameLogic.guessCodeHistory.Count; i++)
+                        {
+                            _spriteBatch.Draw(_tableBase, new Rectangle(_guessHistoryStartX + _tableOffsetX, (_guessHistoryStartY + tableOffsetY) + i * _guessHistroyStepY,
+                                                _guessHistroyStepX * gameLogic.guessCodeHistory[0].Count, _guessHistoryThickness), Color.White);
+                            if (i == gameLogic.guessCodeHistory.Count - 1)
+                            {
+                                _spriteBatch.Draw(_tableBase, new Rectangle(_guessHistoryStartX + _tableOffsetX, (_guessHistoryStartY + tableOffsetY) + (i + 1) * _guessHistroyStepY,
+                                                    _guessHistroyStepX * gameLogic.guessCodeHistory[0].Count, _guessHistoryThickness), Color.White);
+                            }
+                        }
+                        for (int i = 0; i < gameLogic.guessCodeHistory[0].Count; i++)
+                        {
+                            _spriteBatch.Draw(_tableBase, new Rectangle(_guessHistoryStartX + _tableOffsetX + (i * _guessHistroyStepX), (_guessHistoryStartY + tableOffsetY),
+                                                _guessHistoryThickness, _guessHistroyStepY * gameLogic.guessCodeHistory.Count), Color.White);
+                            if (i == gameLogic.guessCodeHistory[0].Count - 1)
+                            {
+                                _spriteBatch.Draw(_tableBase, new Rectangle(_guessHistoryStartX + _tableOffsetX + ((i + 1) * _guessHistroyStepX), (_guessHistoryStartY + tableOffsetY),
+                                                _guessHistoryThickness, (_guessHistroyStepY * gameLogic.guessCodeHistory.Count) + _guessHistoryThickness), Color.White);
+                            }
+                        }
+                    }
+
                     break;
                 case GameState.FinishGame:
                     if (gameLogic.codeGuessed)
