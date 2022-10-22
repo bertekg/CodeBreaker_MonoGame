@@ -3,7 +3,7 @@
     public enum LangOption { PL = 1 };
     public enum LangKey { GameTitle, StartGameKey, GameInstuctionKey, ExitGameKey,
         CodeLength, IsLimitedAttempts, NumberAttempts, IsTimeLimitation, TimeLimit,
-        PlayingSound, MusicVolume, LanguageSelected, CreditsStart, VersionInfo,
+        PlayingSound, MusicVolume, SoundsVolume, LanguageSelected, CreditsStart, VersionInfo,
         HelpLeftRight, HelpUpDown, HelpSpace, HelpEsc, HelpSingleDigitOnce,
         HelpColorsOption, HelpColorRed, HelpColorBlue, HelpColorGreen,
         DebugMarkerIndex, DebugMarkerPos, DebugCurrentCode,
@@ -181,6 +181,17 @@
                             break;
                         default:
                             returnText = "Music volume: ";
+                            break;
+                    }
+                    break;
+                case LangKey.SoundsVolume:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Głośność dzwięków: ";
+                            break;
+                        default:
+                            returnText = "Sounds volume: ";
                             break;
                     }
                     break;
