@@ -53,7 +53,7 @@ namespace CodeBreaker_MonoGame
 
         private Lang lang;
 
-        private string versionText = "1.3.2 (2022.10.22)";
+        private string versionText = "1.3.3 (2022.10.23)";
 
         private int _menuMarkerStartX = 225, _menuMarkerStartY = 330, _menuMarkerStepY = 40;
 
@@ -555,9 +555,9 @@ namespace CodeBreaker_MonoGame
                 case GameState.InGame:
                     for (int i = 0; i < saveData.codeLength; i++)
                     {
-                        _spriteBatch.DrawString(_largeFont, gameLogic.currentCode[i].ToString(), new Vector2(50 + (100 * i), 150), Color.White);
+                        _spriteBatch.DrawString(_largeFont, gameLogic.currentCode[i].ToString(), new Vector2(50 + (105 * i), 150), Color.White);
+                        _spriteBatch.Draw(_gameMarkerSprite, new Vector2(30.0f + (i * 105.0f), 150), i == _gameMarkerIndex ? Color.White : Color.Black);
                     }
-                    _spriteBatch.Draw(_gameMarkerSprite, new Vector2(_gameMarkerPosition, 150), Color.White);
 
                     if (!IS_DEBUG_MODE)
                     {
