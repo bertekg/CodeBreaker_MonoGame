@@ -11,7 +11,8 @@
         FinishWin, FinishLost, FinishRemainingTime, FinishPlayingTime,
         FinishRemainingAttempts, FinishNumberOfAttempts, FinishCorrectCode,
         FinishPlayAgain, InstrucitonAndFinishGoBackMenu,
-        GameInstuction, ControlsInGame, GameOptionKey, GameOption};
+        GameInstuction, ControlsInGame, GameOptionKey, GameOption,
+        GameModifiers};
     internal class Lang
     {
         private LangOption langOption;
@@ -522,6 +523,17 @@
                             break;
                         default:
                             returnText = "Game Option";
+                            break;
+                    }
+                    break;
+                case LangKey.GameModifiers:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Modyfikatory gry:";
+                            break;
+                        default:
+                            returnText = "Game Modifiers:";
                             break;
                     }
                     break;

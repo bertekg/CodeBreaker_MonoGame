@@ -53,9 +53,9 @@ namespace CodeBreaker_MonoGame
 
         private Lang lang;
 
-        private string versionText = "1.3.1 (2022.10.22)";
+        private string versionText = "1.3.2 (2022.10.22)";
 
-        private int _menuMarkerStartX = 225, _menuMarkerStartY = 200, _menuMarkerStepY = 40;
+        private int _menuMarkerStartX = 225, _menuMarkerStartY = 330, _menuMarkerStepY = 40;
 
         private int _optionMarkerIndex;
         private float _optionMarkerPosition;
@@ -504,13 +504,14 @@ namespace CodeBreaker_MonoGame
             switch (gameState)
             {
                 case GameState.Menu:
-                    _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameTitle), new Vector2(120, 10), Color.White);
+                    _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameTitle), new Vector2(120, 50), Color.White);
 
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.StartGameKey), new Vector2(120, 70), Color.White);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.GameInstuctionKey), new Vector2(120, 100), Color.White);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.GameOptionKey), new Vector2(120, 130), Color.White);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.ExitGameKey), new Vector2(120, 160), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.StartGameKey), new Vector2(120, 140), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.GameInstuctionKey), new Vector2(120, 170), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.GameOptionKey), new Vector2(120, 200), Color.White);
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.ExitGameKey), new Vector2(120, 230), Color.White);
 
+                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.GameModifiers), GetMenuMarkerPosition(-1), Color.White);
                     _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.CodeLength) + saveData.codeLength.ToString(), GetMenuMarkerPosition(0), Color.White);
                     _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.IsLimitedAttempts) + lang.GetBoolInLang(saveData.isAttemptsLimit), GetMenuMarkerPosition(1), Color.White);
                     _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.NumberAttempts) + saveData.attemptsLimit.ToString(), GetMenuMarkerPosition(2), saveData.isAttemptsLimit ? Color.White : Color.Gray);
