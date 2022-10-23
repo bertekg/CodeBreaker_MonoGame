@@ -17,6 +17,7 @@ namespace CodeBreaker_MonoGame
 
         private Texture2D _menuMarkerSprite, _gameMarkerSprite, _squereBaseSprite;
         private Texture2D _attemptIconReady, _attemptIconUsed;
+        private Texture2D _iconGame;
 
         private MusicAndSounds _musicAndSounds;
 
@@ -54,7 +55,7 @@ namespace CodeBreaker_MonoGame
 
         private Lang lang;
 
-        private string versionText = "1.3.6 (2022.10.23)";
+        private string versionText = "1.3.7 (2022.10.23)";
 
         private int _menuMarkerStartX = 225, _menuMarkerStartY = 330, _menuMarkerStepY = 40;
 
@@ -75,6 +76,8 @@ namespace CodeBreaker_MonoGame
         
         private int _attemptIconStartX = 415, _attemptIconStartY = 65, _attemptIconStepX = 26, _attmptIconSize = 24;
 
+        private Vector2 _iconLocation;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -93,6 +96,7 @@ namespace CodeBreaker_MonoGame
             _graphics.ApplyChanges();
             lang = new Lang(saveData.langID);
             _timeLimitBarBase = new Rectangle(_timeLimitBarStartX, _timeLimitBarStartY, _timeLimitBarWidthMax, _timeLimitBarHeight);
+            _iconLocation = new Vector2(60, 27);
 
             base.Initialize();
         }
@@ -119,6 +123,7 @@ namespace CodeBreaker_MonoGame
             _squereBaseSprite = Content.Load<Texture2D>("sprites/tableBase");
             _attemptIconReady = Content.Load<Texture2D>("sprites/attemptIconReady");
             _attemptIconUsed = Content.Load<Texture2D>("sprites/attemptIconUsed");
+            _iconGame = Content.Load<Texture2D>("sprites/icon96");
 
             Song song = Content.Load<Song>("audio/music");
             _musicAndSounds = new MusicAndSounds(song, saveData);
@@ -521,7 +526,8 @@ namespace CodeBreaker_MonoGame
             switch (gameState)
             {
                 case GameState.Menu:
-                    _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameTitle), new Vector2(120, 50), Color.White);
+                    _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameTitle), new Vector2(180, 50), Color.White);
+                    _spriteBatch.Draw(_iconGame, _iconLocation, Color.White);
 
                     _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.StartGameKey), new Vector2(120, 140), Color.White);
                     _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.GameInstuctionKey), new Vector2(120, 170), Color.White);
