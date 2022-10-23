@@ -16,6 +16,7 @@ namespace CodeBreaker_MonoGame
         private SpriteFont _largeFont, _bigFont, _middleFont, _smallFont, _littleFont;
 
         private Texture2D _menuMarkerSprite, _gameMarkerSprite, _squereBaseSprite;
+        private Texture2D _attemptIconReady, _attemptIconUsed;
 
         private MusicAndSounds _musicAndSounds;
 
@@ -53,7 +54,7 @@ namespace CodeBreaker_MonoGame
 
         private Lang lang;
 
-        private string versionText = "1.3.5 (2022.10.23)";
+        private string versionText = "1.3.6 (2022.10.23)";
 
         private int _menuMarkerStartX = 225, _menuMarkerStartY = 330, _menuMarkerStepY = 40;
 
@@ -62,7 +63,7 @@ namespace CodeBreaker_MonoGame
 
         private int _optionMarkerStartX = 225, _optionMarkerStartY = 150, _optionMarkerStepY = 40;
 
-        private int _guessHistoryStartX = 600, _guessHistoryStartY = 110, _guessHistroyStepX = 40, _guessHistroyStepY = 50, _guessHistoryThickness = 3;
+        private int _guessHistoryStartX = 600, _guessHistoryStartY = 115, _guessHistroyStepX = 40, _guessHistroyStepY = 50, _guessHistoryThickness = 3;
         private int _tableOffsetX = -11, tableOffsetY = -3;
         private Color _tableColor = Color.Black;
 
@@ -71,6 +72,8 @@ namespace CodeBreaker_MonoGame
 
         private int _timeLimitBarStartX = 10 , _timeLimitBarStartY = 120, _timeLimitBarHeight = 20, _timeLimitBarWidthMax = 320;
         private Rectangle _timeLimitBarBase;
+        
+        private int _attemptIconStartX = 415, _attemptIconStartY = 65, _attemptIconStepX = 26, _attmptIconSize = 24;
 
         public Game1()
         {
@@ -114,6 +117,8 @@ namespace CodeBreaker_MonoGame
             _menuMarkerSprite = Content.Load<Texture2D>("sprites/menuMarker");
             _gameMarkerSprite = Content.Load<Texture2D>("sprites/gameMarker");
             _squereBaseSprite = Content.Load<Texture2D>("sprites/tableBase");
+            _attemptIconReady = Content.Load<Texture2D>("sprites/attemptIconReady");
+            _attemptIconUsed = Content.Load<Texture2D>("sprites/attemptIconUsed");
 
             Song song = Content.Load<Song>("audio/music");
             _musicAndSounds = new MusicAndSounds(song, saveData);
@@ -588,7 +593,19 @@ namespace CodeBreaker_MonoGame
 
                     if (saveData.isAttemptsLimit)
                     {
-                        _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameRemainingAttempts) + (saveData.attemptsLimit - gameLogic.numberOfAttempts).ToString(), new Vector2(360, 10), Color.White);
+                        int remainingAttempt = saveData.attemptsLimit - gameLogic.numberOfAttempts;
+                        _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameRemainingAttempts) + remainingAttempt.ToString(), new Vector2(360, 10), Color.White);
+                        for (int i = 0; i < saveData.attemptsLimit; i++)
+                        {
+                            if (i < remainingAttempt)
+                            {
+                                _spriteBatch.Draw(_attemptIconReady, new Rectangle(_attemptIconStartX + (i * _attemptIconStepX), _attemptIconStartY, _attmptIconSize, _attmptIconSize), Color.White);
+                            }
+                            else
+                            {
+                                _spriteBatch.Draw(_attemptIconUsed, new Rectangle(_attemptIconStartX + (i * _attemptIconStepX), _attemptIconStartY, _attmptIconSize, _attmptIconSize), Color.White);
+                            }
+                        }
                     }
                     else
                     {
@@ -739,6 +756,23 @@ namespace CodeBreaker_MonoGame
             _gameMarkerIndex = 0;
             _playingTime = 0;
             _remainingTime = saveData.timeLimit;
+            if (saveData.isAttemptsLimit)
+            {
+                if (saveData.attemptsLimit < 10)
+                {
+                    _attmptIconSize = 42;
+                    _attemptIconStartX = 395;
+                    _attemptIconStepX = 46;
+                    _attemptIconStartY = 65;
+                }
+                else
+                {
+                    _attmptIconSize = 24;
+                    _attemptIconStartX = 415;
+                    _attemptIconStepX = 26;
+                    _attemptIconStartY = 70;
+                }
+            }
             gameState = GameState.InGame;
         }
         private void GoToMainMenu()
