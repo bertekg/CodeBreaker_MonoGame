@@ -3,11 +3,11 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
-using System.Diagnostics;
+using System;
 
 namespace CodeBreaker_MonoGame
 {
-    public enum GameState { Menu, GameInstructions, Option,  InGame, FinishGame}
+    public enum GameState { Menu, GameInstructions, Option,  InGame, FinishGame }
     public class Game1 : Game
     {
         private GraphicsDeviceManager _graphics;
@@ -15,7 +15,7 @@ namespace CodeBreaker_MonoGame
 
         private SpriteFont _largeFont, _bigFont, _middleFont, _smallFont, _littleFont;
 
-        private Texture2D _menuMarkerSprite, _gameMarkerSprite, _tableBase;
+        private Texture2D _menuMarkerSprite, _gameMarkerSprite, _squereBaseSprite;
 
         private MusicAndSounds _musicAndSounds;
 
@@ -53,7 +53,7 @@ namespace CodeBreaker_MonoGame
 
         private Lang lang;
 
-        private string versionText = "1.3.4 (2022.10.23)";
+        private string versionText = "1.3.5 (2022.10.23)";
 
         private int _menuMarkerStartX = 225, _menuMarkerStartY = 330, _menuMarkerStepY = 40;
 
@@ -64,6 +64,13 @@ namespace CodeBreaker_MonoGame
 
         private int _guessHistoryStartX = 600, _guessHistoryStartY = 110, _guessHistroyStepX = 40, _guessHistroyStepY = 50, _guessHistoryThickness = 3;
         private int _tableOffsetX = -11, tableOffsetY = -3;
+        private Color _tableColor = Color.Black;
+
+        private int _codePositionStartX = 50, _codePositionStepX = 105, _codePostionoStartY = 180;
+        private int _codeOffsetMarkerX = -20, _codeOffsetMarkerY = -2;
+
+        private int _timeLimitBarStartX = 10 , _timeLimitBarStartY = 120, _timeLimitBarHeight = 20, _timeLimitBarWidthMax = 320;
+        private Rectangle _timeLimitBarBase;
 
         public Game1()
         {
@@ -82,6 +89,7 @@ namespace CodeBreaker_MonoGame
             _graphics.PreferredBackBufferHeight = 550;
             _graphics.ApplyChanges();
             lang = new Lang(saveData.langID);
+            _timeLimitBarBase = new Rectangle(_timeLimitBarStartX, _timeLimitBarStartY, _timeLimitBarWidthMax, _timeLimitBarHeight);
 
             base.Initialize();
         }
@@ -105,7 +113,7 @@ namespace CodeBreaker_MonoGame
 
             _menuMarkerSprite = Content.Load<Texture2D>("sprites/menuMarker");
             _gameMarkerSprite = Content.Load<Texture2D>("sprites/gameMarker");
-            _tableBase = Content.Load<Texture2D>("sprites/tableBase");
+            _squereBaseSprite = Content.Load<Texture2D>("sprites/tableBase");
 
             Song song = Content.Load<Song>("audio/music");
             _musicAndSounds = new MusicAndSounds(song, saveData);
@@ -559,8 +567,8 @@ namespace CodeBreaker_MonoGame
                 case GameState.InGame:
                     for (int i = 0; i < saveData.codeLength; i++)
                     {
-                        _spriteBatch.DrawString(_largeFont, gameLogic.currentCode[i].ToString(), new Vector2(50 + (105 * i), 150), Color.White);
-                        _spriteBatch.Draw(_gameMarkerSprite, new Vector2(30.0f + (i * 105.0f), 150), i == _gameMarkerIndex ? Color.White : Color.Black);
+                        _spriteBatch.DrawString(_largeFont, gameLogic.currentCode[i].ToString(), new Vector2(_codePositionStartX + (_codePositionStepX * i), _codePostionoStartY), Color.White);
+                        _spriteBatch.Draw(_gameMarkerSprite, new Vector2(_codePositionStartX + _codeOffsetMarkerX + (i * _codePositionStepX), _codePostionoStartY + _codeOffsetMarkerY), i == _gameMarkerIndex ? Color.White : Color.Black);
                     }
 
                     if (!IS_DEBUG_MODE)
@@ -590,6 +598,8 @@ namespace CodeBreaker_MonoGame
                     if (saveData.isTimeLimit)
                     {
                         _spriteBatch.DrawString(_bigFont, string.Format(lang.GetLangText(LangKey.GameRemainingTime), _remainingTime), new Vector2(10, 10), Color.White);
+                        _spriteBatch.Draw(_squereBaseSprite, _timeLimitBarBase, Color.White);
+                        _spriteBatch.Draw(_squereBaseSprite, GetTimieLimitBarRectangel(), GetTimeLimitBarColor());
                     }
                     
                     for (int i = 0; i < gameLogic.guessCodeHistory.Count; i++)
@@ -600,27 +610,27 @@ namespace CodeBreaker_MonoGame
                             _spriteBatch.DrawString(_bigFont, gameLogic.guessCodeHistory[i][j].value.ToString(), _guessCodeHistoryTextPlace, DecodeColor(gameLogic.guessCodeHistory[i][j].digitState));
                         }
                     }
-                    //private int _tableOffsetX = 10, tableOffsetY = 5;
+
                     if (gameLogic.guessCodeHistory.Count > 0)
                     {
                         for (int i = 0; i < gameLogic.guessCodeHistory.Count; i++)
                         {
-                            _spriteBatch.Draw(_tableBase, new Rectangle(_guessHistoryStartX + _tableOffsetX, (_guessHistoryStartY + tableOffsetY) + i * _guessHistroyStepY,
-                                                _guessHistroyStepX * gameLogic.guessCodeHistory[0].Count, _guessHistoryThickness), Color.White);
+                            _spriteBatch.Draw(_squereBaseSprite, new Rectangle(_guessHistoryStartX + _tableOffsetX, (_guessHistoryStartY + tableOffsetY) + i * _guessHistroyStepY,
+                                                _guessHistroyStepX * gameLogic.guessCodeHistory[0].Count, _guessHistoryThickness), _tableColor);
                             if (i == gameLogic.guessCodeHistory.Count - 1)
                             {
-                                _spriteBatch.Draw(_tableBase, new Rectangle(_guessHistoryStartX + _tableOffsetX, (_guessHistoryStartY + tableOffsetY) + (i + 1) * _guessHistroyStepY,
-                                                    _guessHistroyStepX * gameLogic.guessCodeHistory[0].Count, _guessHistoryThickness), Color.White);
+                                _spriteBatch.Draw(_squereBaseSprite, new Rectangle(_guessHistoryStartX + _tableOffsetX, (_guessHistoryStartY + tableOffsetY) + (i + 1) * _guessHistroyStepY,
+                                                    _guessHistroyStepX * gameLogic.guessCodeHistory[0].Count, _guessHistoryThickness), _tableColor);
                             }
                         }
                         for (int i = 0; i < gameLogic.guessCodeHistory[0].Count; i++)
                         {
-                            _spriteBatch.Draw(_tableBase, new Rectangle(_guessHistoryStartX + _tableOffsetX + (i * _guessHistroyStepX), (_guessHistoryStartY + tableOffsetY),
-                                                _guessHistoryThickness, _guessHistroyStepY * gameLogic.guessCodeHistory.Count), Color.White);
+                            _spriteBatch.Draw(_squereBaseSprite, new Rectangle(_guessHistoryStartX + _tableOffsetX + (i * _guessHistroyStepX), (_guessHistoryStartY + tableOffsetY),
+                                                _guessHistoryThickness, _guessHistroyStepY * gameLogic.guessCodeHistory.Count), _tableColor);
                             if (i == gameLogic.guessCodeHistory[0].Count - 1)
                             {
-                                _spriteBatch.Draw(_tableBase, new Rectangle(_guessHistoryStartX + _tableOffsetX + ((i + 1) * _guessHistroyStepX), (_guessHistoryStartY + tableOffsetY),
-                                                _guessHistoryThickness, (_guessHistroyStepY * gameLogic.guessCodeHistory.Count) + _guessHistoryThickness), Color.White);
+                                _spriteBatch.Draw(_squereBaseSprite, new Rectangle(_guessHistoryStartX + _tableOffsetX + ((i + 1) * _guessHistroyStepX), (_guessHistoryStartY + tableOffsetY),
+                                                _guessHistoryThickness, (_guessHistroyStepY * gameLogic.guessCodeHistory.Count) + _guessHistoryThickness), _tableColor);
                             }
                         }
                     }
@@ -670,6 +680,40 @@ namespace CodeBreaker_MonoGame
 
             base.Draw(gameTime);
         }
+
+        private Rectangle GetTimieLimitBarRectangel()
+        {
+            float barWidth = ((float)_remainingTime / (float)saveData.timeLimit) * _timeLimitBarWidthMax;
+            return new Rectangle(_timeLimitBarStartX, _timeLimitBarStartY, (int)barWidth, _timeLimitBarHeight);
+        }
+
+        private Color GetTimeLimitBarColor()
+        {
+            float remainingTimeFraction = (float)_remainingTime / (float)saveData.timeLimit;
+            Color barColor;
+            if (remainingTimeFraction >= 0.8f)
+            {
+                barColor = new Color(44, 186, 0);
+            }
+            else if(remainingTimeFraction >= 0.6f && remainingTimeFraction < 0.8f)
+            {
+                barColor = new Color(163, 255, 0);
+            }
+            else if(remainingTimeFraction >= 0.4f && remainingTimeFraction < 0.6f)
+            {
+                barColor = new Color(255, 244, 0);
+            }
+            else if (remainingTimeFraction >= 0.2f && remainingTimeFraction < 0.4f)
+            {
+                barColor = new Color(255, 167, 0);
+            }
+            else
+            {
+                barColor = new Color(255, 0, 0);
+            }
+            return barColor;
+        }
+
         private Color DecodeColor(DigitState digitState)
         {
             Color colorDecoded = new Color();
