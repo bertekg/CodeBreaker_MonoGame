@@ -17,25 +17,28 @@ This is my first original game (not based on a tutorial). The game focuses more 
 ## Screenshots
 
 ### 1. Main menu
-![alt text](screenshots/1MainMenu.PNG)
+![alt text](screenshots/1.4.0/1MainMenu.PNG)
 
-### 2. Main menu in Polish language
-![alt text](screenshots/2MainMenuPL.PNG)
+### 2. Game instruction
+![alt text](screenshots/1.4.0/2GameInstruction.PNG)
 
-### 3. After game start
-![alt text](screenshots/3AfterStartGame.PNG)
+### 3. Option game in Polish language
+![alt text](screenshots/1.4.0/3OptionSupportPolish.PNG)
 
-### 4. All possible digit clues
-![alt text](screenshots/4AllPossibleDigitClues.PNG)
+### 4. After game start
+![alt text](screenshots/1.4.0/4AfterStartGame.PNG)
 
-### 5. Before game end
-![alt text](screenshots/5BeforeGameEnd.PNG)
+### 5. All possible digit clues
+![alt text](screenshots/1.4.0/5AllPossibleDigitClues.PNG)
 
-### 6. Successful game
-![alt text](screenshots/6GameFinishWin.PNG)
+### 6. Before game end
+![alt text](screenshots/1.4.0/6BeforeGameEnd.PNG)
 
-### 7. Possible modes
-![alt text](screenshots/7PossibleModes.PNG)
+### 7. Successful game
+![alt text](screenshots/1.4.0/7GameFinishWin.PNG)
 
-### 8. Unsuccessful game
-![alt text](screenshots/8GameFinishLose.PNG)
+### 8. Possible game modyfication
+![alt text](screenshots/1.4.0/8PossibleModes.PNG)
+
+### 9. Unsuccessful game
+![alt text](screenshots/1.4.0/9GameFinishLose.PNG)
