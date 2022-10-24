@@ -30,11 +30,9 @@ namespace CodeBreaker_MonoGame
         private bool _keyRightUp, _keyLeftUp, _keyUpUp, _keyDownUp;
         private bool _keyEnterUp, _keyHelpUp, _keyOptionUp, _keyEscapeUp, _keySpaceUp;
 
-        GameLogic gameLogic;
+        private GameLogic _gameLogic;
 
-        const bool IS_DEBUG_MODE = false;
-
-        GameState gameState;
+        private GameState _gameState;
 
         private int _menuMarkerIndex;
         private float _menuMarkerPosition;
@@ -44,8 +42,6 @@ namespace CodeBreaker_MonoGame
         private int _gameMarkerIndex;
         private float _gameMarkerPosition;
 
-        const int MAX_NUMBER_OF_HINTS = 8;
-
         private Vector2 _guessCodeHistoryTextPlace;
 
         private string _endGameInfo;
@@ -53,31 +49,40 @@ namespace CodeBreaker_MonoGame
 
         string _saveDataPath;
 
-        private Lang lang;
-
-        private string versionText = "1.4.0 (2022.10.23)";
-
-        private int _menuMarkerStartX = 225, _menuMarkerStartY = 330, _menuMarkerStepY = 40;
+        private Lang _lang;
 
         private int _optionMarkerIndex;
         private float _optionMarkerPosition;
 
-        private int _optionMarkerStartX = 225, _optionMarkerStartY = 150, _optionMarkerStepY = 40;
-
-        private int _guessHistoryStartX = 600, _guessHistoryStartY = 115, _guessHistroyStepX = 40, _guessHistroyStepY = 50, _guessHistoryThickness = 3;
-        private int _tableOffsetX = -11, tableOffsetY = -3;
         private Color _tableColor = Color.Black;
 
-        private int _codePositionStartX = 50, _codePositionStepX = 105, _codePostionoStartY = 180;
-        private int _codeOffsetMarkerX = -20, _codeOffsetMarkerY = -2;
-
-        private int _timeLimitBarStartX = 10 , _timeLimitBarStartY = 120, _timeLimitBarHeight = 20, _timeLimitBarWidthMax = 320;
         private Rectangle _timeLimitBarBase;
-        
-        private int _attemptIconStartX = 415, _attemptIconStartY = 65, _attemptIconStepX = 26, _attmptIconSize = 24;
+
+        private int _attemptIconStartX, _attemptIconStartY, _attemptIconStepX, _attmptIconSize;
 
         private Vector2 _iconLocation;
 
+        SaveData saveData;
+
+        const bool IS_DEBUG_MODE = false;
+
+        const int MAX_NUMBER_OF_HINTS = 8;
+
+        const string VERSION_GAME = "1.4.1 (2022.10.24)";
+
+        const int MENU_MARKER_START_X = 225, MENU_MARKER_START_Y = 330, MENU_MARKER_STEP_Y = 40;
+
+        const int OPTION_MARKER_START_X = 225, OPTION_MARKER_START_Y = 150, PTION_MARKER_STEP_Y = 40;
+
+        const int GUESS_HISTORY_START_X = 600, GUESS_HISTORY_START_Y = 115;
+        const int GUESS_HISTORY_STEP_X = 40, GUESS_HISTORY_STEP_Y = 50, GUESS_HISTORY_THICKNESS = 3;
+        const int GUESS_TABLE_OFFSET_X = -11, gUESS_TABLE_OFFSET_Y = -3;
+
+        const int CODE_POSITION_START_X = 50, CODE_POSITION_START_Y = 180, CODE_POSITION_STEP_X = 105;
+        const int CODE_OFFSET_MARKER_X = -20, CODE_OFFSET_MARKER_Y = -2;
+
+        const int TIME_LIMIT_BAR_START_X = 10 , TIME_LIMIT_BAR_START_Y = 120, TIME_LIMIT_BAR_HEIGHT = 20, TIME_LIMIT_BAR_WIDTH_MAX = 320;
+        
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -89,14 +94,11 @@ namespace CodeBreaker_MonoGame
         {
             Window.Title = "Code Breaker - MonoGame";
             InitializePrivatVariables();
-            GoToMainMenu();
             ReadSaveData();
+            GoToMainMenu();
             _graphics.PreferredBackBufferWidth = 820;
             _graphics.PreferredBackBufferHeight = 550;
             _graphics.ApplyChanges();
-            lang = new Lang(saveData.langID);
-            _timeLimitBarBase = new Rectangle(_timeLimitBarStartX, _timeLimitBarStartY, _timeLimitBarWidthMax, _timeLimitBarHeight);
-            _iconLocation = new Vector2(60, 27);
 
             base.Initialize();
         }
@@ -106,7 +108,12 @@ namespace CodeBreaker_MonoGame
 
             _keyRightUp = true; _keyLeftUp = true; _keyUpUp = true; _keyDownUp = true;
             _keyEnterUp = true; _keyHelpUp = true; _keyOptionUp = true; _keyEscapeUp = true; _keySpaceUp = true;
-    }
+
+            _timeLimitBarBase = new Rectangle(TIME_LIMIT_BAR_START_X, TIME_LIMIT_BAR_START_Y, TIME_LIMIT_BAR_WIDTH_MAX, TIME_LIMIT_BAR_HEIGHT);
+            _iconLocation = new Vector2(60, 27);
+
+            _attemptIconStartX = 415; _attemptIconStartY = 65; _attemptIconStepX = 26; _attmptIconSize = 24;
+        }
 
         protected override void LoadContent()
         {
@@ -153,7 +160,7 @@ namespace CodeBreaker_MonoGame
             if ( (keyboardState.IsKeyDown(Keys.Enter) || gamePadState.Buttons.Start == ButtonState.Pressed)
                 && _keyEnterUp == true)
             {
-                if (gameState == GameState.Menu || gameState == GameState.FinishGame)
+                if (_gameState == GameState.Menu || _gameState == GameState.FinishGame)
                 {
                     _musicAndSounds.PlaySoundEffect(_startSoundEffect);
                     StartNewGame();
@@ -169,10 +176,10 @@ namespace CodeBreaker_MonoGame
             if ( (keyboardState.IsKeyDown(Keys.H) || gamePadState.Buttons.RightShoulder == ButtonState.Pressed)
                 && _keyHelpUp == true)
             {
-                if (gameState == GameState.Menu)
+                if (_gameState == GameState.Menu)
                 {
                     _musicAndSounds.PlaySoundEffect(_menuNaviInstr);
-                    gameState = GameState.GameInstructions;
+                    _gameState = GameState.GameInstructions;
                 }   
                 _keyHelpUp = false;
             }
@@ -185,10 +192,10 @@ namespace CodeBreaker_MonoGame
             if ( (keyboardState.IsKeyDown(Keys.O) || gamePadState.Buttons.LeftShoulder == ButtonState.Pressed)
                 && _keyOptionUp == true)
             {
-                if (gameState == GameState.Menu)
+                if (_gameState == GameState.Menu)
                 {
                     _musicAndSounds.PlaySoundEffect(_menuNaviOption);
-                    gameState = GameState.Option;
+                    _gameState = GameState.Option;
                     _optionMarkerIndex = 0;
                 }
                 _keyOptionUp = false;
@@ -202,7 +209,7 @@ namespace CodeBreaker_MonoGame
             if ( (keyboardState.IsKeyDown(Keys.Escape) || gamePadState.Buttons.Back == ButtonState.Pressed)
                 && _keyEscapeUp == true)
             {
-                if (gameState == GameState.Menu)
+                if (_gameState == GameState.Menu)
                 {
                     Exit();
                 }
@@ -222,7 +229,7 @@ namespace CodeBreaker_MonoGame
             if ( (keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D) || gamePadState.DPad.Right == ButtonState.Pressed)
                 && _keyRightUp == true)
             {
-                if (gameState == GameState.InGame)
+                if (_gameState == GameState.InGame)
                 {
                     _gameMarkerIndex++;
                     if (_gameMarkerIndex > saveData.codeLength - 1)
@@ -231,7 +238,7 @@ namespace CodeBreaker_MonoGame
                     }
                     _musicAndSounds.PlaySoundEffect(_gameSideSoundEffect);
                 }
-                else if (gameState == GameState.Menu)
+                else if (_gameState == GameState.Menu)
                 {
                     switch (_menuMarkerIndex)
                     {
@@ -264,7 +271,7 @@ namespace CodeBreaker_MonoGame
                     }
                     _musicAndSounds.PlaySoundEffect(_menuSideSoundEffect);
                 }
-                else if(gameState == GameState.Option)
+                else if(_gameState == GameState.Option)
                 {
                     switch (_optionMarkerIndex)
                     {
@@ -278,7 +285,7 @@ namespace CodeBreaker_MonoGame
                             _musicAndSounds.IncSoundsVolume();
                             break;
                         case 3:
-                            lang.IncSelection();
+                            _lang.IncSelection();
                             break;
                         default:
                             break;
@@ -297,7 +304,7 @@ namespace CodeBreaker_MonoGame
             if ( (keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A) || gamePadState.DPad.Left == ButtonState.Pressed)
                 && _keyLeftUp == true)
             {
-                if (gameState == GameState.InGame)
+                if (_gameState == GameState.InGame)
                 {
                     _gameMarkerIndex--;
                     if (_gameMarkerIndex < 0)
@@ -306,7 +313,7 @@ namespace CodeBreaker_MonoGame
                     }
                     _musicAndSounds.PlaySoundEffect(_gameSideSoundEffect);
                 }
-                else if (gameState == GameState.Menu)
+                else if (_gameState == GameState.Menu)
                 {
                     switch (_menuMarkerIndex)
                     {
@@ -339,7 +346,7 @@ namespace CodeBreaker_MonoGame
                     }
                     _musicAndSounds.PlaySoundEffect(_menuSideSoundEffect);
                 }
-                else if (gameState == GameState.Option)
+                else if (_gameState == GameState.Option)
                 {
                     switch (_optionMarkerIndex)
                     {
@@ -353,7 +360,7 @@ namespace CodeBreaker_MonoGame
                             _musicAndSounds.DecSoundsVolume();
                             break;
                         case 3:
-                            lang.DecSelection();
+                            _lang.DecSelection();
                             break;
                         default:
                             break;
@@ -373,16 +380,16 @@ namespace CodeBreaker_MonoGame
             if ( (keyboardState.IsKeyDown(Keys.Up) || keyboardState.IsKeyDown(Keys.W) || gamePadState.DPad.Up == ButtonState.Pressed)
                 && _keyUpUp == true)
             {
-                if (gameState == GameState.InGame)
+                if (_gameState == GameState.InGame)
                 {
-                    gameLogic.currentCode[_gameMarkerIndex]++;
-                    if (gameLogic.currentCode[_gameMarkerIndex] > 9)
+                    _gameLogic.currentCode[_gameMarkerIndex]++;
+                    if (_gameLogic.currentCode[_gameMarkerIndex] > 9)
                     {
-                        gameLogic.currentCode[_gameMarkerIndex] = 0;
+                        _gameLogic.currentCode[_gameMarkerIndex] = 0;
                     }
                     _musicAndSounds.PlaySoundEffect(_gameUpDownSoundEffect);        
                 }
-                else if (gameState == GameState.Menu)
+                else if (_gameState == GameState.Menu)
                 {
                     _menuMarkerIndex--;
                     if (_menuMarkerIndex < 0)
@@ -397,7 +404,7 @@ namespace CodeBreaker_MonoGame
                     }
                     _musicAndSounds.PlaySoundEffect(_menuUpDownSoundEffect);
                 }
-                else if (gameState == GameState.Option)
+                else if (_gameState == GameState.Option)
                 {
                     _optionMarkerIndex--;
                     if (_optionMarkerIndex < 0)
@@ -421,16 +428,16 @@ namespace CodeBreaker_MonoGame
             if ( (keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S) || gamePadState.DPad.Down == ButtonState.Pressed)
                 && _keyDownUp == true)
             {
-                if (gameState == GameState.InGame)
+                if (_gameState == GameState.InGame)
                 {
-                    gameLogic.currentCode[_gameMarkerIndex]--;
-                    if (gameLogic.currentCode[_gameMarkerIndex] < 0)
+                    _gameLogic.currentCode[_gameMarkerIndex]--;
+                    if (_gameLogic.currentCode[_gameMarkerIndex] < 0)
                     {
-                        gameLogic.currentCode[_gameMarkerIndex] = 9;
+                        _gameLogic.currentCode[_gameMarkerIndex] = 9;
                     }
                     _musicAndSounds.PlaySoundEffect(_gameUpDownSoundEffect);
                 }
-                else if (gameState == GameState.Menu)
+                else if (_gameState == GameState.Menu)
                 {
                     _menuMarkerIndex++;
                     if ((_menuMarkerIndex == 2 && saveData.isAttemptsLimit == false) ||
@@ -445,7 +452,7 @@ namespace CodeBreaker_MonoGame
                     }
                     _musicAndSounds.PlaySoundEffect(_menuUpDownSoundEffect);
                 }
-                else if (gameState == GameState.Option)
+                else if (_gameState == GameState.Option)
                 {
                     _optionMarkerIndex++;
                     if (_optionMarkerIndex == 1 && _musicAndSounds.GetIsSounding() == false)
@@ -466,23 +473,23 @@ namespace CodeBreaker_MonoGame
                 _keyDownUp = true;
             }
 
-            _menuMarkerPosition = _menuMarkerStartY + (_menuMarkerIndex * _menuMarkerStepY) - 5;
-            _optionMarkerPosition = _optionMarkerStartY + (_optionMarkerIndex * _optionMarkerStepY) - 5;
+            _menuMarkerPosition = MENU_MARKER_START_Y + (_menuMarkerIndex * MENU_MARKER_STEP_Y) - 5;
+            _optionMarkerPosition = OPTION_MARKER_START_Y + (_optionMarkerIndex * PTION_MARKER_STEP_Y) - 5;
 
             if ( (keyboardState.IsKeyDown(Keys.Space) || gamePadState.Buttons.A == ButtonState.Pressed)
                 && _keySpaceUp == true)
             {
-                if (gameState == GameState.InGame)
+                if (_gameState == GameState.InGame)
                 {
-                    bool isCodeCorrect = gameLogic.TryCode();
+                    bool isCodeCorrect = _gameLogic.TryCode();
                     if (isCodeCorrect)
                     {
-                        gameState = GameState.FinishGame;
+                        _gameState = GameState.FinishGame;
                         _musicAndSounds.PlaySoundEffect(_successSoundEffect);
                     }
-                    else if (((gameLogic.numberOfAttempts >= saveData.attemptsLimit) && saveData.isAttemptsLimit))
+                    else if (((_gameLogic.numberOfAttempts >= saveData.attemptsLimit) && saveData.isAttemptsLimit))
                     {
-                        gameState = GameState.FinishGame;
+                        _gameState = GameState.FinishGame;
                         _musicAndSounds.PlaySoundEffect(_failSoundEffect);
                     }
                     else
@@ -498,7 +505,7 @@ namespace CodeBreaker_MonoGame
                 _keySpaceUp = true;
             }
 
-            if (gameState == GameState.InGame)
+            if (_gameState == GameState.InGame)
             {
                 if (saveData.isTimeLimit)
                 {
@@ -506,7 +513,7 @@ namespace CodeBreaker_MonoGame
                     if (_remainingTime <= 0)
                     {
                         _remainingTime = 0;
-                        gameState = GameState.FinishGame;
+                        _gameState = GameState.FinishGame;
                         _musicAndSounds.PlaySoundEffect(_failSoundEffect);
                     }
                 }
@@ -525,84 +532,84 @@ namespace CodeBreaker_MonoGame
             _spriteBatch.Begin();
 
             _spriteBatch.Draw(_background, Vector2.Zero, Color.White);
-            switch (gameState)
+            switch (_gameState)
             {
                 case GameState.Menu:
-                    _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameTitle), new Vector2(180, 50), Color.Black);
+                    _spriteBatch.DrawString(_bigFont, _lang.GetLangText(LangKey.GameTitle), new Vector2(180, 50), Color.Black);
                     _spriteBatch.Draw(_iconGame, _iconLocation, Color.White);
 
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.StartGameKey), new Vector2(120, 140), Color.Black);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.GameInstuctionKey), new Vector2(120, 170), Color.Black);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.GameOptionKey), new Vector2(120, 200), Color.Black);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.ExitGameKey), new Vector2(120, 230), Color.Black);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.StartGameKey), new Vector2(120, 140), Color.Black);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.GameInstuctionKey), new Vector2(120, 170), Color.Black);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.GameOptionKey), new Vector2(120, 200), Color.Black);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.ExitGameKey), new Vector2(120, 230), Color.Black);
 
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.GameModifiers), GetMenuMarkerPosition(-1), Color.Black);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.CodeLength) + saveData.codeLength.ToString(), GetMenuMarkerPosition(0), Color.Black);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.IsLimitedAttempts) + lang.GetBoolInLang(saveData.isAttemptsLimit), GetMenuMarkerPosition(1), Color.Black);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.NumberAttempts) + saveData.attemptsLimit.ToString(), GetMenuMarkerPosition(2), saveData.isAttemptsLimit ? Color.Black : Color.Gray);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.IsTimeLimitation) + lang.GetBoolInLang(saveData.isTimeLimit), GetMenuMarkerPosition(3), Color.Black);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.TimeLimit) + saveData.timeLimit.ToString(), GetMenuMarkerPosition(4), saveData.isTimeLimit ? Color.Black : Color.Gray);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.GameModifiers), GetMenuMarkerPosition(-1), Color.Black);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.CodeLength) + saveData.codeLength.ToString(), GetMenuMarkerPosition(0), Color.Black);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.IsLimitedAttempts) + _lang.GetBoolInLang(saveData.isAttemptsLimit), GetMenuMarkerPosition(1), Color.Black);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.NumberAttempts) + saveData.attemptsLimit.ToString(), GetMenuMarkerPosition(2), saveData.isAttemptsLimit ? Color.Black : Color.Gray);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.IsTimeLimitation) + _lang.GetBoolInLang(saveData.isTimeLimit), GetMenuMarkerPosition(3), Color.Black);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.TimeLimit) + saveData.timeLimit.ToString(), GetMenuMarkerPosition(4), saveData.isTimeLimit ? Color.Black : Color.Gray);
 
-                    _spriteBatch.DrawString(_littleFont, lang.GetLangText(LangKey.CreditsStart) + "Bartłomiej Grywalski", new Vector2(20, 530), Color.Black);
-                    _spriteBatch.DrawString(_littleFont, lang.GetLangText(LangKey.VersionInfo) + versionText, new Vector2(600, 530), Color.Black);
+                    _spriteBatch.DrawString(_littleFont, _lang.GetLangText(LangKey.CreditsStart) + "Bartłomiej Grywalski", new Vector2(20, 530), Color.Black);
+                    _spriteBatch.DrawString(_littleFont, _lang.GetLangText(LangKey.VersionInfo) + VERSION_GAME, new Vector2(600, 530), Color.Black);
                     _spriteBatch.Draw(_menuMarkerSprite, new Vector2(210, _menuMarkerPosition), Color.Purple);
                     break;
                 case GameState.GameInstructions:
-                    _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameInstuction), new Vector2(250, 50), Color.Black);
+                    _spriteBatch.DrawString(_bigFont, _lang.GetLangText(LangKey.GameInstuction), new Vector2(250, 50), Color.Black);
 
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpSingleDigitOnce), new Vector2(50, 120), Color.Black);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorsOption), new Vector2(50, 150), Color.Black);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorRed), new Vector2(50, 180), Color.Red);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorBlue), new Vector2(50, 210), Color.Blue);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorGreen), new Vector2(50, 240), Color.Green);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.HelpSingleDigitOnce), new Vector2(50, 120), Color.Black);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.HelpColorsOption), new Vector2(50, 150), Color.Black);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.HelpColorRed), new Vector2(50, 180), Color.Red);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.HelpColorBlue), new Vector2(50, 210), Color.Blue);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.HelpColorGreen), new Vector2(50, 240), Color.Green);
 
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.ControlsInGame), new Vector2(50, 300), Color.Black);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpLeftRight), new Vector2(50, 330), Color.Black);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpUpDown), new Vector2(50, 360), Color.Black);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpSpace), new Vector2(50, 390), Color.Black);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpEsc), new Vector2(50, 420), Color.Black);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.ControlsInGame), new Vector2(50, 300), Color.Black);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.HelpLeftRight), new Vector2(50, 330), Color.Black);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.HelpUpDown), new Vector2(50, 360), Color.Black);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.HelpSpace), new Vector2(50, 390), Color.Black);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.HelpEsc), new Vector2(50, 420), Color.Black);
 
-                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.InstrucitonAndFinishGoBackMenu), new Vector2(10, 500), Color.Black);
+                    _spriteBatch.DrawString(_middleFont, _lang.GetLangText(LangKey.InstrucitonAndFinishGoBackMenu), new Vector2(10, 500), Color.Black);
 
                     break;
                 case GameState.Option:
-                    _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameOption), new Vector2(300, 50), Color.Black);
+                    _spriteBatch.DrawString(_bigFont, _lang.GetLangText(LangKey.GameOption), new Vector2(300, 50), Color.Black);
 
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.PlayingSound) + lang.GetBoolInLang(_musicAndSounds.GetIsSounding()), GetOptionMarkerPosition(0), Color.Black);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.MusicVolume) + _musicAndSounds.GetMusicVolumePercentString(), GetOptionMarkerPosition(1), _musicAndSounds.GetIsSounding() ? Color.Black : Color.Gray);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.SoundsVolume) + _musicAndSounds.GetSoundsVolumePercentString(), GetOptionMarkerPosition(2), _musicAndSounds.GetIsSounding() ? Color.Black : Color.Gray);
-                    _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.LanguageSelected), GetOptionMarkerPosition(3), Color.Black);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.PlayingSound) + _lang.GetBoolInLang(_musicAndSounds.GetIsSounding()), GetOptionMarkerPosition(0), Color.Black);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.MusicVolume) + _musicAndSounds.GetMusicVolumePercentString(), GetOptionMarkerPosition(1), _musicAndSounds.GetIsSounding() ? Color.Black : Color.Gray);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.SoundsVolume) + _musicAndSounds.GetSoundsVolumePercentString(), GetOptionMarkerPosition(2), _musicAndSounds.GetIsSounding() ? Color.Black : Color.Gray);
+                    _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.LanguageSelected), GetOptionMarkerPosition(3), Color.Black);
 
                     _spriteBatch.Draw(_menuMarkerSprite, new Vector2(210, _optionMarkerPosition), Color.Purple);
 
-                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.InstrucitonAndFinishGoBackMenu), new Vector2(10, 500), Color.Black);
+                    _spriteBatch.DrawString(_middleFont, _lang.GetLangText(LangKey.InstrucitonAndFinishGoBackMenu), new Vector2(10, 500), Color.Black);
                     break;
                 case GameState.InGame:
                     for (int i = 0; i < saveData.codeLength; i++)
                     {
-                        _spriteBatch.DrawString(_largeFont, gameLogic.currentCode[i].ToString(), new Vector2(_codePositionStartX + (_codePositionStepX * i), _codePostionoStartY), Color.Black);
-                        _spriteBatch.Draw(_gameMarkerSprite, new Vector2(_codePositionStartX + _codeOffsetMarkerX + (i * _codePositionStepX), _codePostionoStartY + _codeOffsetMarkerY), i == _gameMarkerIndex ? Color.Purple : Color.Gray);
+                        _spriteBatch.DrawString(_largeFont, _gameLogic.currentCode[i].ToString(), new Vector2(CODE_POSITION_START_X + (CODE_POSITION_STEP_X * i), CODE_POSITION_START_Y), Color.Black);
+                        _spriteBatch.Draw(_gameMarkerSprite, new Vector2(CODE_POSITION_START_X + CODE_OFFSET_MARKER_X + (i * CODE_POSITION_STEP_X), CODE_POSITION_START_Y + CODE_OFFSET_MARKER_Y), i == _gameMarkerIndex ? Color.Purple : Color.Gray);
                     }
 
                     if (!IS_DEBUG_MODE)
                     {
-                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpSingleDigitOnce), new Vector2(5, 400), Color.Black);
-                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorsOption), new Vector2(5, 430), Color.Black);
-                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorRed), new Vector2(5, 460), Color.Red);
-                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorBlue), new Vector2(5, 490), Color.Blue);
-                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.HelpColorGreen), new Vector2(5, 520), Color.Green);
+                        _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.HelpSingleDigitOnce), new Vector2(5, 400), Color.Black);
+                        _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.HelpColorsOption), new Vector2(5, 430), Color.Black);
+                        _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.HelpColorRed), new Vector2(5, 460), Color.Red);
+                        _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.HelpColorBlue), new Vector2(5, 490), Color.Blue);
+                        _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.HelpColorGreen), new Vector2(5, 520), Color.Green);
                     }
                     else
                     {
-                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.DebugMarkerIndex) + _gameMarkerIndex.ToString()
-                            + lang.GetLangText(LangKey.DebugMarkerPos) + _gameMarkerPosition.ToString(), new Vector2(10, 400), Color.Black);
-                        _spriteBatch.DrawString(_smallFont, lang.GetLangText(LangKey.DebugCurrentCode) + gameLogic.CurrentCodeString(), new Vector2(10, 430), Color.Black);
+                        _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.DebugMarkerIndex) + _gameMarkerIndex.ToString()
+                            + _lang.GetLangText(LangKey.DebugMarkerPos) + _gameMarkerPosition.ToString(), new Vector2(10, 400), Color.Black);
+                        _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.DebugCurrentCode) + _gameLogic.CurrentCodeString(), new Vector2(10, 430), Color.Black);
                     }
 
                     if (saveData.isAttemptsLimit)
                     {
-                        int remainingAttempt = saveData.attemptsLimit - gameLogic.numberOfAttempts;
-                        _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameRemainingAttempts) + remainingAttempt.ToString(), new Vector2(360, 10), Color.Black);
+                        int remainingAttempt = saveData.attemptsLimit - _gameLogic.numberOfAttempts;
+                        _spriteBatch.DrawString(_bigFont, _lang.GetLangText(LangKey.GameRemainingAttempts) + remainingAttempt.ToString(), new Vector2(360, 10), Color.Black);
                         for (int i = 0; i < saveData.attemptsLimit; i++)
                         {
                             if (i < remainingAttempt)
@@ -617,85 +624,85 @@ namespace CodeBreaker_MonoGame
                     }
                     else
                     {
-                        _spriteBatch.DrawString(_bigFont, lang.GetLangText(LangKey.GameNumberOfAttempts) + gameLogic.numberOfAttempts.ToString(), new Vector2(360, 10), Color.Black);
+                        _spriteBatch.DrawString(_bigFont, _lang.GetLangText(LangKey.GameNumberOfAttempts) + _gameLogic.numberOfAttempts.ToString(), new Vector2(360, 10), Color.Black);
                     }
 
                     if (saveData.isTimeLimit)
                     {
-                        _spriteBatch.DrawString(_bigFont, string.Format(lang.GetLangText(LangKey.GameRemainingTime), _remainingTime), new Vector2(10, 10), Color.Black);
+                        _spriteBatch.DrawString(_bigFont, string.Format(_lang.GetLangText(LangKey.GameRemainingTime), _remainingTime), new Vector2(10, 10), Color.Black);
                         _spriteBatch.Draw(_squereBaseSprite, _timeLimitBarBase, Color.White);
                         _spriteBatch.Draw(_squereBaseSprite, GetTimieLimitBarRectangel(), GetTimeLimitBarColor());
                     }
                     
-                    for (int i = 0; i < gameLogic.guessCodeHistory.Count; i++)
+                    for (int i = 0; i < _gameLogic.guessCodeHistory.Count; i++)
                     {
-                        for (int j = 0; j < gameLogic.guessCodeHistory[i].Count; j++)
+                        for (int j = 0; j < _gameLogic.guessCodeHistory[i].Count; j++)
                         {
-                            _guessCodeHistoryTextPlace = new Vector2(_guessHistoryStartX + (j * _guessHistroyStepX), _guessHistoryStartY + i * _guessHistroyStepY);
-                            _spriteBatch.DrawString(_bigFont, gameLogic.guessCodeHistory[i][j].value.ToString(), _guessCodeHistoryTextPlace, DecodeColor(gameLogic.guessCodeHistory[i][j].digitState));
+                            _guessCodeHistoryTextPlace = new Vector2(GUESS_HISTORY_START_X + (j * GUESS_HISTORY_STEP_X), GUESS_HISTORY_START_Y + i * GUESS_HISTORY_STEP_Y);
+                            _spriteBatch.DrawString(_bigFont, _gameLogic.guessCodeHistory[i][j].value.ToString(), _guessCodeHistoryTextPlace, DecodeColor(_gameLogic.guessCodeHistory[i][j].digitState));
                         }
                     }
 
-                    if (gameLogic.guessCodeHistory.Count > 0)
+                    if (_gameLogic.guessCodeHistory.Count > 0)
                     {
-                        for (int i = 0; i < gameLogic.guessCodeHistory.Count; i++)
+                        for (int i = 0; i < _gameLogic.guessCodeHistory.Count; i++)
                         {
-                            _spriteBatch.Draw(_squereBaseSprite, new Rectangle(_guessHistoryStartX + _tableOffsetX, (_guessHistoryStartY + tableOffsetY) + i * _guessHistroyStepY,
-                                                _guessHistroyStepX * gameLogic.guessCodeHistory[0].Count, _guessHistoryThickness), _tableColor);
-                            if (i == gameLogic.guessCodeHistory.Count - 1)
+                            _spriteBatch.Draw(_squereBaseSprite, new Rectangle(GUESS_HISTORY_START_X + GUESS_TABLE_OFFSET_X, (GUESS_HISTORY_START_Y + gUESS_TABLE_OFFSET_Y) + i * GUESS_HISTORY_STEP_Y,
+                                                GUESS_HISTORY_STEP_X * _gameLogic.guessCodeHistory[0].Count, GUESS_HISTORY_THICKNESS), _tableColor);
+                            if (i == _gameLogic.guessCodeHistory.Count - 1)
                             {
-                                _spriteBatch.Draw(_squereBaseSprite, new Rectangle(_guessHistoryStartX + _tableOffsetX, (_guessHistoryStartY + tableOffsetY) + (i + 1) * _guessHistroyStepY,
-                                                    _guessHistroyStepX * gameLogic.guessCodeHistory[0].Count, _guessHistoryThickness), _tableColor);
+                                _spriteBatch.Draw(_squereBaseSprite, new Rectangle(GUESS_HISTORY_START_X + GUESS_TABLE_OFFSET_X, (GUESS_HISTORY_START_Y + gUESS_TABLE_OFFSET_Y) + (i + 1) * GUESS_HISTORY_STEP_Y,
+                                                    GUESS_HISTORY_STEP_X * _gameLogic.guessCodeHistory[0].Count, GUESS_HISTORY_THICKNESS), _tableColor);
                             }
                         }
-                        for (int i = 0; i < gameLogic.guessCodeHistory[0].Count; i++)
+                        for (int i = 0; i < _gameLogic.guessCodeHistory[0].Count; i++)
                         {
-                            _spriteBatch.Draw(_squereBaseSprite, new Rectangle(_guessHistoryStartX + _tableOffsetX + (i * _guessHistroyStepX), (_guessHistoryStartY + tableOffsetY),
-                                                _guessHistoryThickness, _guessHistroyStepY * gameLogic.guessCodeHistory.Count), _tableColor);
-                            if (i == gameLogic.guessCodeHistory[0].Count - 1)
+                            _spriteBatch.Draw(_squereBaseSprite, new Rectangle(GUESS_HISTORY_START_X + GUESS_TABLE_OFFSET_X + (i * GUESS_HISTORY_STEP_X), (GUESS_HISTORY_START_Y + gUESS_TABLE_OFFSET_Y),
+                                                GUESS_HISTORY_THICKNESS, GUESS_HISTORY_STEP_Y * _gameLogic.guessCodeHistory.Count), _tableColor);
+                            if (i == _gameLogic.guessCodeHistory[0].Count - 1)
                             {
-                                _spriteBatch.Draw(_squereBaseSprite, new Rectangle(_guessHistoryStartX + _tableOffsetX + ((i + 1) * _guessHistroyStepX), (_guessHistoryStartY + tableOffsetY),
-                                                _guessHistoryThickness, (_guessHistroyStepY * gameLogic.guessCodeHistory.Count) + _guessHistoryThickness), _tableColor);
+                                _spriteBatch.Draw(_squereBaseSprite, new Rectangle(GUESS_HISTORY_START_X + GUESS_TABLE_OFFSET_X + ((i + 1) * GUESS_HISTORY_STEP_X), (GUESS_HISTORY_START_Y + gUESS_TABLE_OFFSET_Y),
+                                                GUESS_HISTORY_THICKNESS, (GUESS_HISTORY_STEP_Y * _gameLogic.guessCodeHistory.Count) + GUESS_HISTORY_THICKNESS), _tableColor);
                             }
                         }
                     }
 
                     break;
                 case GameState.FinishGame:
-                    if (gameLogic.codeGuessed)
+                    if (_gameLogic.codeGuessed)
                     {
-                        _endGameInfo = lang.GetLangText(LangKey.FinishWin); _endGameColor = Color.Green;
+                        _endGameInfo = _lang.GetLangText(LangKey.FinishWin); _endGameColor = Color.Green;
                     }
                     else
                     {
-                        _endGameInfo = lang.GetLangText(LangKey.FinishLost); _endGameColor = Color.Red;
+                        _endGameInfo = _lang.GetLangText(LangKey.FinishLost); _endGameColor = Color.Red;
                     }
 
                     _spriteBatch.DrawString(_bigFont, _endGameInfo, new Vector2(200, 40), _endGameColor);
 
                     if (saveData.isTimeLimit)
                     {
-                        _spriteBatch.DrawString(_middleFont, string.Format(lang.GetLangText(LangKey.FinishRemainingTime), _remainingTime), new Vector2(200, 100), Color.Black);
+                        _spriteBatch.DrawString(_middleFont, string.Format(_lang.GetLangText(LangKey.FinishRemainingTime), _remainingTime), new Vector2(200, 100), Color.Black);
                     }
                     else
                     {
-                        _spriteBatch.DrawString(_middleFont, string.Format(lang.GetLangText(LangKey.FinishPlayingTime), _playingTime), new Vector2(200, 100), Color.Black);
+                        _spriteBatch.DrawString(_middleFont, string.Format(_lang.GetLangText(LangKey.FinishPlayingTime), _playingTime), new Vector2(200, 100), Color.Black);
                     }
 
                     if (saveData.isAttemptsLimit)
                     {
-                        _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.FinishRemainingAttempts) + (saveData.attemptsLimit - gameLogic.numberOfAttempts).ToString(),
+                        _spriteBatch.DrawString(_middleFont, _lang.GetLangText(LangKey.FinishRemainingAttempts) + (saveData.attemptsLimit - _gameLogic.numberOfAttempts).ToString(),
                             new Vector2(200, 160), Color.Black);
                     }
                     else
                     {
-                        _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.FinishNumberOfAttempts) + gameLogic.numberOfAttempts.ToString(), new Vector2(200, 160), Color.Black);
+                        _spriteBatch.DrawString(_middleFont, _lang.GetLangText(LangKey.FinishNumberOfAttempts) + _gameLogic.numberOfAttempts.ToString(), new Vector2(200, 160), Color.Black);
                     }
 
-                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.FinishCorrectCode) + gameLogic.CorrectCodeString(), new Vector2(200, 220), Color.Black);
+                    _spriteBatch.DrawString(_middleFont, _lang.GetLangText(LangKey.FinishCorrectCode) + _gameLogic.CorrectCodeString(), new Vector2(200, 220), Color.Black);
 
-                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.FinishPlayAgain), new Vector2(10, 360), Color.Black);
-                    _spriteBatch.DrawString(_middleFont, lang.GetLangText(LangKey.InstrucitonAndFinishGoBackMenu), new Vector2(10, 400), Color.Black);
+                    _spriteBatch.DrawString(_middleFont, _lang.GetLangText(LangKey.FinishPlayAgain), new Vector2(10, 360), Color.Black);
+                    _spriteBatch.DrawString(_middleFont, _lang.GetLangText(LangKey.InstrucitonAndFinishGoBackMenu), new Vector2(10, 400), Color.Black);
                     break;
                 default:
                     break;
@@ -708,8 +715,8 @@ namespace CodeBreaker_MonoGame
 
         private Rectangle GetTimieLimitBarRectangel()
         {
-            float barWidth = ((float)_remainingTime / (float)saveData.timeLimit) * _timeLimitBarWidthMax;
-            return new Rectangle(_timeLimitBarStartX, _timeLimitBarStartY, (int)barWidth, _timeLimitBarHeight);
+            float barWidth = ((float)_remainingTime / (float)saveData.timeLimit) * TIME_LIMIT_BAR_WIDTH_MAX;
+            return new Rectangle(TIME_LIMIT_BAR_START_X, TIME_LIMIT_BAR_START_Y, (int)barWidth, TIME_LIMIT_BAR_HEIGHT);
         }
 
         private Color GetTimeLimitBarColor()
@@ -760,7 +767,7 @@ namespace CodeBreaker_MonoGame
         }
         private void StartNewGame()
         {
-            gameLogic = new GameLogic(saveData.codeLength, MAX_NUMBER_OF_HINTS);
+            _gameLogic = new GameLogic(saveData.codeLength, MAX_NUMBER_OF_HINTS);
             _gameMarkerIndex = 0;
             _playingTime = 0;
             _remainingTime = saveData.timeLimit;
@@ -781,14 +788,14 @@ namespace CodeBreaker_MonoGame
                     _attemptIconStartY = 70;
                 }
             }
-            gameState = GameState.InGame;
+            _gameState = GameState.InGame;
         }
         private void GoToMainMenu()
         {
             _menuMarkerIndex = 0;
-            gameState = GameState.Menu;
+            _gameState = GameState.Menu;
         }
-        SaveData saveData = new SaveData();
+        
         private void ReadSaveData()
         { 
             if(System.IO.File.Exists(_saveDataPath))
@@ -811,6 +818,7 @@ namespace CodeBreaker_MonoGame
                 saveData.soundsVolumePercent = 90;
                 saveData.langID = 0;
             }
+            _lang = new Lang(saveData.langID);
         }
         protected override void EndRun()
         {
@@ -822,7 +830,7 @@ namespace CodeBreaker_MonoGame
             saveData.isSounding = _musicAndSounds.GetIsSounding();
             saveData.musicVolumePercent = _musicAndSounds.GetMusicVolumePercent();
             saveData.soundsVolumePercent = _musicAndSounds.GetSoundsVolumePercent();
-            saveData.langID = lang.GetLangID();
+            saveData.langID = _lang.GetLangID();
 
             System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(SaveData));
 
@@ -832,11 +840,11 @@ namespace CodeBreaker_MonoGame
         }
         private Vector2 GetMenuMarkerPosition(int row)
         {
-            return new Vector2(_menuMarkerStartX, _menuMarkerStartY + (row * _menuMarkerStepY));
+            return new Vector2(MENU_MARKER_START_X, MENU_MARKER_START_Y + (row * MENU_MARKER_STEP_Y));
         }
         private Vector2 GetOptionMarkerPosition(int row)
         {
-            return new Vector2(_optionMarkerStartX, _optionMarkerStartY + (row * _optionMarkerStepY));
+            return new Vector2(OPTION_MARKER_START_X, OPTION_MARKER_START_Y + (row * PTION_MARKER_STEP_Y));
         }
     }
 }
