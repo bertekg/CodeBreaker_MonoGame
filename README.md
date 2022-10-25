@@ -12,33 +12,37 @@ The game allows you to guess the code in unlimited time and number of attempts. 
 
 The game supports multilingual features, supported languages: English, Polish.
 
-This is my first original game (not based on a tutorial). The game focuses more on game logic, without advanced graphics. This game uses the MonoGame framework. 
+This is my first original game (not based on a tutorial). The game focuses more on game logic, without advanced graphics. This game uses the MonoGame framework.
+
+## Builds
+If you want you can download current and previous versions of builds here: https://drive.google.com/drive/folders/1V3SWZ5HnUAJ59IXYfiHEPYbjdJdHNkdT?usp=sharing
 
 ## Screenshots
+All screenshots from current and previous versions are available here: https://drive.google.com/drive/folders/1m8CKQG6sDc0-qGZWj7o5AKtor24r2oxB?usp=sharing
 
 ### 1. Main menu
-![alt text](screenshots/1.4.0/1MainMenu.PNG)
+![alt text](Screenshots/1MainMenu.PNG)
 
 ### 2. Game instruction
-![alt text](screenshots/1.4.0/2GameInstruction.PNG)
+![alt text](Screenshots/2GameInstruction.PNG)
 
 ### 3. Option game in Polish language
-![alt text](screenshots/1.4.0/3OptionSupportPolish.PNG)
+![alt text](Screenshots/3OptionSupportPolish.PNG)
 
 ### 4. After game start
-![alt text](screenshots/1.4.0/4AfterStartGame.PNG)
+![alt text](Screenshots/4AfterStartGame.PNG)
 
 ### 5. All possible digit clues
-![alt text](screenshots/1.4.0/5AllPossibleDigitClues.PNG)
+![alt text](Screenshots/5AllPossibleDigitClues.PNG)
 
 ### 6. Before game end
-![alt text](screenshots/1.4.0/6BeforeGameEnd.PNG)
+![alt text](Screenshots/6BeforeGameEnd.PNG)
 
 ### 7. Successful game
-![alt text](screenshots/1.4.0/7GameFinishWin.PNG)
+![alt text](Screenshots/7GameFinishWin.PNG)
 
 ### 8. Possible game modyfication
-![alt text](screenshots/1.4.0/8PossibleModes.PNG)
+![alt text](Screenshots/8PossibleModes.PNG)
 
 ### 9. Unsuccessful game
-![alt text](screenshots/1.4.0/9GameFinishLose.PNG)
+![alt text](Screenshots/9GameFinishLose.PNG)

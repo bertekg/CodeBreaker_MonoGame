@@ -544,7 +544,7 @@
         }
         public string GetBoolInLang(bool value)
         {
-            string answer = string.Empty;
+            string answer;
             if (value)
             {
                 switch (langOption)
