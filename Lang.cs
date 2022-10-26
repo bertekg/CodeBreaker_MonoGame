@@ -233,10 +233,10 @@
                     switch (langOption)
                     {
                         case LangOption.PL:
-                            returnText = "[Lewo],[Prawo] - Przesuń kursor w kodzie.";
+                            returnText = "[Lewo lub A],[Prawo lub D] - Przesuń kursor w kodzie.";
                             break;
                         default:
-                            returnText = "[Left],[Right] - Move the cursor in the code.";
+                            returnText = "[Left or A],[Right or D] - Move the cursor in the code.";
                             break;
                     }
                     break;
@@ -244,10 +244,10 @@
                     switch (langOption)
                     {
                         case LangOption.PL:
-                            returnText = "[Góra],[Dół] -  Zmiana wartości wskazanej cyfry.";
+                            returnText = "[Góra lub W],[Dół lub S] -  Zmiana wartości wskazanej cyfry.";
                             break;
                         default:
-                            returnText = "[Up],[Down] - Change the value of the indicated digit.";
+                            returnText = "[Up or W],[Down or S] - Change the value of the indicated digit.";
                             break;
                     }
                     break;
@@ -478,7 +478,7 @@
                             returnText = "Naciśnij [Enter lub Start] aby zagrać ponownie";
                             break;
                         default:
-                            returnText = "Press [Enter or Back] to Start Game again";
+                            returnText = "Press [Enter or Start] to Start Game again";
                             break;
                     }
                     break;
