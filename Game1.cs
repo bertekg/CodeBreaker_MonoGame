@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 using CodeBreaker_MonoGame.Class;
+using CodeBreaker_MonoGame.Screen;
 
 namespace CodeBreaker_MonoGame
 {
@@ -46,9 +47,6 @@ namespace CodeBreaker_MonoGame
 
         private Vector2 _guessCodeHistoryTextPlace;
 
-        private string _endGameInfo;
-        private Color _endGameColor;
-
         string _saveDataPath;
 
         private Lang _lang;
@@ -71,7 +69,7 @@ namespace CodeBreaker_MonoGame
 
         const int MAX_NUMBER_OF_HINTS = 8;
 
-        const string VERSION_GAME = "1.4.2 (2022.10.26)";
+        const string VERSION_GAME = "1.4.3 (2022.10.27)";
 
         const int MENU_MARKER_START_X = 225, MENU_MARKER_START_Y = 330, MENU_MARKER_STEP_Y = 40;
 
@@ -85,7 +83,9 @@ namespace CodeBreaker_MonoGame
         const int CODE_OFFSET_MARKER_X = -20, CODE_OFFSET_MARKER_Y = -2;
 
         const int TIME_LIMIT_BAR_START_X = 10 , TIME_LIMIT_BAR_START_Y = 120, TIME_LIMIT_BAR_HEIGHT = 20, TIME_LIMIT_BAR_WIDTH_MAX = 320;
-        
+
+        FinishGameScene _finishGameScene;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -499,11 +499,13 @@ namespace CodeBreaker_MonoGame
                     if (isCodeCorrect)
                     {
                         _gameState = GameState.FinishGame;
+                        SwitchToFinishGame();
                         _musicAndSounds.PlaySoundEffect(_successSoundEffect);
                     }
                     else if (((_gameLogic.numberOfAttempts >= saveData.attemptsLimit) && saveData.isAttemptsLimit))
                     {
                         _gameState = GameState.FinishGame;
+                        SwitchToFinishGame();
                         _musicAndSounds.PlaySoundEffect(_failSoundEffect);
                     }
                     else
@@ -528,6 +530,7 @@ namespace CodeBreaker_MonoGame
                     {
                         _remainingTime = 0;
                         _gameState = GameState.FinishGame;
+                        SwitchToFinishGame();
                         _musicAndSounds.PlaySoundEffect(_failSoundEffect);
                     }
                 }
@@ -685,40 +688,7 @@ namespace CodeBreaker_MonoGame
 
                     break;
                 case GameState.FinishGame:
-                    if (_gameLogic.codeGuessed)
-                    {
-                        _endGameInfo = _lang.GetLangText(LangKey.FinishWin); _endGameColor = Color.Green;
-                    }
-                    else
-                    {
-                        _endGameInfo = _lang.GetLangText(LangKey.FinishLost); _endGameColor = Color.Red;
-                    }
-
-                    _spriteBatch.DrawString(_bigFont, _endGameInfo, new Vector2(200, 40), _endGameColor);
-
-                    if (saveData.isTimeLimit)
-                    {
-                        _spriteBatch.DrawString(_middleFont, string.Format(_lang.GetLangText(LangKey.FinishRemainingTime), _remainingTime), new Vector2(200, 100), Color.Black);
-                    }
-                    else
-                    {
-                        _spriteBatch.DrawString(_middleFont, string.Format(_lang.GetLangText(LangKey.FinishPlayingTime), _playingTime), new Vector2(200, 100), Color.Black);
-                    }
-
-                    if (saveData.isAttemptsLimit)
-                    {
-                        _spriteBatch.DrawString(_middleFont, _lang.GetLangText(LangKey.FinishRemainingAttempts) + (saveData.attemptsLimit - _gameLogic.numberOfAttempts).ToString(),
-                            new Vector2(200, 160), Color.Black);
-                    }
-                    else
-                    {
-                        _spriteBatch.DrawString(_middleFont, _lang.GetLangText(LangKey.FinishNumberOfAttempts) + _gameLogic.numberOfAttempts.ToString(), new Vector2(200, 160), Color.Black);
-                    }
-
-                    _spriteBatch.DrawString(_middleFont, _lang.GetLangText(LangKey.FinishCorrectCode) + _gameLogic.CorrectCodeString(), new Vector2(200, 220), Color.Black);
-
-                    _spriteBatch.DrawString(_middleFont, _lang.GetLangText(LangKey.FinishPlayAgain), new Vector2(10, 360), Color.Black);
-                    _spriteBatch.DrawString(_middleFont, _lang.GetLangText(LangKey.InstrucitonAndFinishGoBackMenu), new Vector2(10, 400), Color.Black);
+                    _finishGameScene.Draw(_spriteBatch);
                     break;
                 default:
                     break;
@@ -861,6 +831,18 @@ namespace CodeBreaker_MonoGame
         private Vector2 GetOptionMarkerPosition(int row)
         {
             return new Vector2(OPTION_MARKER_START_X, OPTION_MARKER_START_Y + (row * PTION_MARKER_STEP_Y));
+        }
+        private void SwitchToFinishGame()
+        {
+            _gameState = GameState.FinishGame;
+            double time;
+
+            if (saveData.isTimeLimit)
+                time = _remainingTime;
+            else
+                time = _playingTime;
+
+            _finishGameScene = new FinishGameScene(_gameLogic, saveData, _bigFont, _middleFont, _lang, time);
         }
     }
 }
