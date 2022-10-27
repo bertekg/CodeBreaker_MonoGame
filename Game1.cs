@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
+using CodeBreaker_MonoGame.Class;
 
 namespace CodeBreaker_MonoGame
 {
@@ -34,8 +35,9 @@ namespace CodeBreaker_MonoGame
 
         private GameState _gameState;
 
+        private Marker _menuMarker;
         private int _menuMarkerIndex;
-        private float _menuMarkerPosition;
+        //private float _menuMarkerPosition;
 
         private double _playingTime, _remainingTime;
 
@@ -51,8 +53,9 @@ namespace CodeBreaker_MonoGame
 
         private Lang _lang;
 
+        private Marker _optionMarker;
         private int _optionMarkerIndex;
-        private float _optionMarkerPosition;
+        //private float _optionMarkerPosition;
 
         private Color _tableColor = Color.Black;
 
@@ -126,6 +129,11 @@ namespace CodeBreaker_MonoGame
             _littleFont = Content.Load<SpriteFont>("fonts/little");
 
             _menuMarkerSprite = Content.Load<Texture2D>("sprites/menuMarker");
+            _menuMarker = new Marker(_menuMarkerSprite, 4,
+                new Vector2(MENU_MARKER_START_X - 15, MENU_MARKER_START_Y - 5), new Vector2(210, MENU_MARKER_START_Y + (4 * MENU_MARKER_STEP_Y) - 5));
+            //_optionMarkerPosition = OPTION_MARKER_START_Y + (_optionMarkerIndex * PTION_MARKER_STEP_Y) - 5;
+            _optionMarker = new Marker(_menuMarkerSprite, 3,
+                new Vector2(210, OPTION_MARKER_START_Y - 5), new Vector2(210, OPTION_MARKER_START_Y + (3 * PTION_MARKER_STEP_Y) - 5));
             _gameMarkerSprite = Content.Load<Texture2D>("sprites/gameMarker");
             _squereBaseSprite = Content.Load<Texture2D>("sprites/tableBase");
             _attemptIconReady = Content.Load<Texture2D>("sprites/attemptIconReady");
@@ -402,6 +410,7 @@ namespace CodeBreaker_MonoGame
                     {
                         _menuMarkerIndex--;
                     }
+                    _menuMarker.MoveMarker(_menuMarkerIndex);
                     _musicAndSounds.PlaySoundEffect(_menuUpDownSoundEffect);
                 }
                 else if (_gameState == GameState.Option)
@@ -415,6 +424,7 @@ namespace CodeBreaker_MonoGame
                     {
                         _optionMarkerIndex -= 2;
                     }
+                    _optionMarker.MoveMarker(_optionMarkerIndex);
                     _musicAndSounds.PlaySoundEffect(_menuUpDownSoundEffect);
                 }
                 _keyUpUp = false;
@@ -450,6 +460,7 @@ namespace CodeBreaker_MonoGame
                     {
                         _menuMarkerIndex = 0;
                     }
+                    _menuMarker.MoveMarker(_menuMarkerIndex);
                     _musicAndSounds.PlaySoundEffect(_menuUpDownSoundEffect);
                 }
                 else if (_gameState == GameState.Option)
@@ -463,6 +474,7 @@ namespace CodeBreaker_MonoGame
                     {
                         _optionMarkerIndex = 0;
                     }
+                    _optionMarker.MoveMarker(_optionMarkerIndex);
                     _musicAndSounds.PlaySoundEffect(_menuUpDownSoundEffect);
                 }
                 _keyDownUp = false;
@@ -473,8 +485,10 @@ namespace CodeBreaker_MonoGame
                 _keyDownUp = true;
             }
 
-            _menuMarkerPosition = MENU_MARKER_START_Y + (_menuMarkerIndex * MENU_MARKER_STEP_Y) - 5;
-            _optionMarkerPosition = OPTION_MARKER_START_Y + (_optionMarkerIndex * PTION_MARKER_STEP_Y) - 5;
+            //_menuMarkerPosition = MENU_MARKER_START_Y + (_menuMarkerIndex * MENU_MARKER_STEP_Y) - 5;
+            _menuMarker.Update();
+            //_optionMarkerPosition = OPTION_MARKER_START_Y + (_optionMarkerIndex * PTION_MARKER_STEP_Y) - 5;
+            _optionMarker.Update();
 
             if ( (keyboardState.IsKeyDown(Keys.Space) || gamePadState.Buttons.A == ButtonState.Pressed)
                 && _keySpaceUp == true)
@@ -552,7 +566,8 @@ namespace CodeBreaker_MonoGame
 
                     _spriteBatch.DrawString(_littleFont, _lang.GetLangText(LangKey.CreditsStart) + "Bartłomiej Grywalski", new Vector2(20, 530), Color.Black);
                     _spriteBatch.DrawString(_littleFont, _lang.GetLangText(LangKey.VersionInfo) + VERSION_GAME, new Vector2(600, 530), Color.Black);
-                    _spriteBatch.Draw(_menuMarkerSprite, new Vector2(210, _menuMarkerPosition), Color.Purple);
+                    //_spriteBatch.Draw(_menuMarkerSprite, new Vector2(210, _menuMarkerPosition), Color.Purple);
+                    _menuMarker.Draw(_spriteBatch);
                     break;
                 case GameState.GameInstructions:
                     _spriteBatch.DrawString(_bigFont, _lang.GetLangText(LangKey.GameInstuction), new Vector2(250, 50), Color.Black);
@@ -580,7 +595,8 @@ namespace CodeBreaker_MonoGame
                     _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.SoundsVolume) + _musicAndSounds.GetSoundsVolumePercentString(), GetOptionMarkerPosition(2), _musicAndSounds.GetIsSounding() ? Color.Black : Color.Gray);
                     _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.LanguageSelected), GetOptionMarkerPosition(3), Color.Black);
 
-                    _spriteBatch.Draw(_menuMarkerSprite, new Vector2(210, _optionMarkerPosition), Color.Purple);
+                    //_spriteBatch.Draw(_menuMarkerSprite, new Vector2(210, _optionMarkerPosition), Color.Purple);
+                    _optionMarker.Draw(_spriteBatch);
 
                     _spriteBatch.DrawString(_middleFont, _lang.GetLangText(LangKey.InstrucitonAndFinishGoBackMenu), new Vector2(10, 500), Color.Black);
                     break;
