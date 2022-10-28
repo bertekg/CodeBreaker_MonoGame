@@ -5,7 +5,7 @@ using System;
 
 namespace CodeBreaker_MonoGame.Screen
 {
-    internal class FinishGameScene : IScene
+    internal class FinishScene : IScene
     {
         private readonly SpriteFont _titleFont;
         private readonly SpriteFont _otherFont;
@@ -16,7 +16,7 @@ namespace CodeBreaker_MonoGame.Screen
         private readonly string attemptsText;
         private readonly string _correctCodeString;
 
-        public FinishGameScene(GameLogic gameLogic, SaveData saveData, SpriteFont bigFont, SpriteFont middleFont, Lang lang, double time)
+        public FinishScene(GameLogic gameLogic, SaveData saveData, SpriteFont bigFont, SpriteFont middleFont, Lang lang, double time)
         {
             _titleFont = bigFont;
             _otherFont = middleFont;
