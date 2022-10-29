@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 
-namespace CodeBreaker_MonoGame.Screen
+namespace CodeBreaker_MonoGame.Scene
 {
     internal class InstructionScene : IScene
     {
@@ -40,7 +40,7 @@ namespace CodeBreaker_MonoGame.Screen
 
             spriteBatch.DrawString(_navigationFont, _lang.GetLangText(LangKey.InstrucitonAndFinishGoBackMenu), new Vector2(10, 500), Color.Black);
         }
-        public void Update()
+        public void Update(double deltaTime)
         {
             KeyboardState keyboardState = Keyboard.GetState();
             GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);

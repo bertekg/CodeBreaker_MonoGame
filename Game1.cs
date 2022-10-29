@@ -3,11 +3,11 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
-using CodeBreaker_MonoGame.Screen;
+using CodeBreaker_MonoGame.Scene;
 
 namespace CodeBreaker_MonoGame
 {
-    public enum GameState { Menu, GameInstructions, Option,  InGame, FinishGame }
+    public enum GameState { Menu, Instructions, Option,  Game, Finish }
     public class Game1 : Game
     {
         private GraphicsDeviceManager _graphics;
@@ -28,51 +28,26 @@ namespace CodeBreaker_MonoGame
         private SoundEffect _successSoundEffect, _failSoundEffect;
         private SoundEffect _menuNaviInstr, _menuNaviOption;
 
-        private bool _keyRightUp, _keyLeftUp, _keyUpUp, _keyDownUp;
-        private bool _keyEscapeUp, _keySpaceUp;
-
         private GameLogic _gameLogic;
 
         private GameState _gameState;
-
-        private double _playingTime, _remainingTime;
-
-        private int _gameMarkerIndex;
-        private float _gameMarkerPosition;
-
-        private Vector2 _guessCodeHistoryTextPlace;
 
         string _saveDataPath;
 
         private Lang _lang;
 
-        private Color _tableColor = Color.Black;
-
-        private Rectangle _timeLimitBarBase;
-
-        private int _attemptIconStartX, _attemptIconStartY, _attemptIconStepX, _attmptIconSize;
-
         SaveData _saveData;
 
-        const bool IS_DEBUG_MODE = true;
+        const bool IS_DEBUG_MODE = false;
 
         const int MAX_NUMBER_OF_HINTS = 8;
 
-        const string VERSION_GAME = "1.4.6 (2022.10.29)";
-
-        const int GUESS_HISTORY_START_X = 600, GUESS_HISTORY_START_Y = 115;
-        const int GUESS_HISTORY_STEP_X = 40, GUESS_HISTORY_STEP_Y = 50, GUESS_HISTORY_THICKNESS = 3;
-        const int GUESS_TABLE_OFFSET_X = -11, gUESS_TABLE_OFFSET_Y = -3;
-
-        const int CODE_POSITION_START_X = 50, CODE_POSITION_START_Y = 180, CODE_POSITION_STEP_X = 105;
-        const int CODE_OFFSET_MARKER_X = -20, CODE_OFFSET_MARKER_Y = -2;
-
-        const int TIME_LIMIT_BAR_START_X = 10 , TIME_LIMIT_BAR_START_Y = 120, TIME_LIMIT_BAR_HEIGHT = 20, TIME_LIMIT_BAR_WIDTH_MAX = 320;
+        const string VERSION_GAME = "1.4.7 (2022.10.29)";
 
         MenuScene _menuScene;
         InstructionScene _instructionScene;
         OptionScene _optionScene;
-
+        GameScene _gameScene;
         FinishScene _finishScene;
 
         public Game1()
@@ -95,13 +70,6 @@ namespace CodeBreaker_MonoGame
         private void InitializePrivatVariables()
         {
             _saveDataPath = System.IO.Path.Combine(System.Environment.CurrentDirectory, "SaveData.xml");
-
-            _keyRightUp = true; _keyLeftUp = true; _keyUpUp = true; _keyDownUp = true;
-            _keyEscapeUp = true; _keySpaceUp = true;
-
-            _timeLimitBarBase = new Rectangle(TIME_LIMIT_BAR_START_X, TIME_LIMIT_BAR_START_Y, TIME_LIMIT_BAR_WIDTH_MAX, TIME_LIMIT_BAR_HEIGHT);
-
-            _attemptIconStartX = 415; _attemptIconStartY = 65; _attemptIconStepX = 26; _attmptIconSize = 24;
         }
 
         protected override void LoadContent()
@@ -145,183 +113,25 @@ namespace CodeBreaker_MonoGame
 
         protected override void Update(GameTime gameTime)
         {
-            KeyboardState keyboardState = Keyboard.GetState();
-            GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
-
             switch (_gameState)
             {
                 case GameState.Menu:
-                    _menuScene.Update();
+                    _menuScene.Update(gameTime.ElapsedGameTime.TotalSeconds);
                     break;
-                case GameState.GameInstructions:
-                    _instructionScene.Update();
+                case GameState.Instructions:
+                    _instructionScene.Update(gameTime.ElapsedGameTime.TotalSeconds);
                     break;
                 case GameState.Option:
-                    _optionScene.Update();
+                    _optionScene.Update(gameTime.ElapsedGameTime.TotalSeconds);
                     break;
-                case GameState.InGame:
+                case GameState.Game:
+                    _gameScene.Update(gameTime.ElapsedGameTime.TotalSeconds);
                     break;
-                case GameState.FinishGame:
-                    _finishScene.Update();
+                case GameState.Finish:
+                    _finishScene.Update(gameTime.ElapsedGameTime.TotalSeconds);
                     break;
                 default:
                     break;
-            }               
-
-            //if ( (keyboardState.IsKeyDown(Keys.Enter) || gamePadState.Buttons.Start == ButtonState.Pressed)
-            //    && _keyEnterUp == true)
-            //{
-            //    if (_gameState == GameState.FinishGame)
-            //    {
-            //        GoToGame();
-            //    }
-            //    _keyEnterUp = false;
-            //}
-            //else if ( (keyboardState.IsKeyUp(Keys.Enter) && gamePadState.Buttons.Start == ButtonState.Released)
-            //    && _keyEnterUp == false)
-            //{
-            //    _keyEnterUp = true;
-            //}
-
-            if ( (keyboardState.IsKeyDown(Keys.Escape) || gamePadState.Buttons.Back == ButtonState.Pressed)
-                && _keyEscapeUp == true)
-            {
-                if (_gameState == GameState.InGame/* || _gameState == GameState.FinishGame*/)
-                {                    
-                    GoToMainMenu(true);
-                }
-                _keyEscapeUp = false;
-            }
-            else if ( (keyboardState.IsKeyUp(Keys.Escape) && gamePadState.Buttons.Back == ButtonState.Released)
-                && _keyEscapeUp == false)
-            {
-                _keyEscapeUp = true;
-            }
-
-            if ( (keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D) || gamePadState.DPad.Right == ButtonState.Pressed)
-                && _keyRightUp == true)
-            {
-                if (_gameState == GameState.InGame)
-                {
-                    _gameMarkerIndex++;
-                    if (_gameMarkerIndex > _saveData.codeLength - 1)
-                    {
-                        _gameMarkerIndex = 0;
-                    }
-                    musicAndSounds.PlaySoundEffect(_gameSideSoundEffect);
-                }
-                _keyRightUp = false;
-            }
-            else if( (keyboardState.IsKeyUp(Keys.Right) && keyboardState.IsKeyUp(Keys.D) && gamePadState.DPad.Right == ButtonState.Released)
-                && _keyRightUp == false)
-            {
-                _keyRightUp = true;
-            }
-
-            if ( (keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A) || gamePadState.DPad.Left == ButtonState.Pressed)
-                && _keyLeftUp == true)
-            {
-                if (_gameState == GameState.InGame)
-                {
-                    _gameMarkerIndex--;
-                    if (_gameMarkerIndex < 0)
-                    {
-                        _gameMarkerIndex = _saveData.codeLength - 1;
-                    }
-                    musicAndSounds.PlaySoundEffect(_gameSideSoundEffect);
-                }
-                _keyLeftUp = false;
-            }
-            else if ( (keyboardState.IsKeyUp(Keys.Left) && keyboardState.IsKeyUp(Keys.A) && gamePadState.DPad.Left == ButtonState.Released)
-                && _keyLeftUp == false)
-            {
-                _keyLeftUp = true;
-            }
-
-            _gameMarkerPosition = 30.0f + (_gameMarkerIndex * 100.0f);
-
-            if ( (keyboardState.IsKeyDown(Keys.Up) || keyboardState.IsKeyDown(Keys.W) || gamePadState.DPad.Up == ButtonState.Pressed)
-                && _keyUpUp == true)
-            {
-                if (_gameState == GameState.InGame)
-                {
-                    _gameLogic.currentCode[_gameMarkerIndex]++;
-                    if (_gameLogic.currentCode[_gameMarkerIndex] > 9)
-                    {
-                        _gameLogic.currentCode[_gameMarkerIndex] = 0;
-                    }
-                    musicAndSounds.PlaySoundEffect(_gameUpDownSoundEffect);        
-                }
-                _keyUpUp = false;
-            }
-            else if ( (keyboardState.IsKeyUp(Keys.Up) && keyboardState.IsKeyUp(Keys.W) && gamePadState.DPad.Up == ButtonState.Released)
-                && _keyUpUp == false)
-            {
-                _keyUpUp = true;
-            }
-
-            if ( (keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S) || gamePadState.DPad.Down == ButtonState.Pressed)
-                && _keyDownUp == true)
-            {
-                if (_gameState == GameState.InGame)
-                {
-                    _gameLogic.currentCode[_gameMarkerIndex]--;
-                    if (_gameLogic.currentCode[_gameMarkerIndex] < 0)
-                    {
-                        _gameLogic.currentCode[_gameMarkerIndex] = 9;
-                    }
-                    musicAndSounds.PlaySoundEffect(_gameUpDownSoundEffect);
-                }
-                _keyDownUp = false;
-            }
-            else if ( (keyboardState.IsKeyUp(Keys.Down) && keyboardState.IsKeyUp(Keys.S) && gamePadState.DPad.Down == ButtonState.Released)
-                && _keyDownUp == false)
-            {
-                _keyDownUp = true;
-            }
-
-            if ( (keyboardState.IsKeyDown(Keys.Space) || gamePadState.Buttons.A == ButtonState.Pressed)
-                && _keySpaceUp == true)
-            {
-                if (_gameState == GameState.InGame)
-                {
-                    bool isCodeCorrect = _gameLogic.TryCode();
-                    if (isCodeCorrect)
-                    {
-                        GoToFinish(_successSoundEffect);
-                    }
-                    else if (((_gameLogic.numberOfAttempts >= _saveData.attemptsLimit) && _saveData.isAttemptsLimit))
-                    {
-                        GoToFinish(_failSoundEffect);
-                    }
-                    else
-                    {
-                        musicAndSounds.PlaySoundEffect(_unlockTrySoundEffect);
-                    }
-                }                
-                _keySpaceUp = false;
-            }
-            else if ( (keyboardState.IsKeyUp(Keys.Space) && gamePadState.Buttons.A == ButtonState.Released)
-                && _keySpaceUp == false)
-            {
-                _keySpaceUp = true;
-            }
-
-            if (_gameState == GameState.InGame)
-            {
-                if (_saveData.isTimeLimit)
-                {
-                    _remainingTime -= gameTime.ElapsedGameTime.TotalSeconds;
-                    if (_remainingTime <= 0)
-                    {
-                        _remainingTime = 0;
-                        GoToFinish(_failSoundEffect);
-                    }
-                }
-                else
-                {
-                    _playingTime += gameTime.ElapsedGameTime.TotalSeconds;
-                }
             }
 
             base.Update(gameTime);
@@ -338,96 +148,16 @@ namespace CodeBreaker_MonoGame
                 case GameState.Menu:
                     _menuScene.Draw(_spriteBatch);
                     break;
-                case GameState.GameInstructions:
+                case GameState.Instructions:
                     _instructionScene.Draw(_spriteBatch);
                     break;
                 case GameState.Option:
                     _optionScene.Draw(_spriteBatch);
                     break;
-                case GameState.InGame:
-                    for (int i = 0; i < _saveData.codeLength; i++)
-                    {
-                        _spriteBatch.DrawString(_largeFont, _gameLogic.currentCode[i].ToString(), new Vector2(CODE_POSITION_START_X + (CODE_POSITION_STEP_X * i), CODE_POSITION_START_Y), Color.Black);
-                        _spriteBatch.Draw(_gameMarkerSprite, new Vector2(CODE_POSITION_START_X + CODE_OFFSET_MARKER_X + (i * CODE_POSITION_STEP_X), CODE_POSITION_START_Y + CODE_OFFSET_MARKER_Y), i == _gameMarkerIndex ? Color.Purple : Color.Gray);
-                    }
-
-                    if (!IS_DEBUG_MODE)
-                    {
-                        _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.HelpSingleDigitOnce), new Vector2(5, 400), Color.Black);
-                        _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.HelpColorsOption), new Vector2(5, 430), Color.Black);
-                        _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.HelpColorRed), new Vector2(5, 460), Color.Red);
-                        _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.HelpColorBlue), new Vector2(5, 490), Color.Blue);
-                        _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.HelpColorGreen), new Vector2(5, 520), Color.Green);
-                    }
-                    else
-                    {
-                        _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.DebugMarkerIndex) + _gameMarkerIndex.ToString()
-                            + _lang.GetLangText(LangKey.DebugMarkerPos) + _gameMarkerPosition.ToString(), new Vector2(10, 400), Color.Black);
-                        _spriteBatch.DrawString(_smallFont, _lang.GetLangText(LangKey.DebugCurrentCode) + _gameLogic.CurrentCodeString(), new Vector2(10, 430), Color.Black);
-                    }
-
-                    if (_saveData.isAttemptsLimit)
-                    {
-                        int remainingAttempt = _saveData.attemptsLimit - _gameLogic.numberOfAttempts;
-                        _spriteBatch.DrawString(_bigFont, _lang.GetLangText(LangKey.GameRemainingAttempts) + remainingAttempt.ToString(), new Vector2(360, 10), Color.Black);
-                        for (int i = 0; i < _saveData.attemptsLimit; i++)
-                        {
-                            if (i < remainingAttempt)
-                            {
-                                _spriteBatch.Draw(_attemptIconReady, new Rectangle(_attemptIconStartX + (i * _attemptIconStepX), _attemptIconStartY, _attmptIconSize, _attmptIconSize), Color.White);
-                            }
-                            else
-                            {
-                                _spriteBatch.Draw(_attemptIconUsed, new Rectangle(_attemptIconStartX + (i * _attemptIconStepX), _attemptIconStartY, _attmptIconSize, _attmptIconSize), Color.White);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        _spriteBatch.DrawString(_bigFont, _lang.GetLangText(LangKey.GameNumberOfAttempts) + _gameLogic.numberOfAttempts.ToString(), new Vector2(360, 10), Color.Black);
-                    }
-
-                    if (_saveData.isTimeLimit)
-                    {
-                        _spriteBatch.DrawString(_bigFont, string.Format(_lang.GetLangText(LangKey.GameRemainingTime), _remainingTime), new Vector2(10, 10), Color.Black);
-                        _spriteBatch.Draw(_squereBaseSprite, _timeLimitBarBase, Color.White);
-                        _spriteBatch.Draw(_squereBaseSprite, GetTimieLimitBarRectangel(), GetTimeLimitBarColor());
-                    }
-                    
-                    for (int i = 0; i < _gameLogic.guessCodeHistory.Count; i++)
-                    {
-                        for (int j = 0; j < _gameLogic.guessCodeHistory[i].Count; j++)
-                        {
-                            _guessCodeHistoryTextPlace = new Vector2(GUESS_HISTORY_START_X + (j * GUESS_HISTORY_STEP_X), GUESS_HISTORY_START_Y + i * GUESS_HISTORY_STEP_Y);
-                            _spriteBatch.DrawString(_bigFont, _gameLogic.guessCodeHistory[i][j].value.ToString(), _guessCodeHistoryTextPlace, DecodeColor(_gameLogic.guessCodeHistory[i][j].digitState));
-                        }
-                    }
-
-                    if (_gameLogic.guessCodeHistory.Count > 0)
-                    {
-                        for (int i = 0; i < _gameLogic.guessCodeHistory.Count; i++)
-                        {
-                            _spriteBatch.Draw(_squereBaseSprite, new Rectangle(GUESS_HISTORY_START_X + GUESS_TABLE_OFFSET_X, (GUESS_HISTORY_START_Y + gUESS_TABLE_OFFSET_Y) + i * GUESS_HISTORY_STEP_Y,
-                                                GUESS_HISTORY_STEP_X * _gameLogic.guessCodeHistory[0].Count, GUESS_HISTORY_THICKNESS), _tableColor);
-                            if (i == _gameLogic.guessCodeHistory.Count - 1)
-                            {
-                                _spriteBatch.Draw(_squereBaseSprite, new Rectangle(GUESS_HISTORY_START_X + GUESS_TABLE_OFFSET_X, (GUESS_HISTORY_START_Y + gUESS_TABLE_OFFSET_Y) + (i + 1) * GUESS_HISTORY_STEP_Y,
-                                                    GUESS_HISTORY_STEP_X * _gameLogic.guessCodeHistory[0].Count, GUESS_HISTORY_THICKNESS), _tableColor);
-                            }
-                        }
-                        for (int i = 0; i < _gameLogic.guessCodeHistory[0].Count; i++)
-                        {
-                            _spriteBatch.Draw(_squereBaseSprite, new Rectangle(GUESS_HISTORY_START_X + GUESS_TABLE_OFFSET_X + (i * GUESS_HISTORY_STEP_X), (GUESS_HISTORY_START_Y + gUESS_TABLE_OFFSET_Y),
-                                                GUESS_HISTORY_THICKNESS, GUESS_HISTORY_STEP_Y * _gameLogic.guessCodeHistory.Count), _tableColor);
-                            if (i == _gameLogic.guessCodeHistory[0].Count - 1)
-                            {
-                                _spriteBatch.Draw(_squereBaseSprite, new Rectangle(GUESS_HISTORY_START_X + GUESS_TABLE_OFFSET_X + ((i + 1) * GUESS_HISTORY_STEP_X), (GUESS_HISTORY_START_Y + gUESS_TABLE_OFFSET_Y),
-                                                GUESS_HISTORY_THICKNESS, (GUESS_HISTORY_STEP_Y * _gameLogic.guessCodeHistory.Count) + GUESS_HISTORY_THICKNESS), _tableColor);
-                            }
-                        }
-                    }
+                case GameState.Game:
+                    _gameScene.Draw(_spriteBatch);
                     break;
-                case GameState.FinishGame:
+                case GameState.Finish:
                     _finishScene.Draw(_spriteBatch);
                     break;
                 default:
@@ -438,65 +168,11 @@ namespace CodeBreaker_MonoGame
 
             base.Draw(gameTime);
         }
-
-        private Rectangle GetTimieLimitBarRectangel()
-        {
-            float barWidth = ((float)_remainingTime / (float)_saveData.timeLimit) * TIME_LIMIT_BAR_WIDTH_MAX;
-            return new Rectangle(TIME_LIMIT_BAR_START_X, TIME_LIMIT_BAR_START_Y, (int)barWidth, TIME_LIMIT_BAR_HEIGHT);
-        }
-
-        private Color GetTimeLimitBarColor()
-        {
-            float remainingTimeFraction = (float)_remainingTime / (float)_saveData.timeLimit;
-            Color barColor;
-            if (remainingTimeFraction >= 0.8f)
-            {
-                barColor = new Color(44, 186, 0);
-            }
-            else if(remainingTimeFraction >= 0.6f && remainingTimeFraction < 0.8f)
-            {
-                barColor = new Color(163, 255, 0);
-            }
-            else if(remainingTimeFraction >= 0.4f && remainingTimeFraction < 0.6f)
-            {
-                barColor = new Color(255, 244, 0);
-            }
-            else if (remainingTimeFraction >= 0.2f && remainingTimeFraction < 0.4f)
-            {
-                barColor = new Color(255, 167, 0);
-            }
-            else
-            {
-                barColor = new Color(255, 0, 0);
-            }
-            return barColor;
-        }
-
-        private Color DecodeColor(DigitState digitState)
-        {
-            Color colorDecoded = new Color();
-            switch (digitState)
-            {
-                case DigitState.Good:
-                    colorDecoded = Color.Green;
-                    break;
-                case DigitState.Bad:
-                    colorDecoded = Color.Red;
-                    break;
-                case DigitState.Diffrent:
-                    colorDecoded = Color.Blue;
-                    break;
-                default:
-                    break;
-            }
-            return colorDecoded;
-        }
         public void GoToMainMenu(bool isPlaySoundEfect)
         {
             _gameState = GameState.Menu;
             _menuScene = new MenuScene(this, _bigFont, _smallFont, _smallFont, _littleFont, _lang, _iconGame, VERSION_GAME,
                 _menuMarkerSprite, _saveData, _menuSideSoundEffect, _menuUpDownSoundEffect);
-            _keyEscapeUp = false;
             if (isPlaySoundEfect)
                 musicAndSounds.PlaySoundEffect(_returnMenuSoundEffect);
         }
@@ -504,7 +180,7 @@ namespace CodeBreaker_MonoGame
         {
             _instructionScene = new InstructionScene(this, _bigFont, _smallFont, _middleFont, _lang);
             musicAndSounds.PlaySoundEffect(_menuNaviInstr);
-            _gameState = GameState.GameInstructions;
+            _gameState = GameState.Instructions;
         }
         public void GoToOption()
         {
@@ -516,39 +192,23 @@ namespace CodeBreaker_MonoGame
         public void GoToGame()
         {
             _gameLogic = new GameLogic(_saveData.codeLength, MAX_NUMBER_OF_HINTS);
-            _gameMarkerIndex = 0;
-            _playingTime = 0;
-            _remainingTime = _saveData.timeLimit;
-            if (_saveData.isAttemptsLimit)
-            {
-                if (_saveData.attemptsLimit < 10)
-                {
-                    _attmptIconSize = 42;
-                    _attemptIconStartX = 395;
-                    _attemptIconStepX = 46;
-                    _attemptIconStartY = 65;
-                }
-                else
-                {
-                    _attmptIconSize = 24;
-                    _attemptIconStartX = 415;
-                    _attemptIconStepX = 26;
-                    _attemptIconStartY = 70;
-                }
-            }
-            _gameState = GameState.InGame;
+                        
+            _gameState = GameState.Game;
             musicAndSounds.PlaySoundEffect(_startSoundEffect);
+            _gameScene = new GameScene(this, IS_DEBUG_MODE, _saveData, _largeFont, _smallFont, _bigFont, _gameLogic,
+                _gameMarkerSprite, _lang, _attemptIconReady, _attemptIconUsed, _squereBaseSprite, _gameSideSoundEffect,
+                _gameUpDownSoundEffect, _unlockTrySoundEffect, _successSoundEffect, _failSoundEffect);
         }
-        private void GoToFinish(SoundEffect soundEffect)
+        public void GoToFinish(SoundEffect soundEffect)
         {
             musicAndSounds.PlaySoundEffect(soundEffect);
-            _gameState = GameState.FinishGame;
+            _gameState = GameState.Finish;
             double time;
 
             if (_saveData.isTimeLimit)
-                time = _remainingTime;
+                time = _gameScene._remainingTime;
             else
-                time = _playingTime;
+                time = _gameScene._playingTime;
 
             _finishScene = new FinishScene(this, _gameLogic, _saveData, _bigFont, _middleFont, _lang, time);
         }

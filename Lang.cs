@@ -420,10 +420,10 @@
                     switch (langOption)
                     {
                         case LangOption.PL:
-                            returnText = "Pozostały czas {0:N3} [s]";
+                            returnText = "Pozostały czas: {0:N3} [s]";
                             break;
                         default:
-                            returnText = "Remaining time {0:N3} [s]";
+                            returnText = "Remaining time: {0:N3} [s]";
                             break;
                     }
                     break;
@@ -431,10 +431,10 @@
                     switch (langOption)
                     {
                         case LangOption.PL:
-                            returnText = "Czas gry {0:N3} [s]";
+                            returnText = "Czas gry: {0:N3} [s]";
                             break;
                         default:
-                            returnText = "Playing time {0:N3} [s]";
+                            returnText = "Playing time: {0:N3} [s]";
                             break;
                     }
                     break;

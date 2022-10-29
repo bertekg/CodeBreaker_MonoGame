@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace CodeBreaker_MonoGame.Screen
+namespace CodeBreaker_MonoGame.Scene
 {
     internal class OptionScene : IScene
     {
@@ -72,7 +72,7 @@ namespace CodeBreaker_MonoGame.Screen
         {
             _soundsVolume = soundsVolume;
         }
-        public void Update()
+        public void Update(double deltaTime)
         {
             KeyboardState keyboardState = Keyboard.GetState();
             GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);

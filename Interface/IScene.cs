@@ -4,7 +4,7 @@ namespace CodeBreaker_MonoGame.Interface
 {
     internal interface IScene
     {
-        public void Update();
+        public void Update(double deltaTime);
         public void Draw(SpriteBatch spriteBatch);
     }
 }
