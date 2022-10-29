@@ -1,13 +1,15 @@
 ﻿using CodeBreaker_MonoGame.Class;
 using CodeBreaker_MonoGame.Interface;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using System;
+using Microsoft.Xna.Framework.Input;
 
 namespace CodeBreaker_MonoGame.Screen
 {
     internal class MenuScene : IScene
     {
+        private readonly Game1 _game1;
         private readonly SpriteFont _titleFont;
         private readonly SpriteFont _navigationScene;
         private readonly SpriteFont _optionFont;
@@ -23,10 +25,15 @@ namespace CodeBreaker_MonoGame.Screen
         private readonly string _versionGame;
 
         private Marker _menuMarker;
+        private bool _keyEscapeReleased, _keyRightReleased, _keyLeftReleased, _keyUpReleased, _keyDownReleased;
+        private int _menuMarkerIndex;
 
-        public MenuScene(SpriteFont titleFont, SpriteFont navigationScene, SpriteFont optionFont, SpriteFont creditsFont,
-            Lang lang, Texture2D iconGame, string versionGame, Texture2D markerSprite, SaveData saveData)
+        private readonly SoundEffect _menuSideSoundEffect, _menuUpDownSoundEffect;
+        public MenuScene(Game1 game1, SpriteFont titleFont, SpriteFont navigationScene, SpriteFont optionFont,
+            SpriteFont creditsFont, Lang lang, Texture2D iconGame, string versionGame, Texture2D markerSprite,
+            SaveData saveData, SoundEffect menuSideSoundEffect, SoundEffect menuUpDownSoundEffect)
         {
+            _game1 = game1;
             _titleFont = titleFont;
             _navigationScene = navigationScene;
             _optionFont = optionFont;
@@ -38,6 +45,8 @@ namespace CodeBreaker_MonoGame.Screen
             _menuMarker = new Marker(markerSprite, 4, new Vector2(MENU_MARKER_START_X - 15, MENU_MARKER_START_Y - 5),
                 new Vector2(210, MENU_MARKER_START_Y + (4 * MENU_MARKER_STEP_Y) - 5));
             _saveData = saveData;
+            _menuSideSoundEffect = menuSideSoundEffect;
+            _menuUpDownSoundEffect = menuUpDownSoundEffect;
             MoveMarker(0);
         }
 
@@ -63,10 +72,160 @@ namespace CodeBreaker_MonoGame.Screen
 
             _menuMarker.Draw(spriteBatch);
         }
-
         public void Update()
         {
-            throw new NotImplementedException();
+            KeyboardState keyboardState = Keyboard.GetState();
+            GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
+
+            if (keyboardState.IsKeyDown(Keys.Enter) || gamePadState.Buttons.Start == ButtonState.Pressed)
+                _game1.GoToGame();
+
+            if (keyboardState.IsKeyDown(Keys.H) || gamePadState.Buttons.RightShoulder == ButtonState.Pressed)
+            {
+                _game1.GoToInstuction();
+            }
+
+            if (keyboardState.IsKeyDown(Keys.O) || gamePadState.Buttons.LeftShoulder == ButtonState.Pressed)
+            {
+                _game1.GoToOption();
+            }
+
+            if ((keyboardState.IsKeyDown(Keys.Escape) || gamePadState.Buttons.Back == ButtonState.Pressed)
+                && _keyEscapeReleased == true)
+            {
+                _game1.Exit();
+            }
+            else if ((keyboardState.IsKeyUp(Keys.Escape) && gamePadState.Buttons.Back == ButtonState.Released)
+                && _keyEscapeReleased == false)
+                _keyEscapeReleased = true;
+
+            if ((keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D) || gamePadState.DPad.Right == ButtonState.Pressed)
+                && _keyRightReleased == true)
+            {
+                switch (_menuMarkerIndex)
+                {
+                    case 0:
+                        if (_saveData.codeLength < 5)
+                        {
+                            _saveData.codeLength++;
+                        }
+                        break;
+                    case 1:
+                        _saveData.isAttemptsLimit = true;
+                        break;
+                    case 2:
+                        if (_saveData.attemptsLimit < 15)
+                        {
+                            _saveData.attemptsLimit++;
+                        }
+                        break;
+                    case 3:
+                        _saveData.isTimeLimit = true;
+                        break;
+                    case 4:
+                        if (_saveData.timeLimit < 150)
+                        {
+                            _saveData.timeLimit += 10;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                _game1.PlaySoundEffect(_menuSideSoundEffect);
+                _keyRightReleased = false;
+            }
+            else if ((keyboardState.IsKeyUp(Keys.Right) && keyboardState.IsKeyUp(Keys.D) && gamePadState.DPad.Right == ButtonState.Released)
+               && _keyRightReleased == false)
+            {
+                _keyRightReleased = true;
+            }
+
+            if ((keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A) || gamePadState.DPad.Left == ButtonState.Pressed)
+                && _keyLeftReleased == true)
+            {
+                switch (_menuMarkerIndex)
+                {
+                    case 0:
+                        if (_saveData.codeLength > 3)
+                        {
+                            _saveData.codeLength--;
+                        }
+                        break;
+                    case 1:
+                        _saveData.isAttemptsLimit = false;
+                        break;
+                    case 2:
+                        if (_saveData.attemptsLimit > 3)
+                        {
+                            _saveData.attemptsLimit--;
+                        }
+                        break;
+                    case 3:
+                        _saveData.isTimeLimit = false;
+                        break;
+                    case 4:
+                        if (_saveData.timeLimit > 10)
+                        {
+                            _saveData.timeLimit -= 10;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                _game1.PlaySoundEffect(_menuSideSoundEffect);
+                _keyLeftReleased = false;
+            }
+            else if ((keyboardState.IsKeyUp(Keys.Left) && keyboardState.IsKeyUp(Keys.A) && gamePadState.DPad.Left == ButtonState.Released)
+                && _keyLeftReleased == false)
+            {
+                _keyLeftReleased = true;
+            }
+
+            if ((keyboardState.IsKeyDown(Keys.Up) || keyboardState.IsKeyDown(Keys.W) || gamePadState.DPad.Up == ButtonState.Pressed)
+                && _keyUpReleased == true)
+            {
+                _menuMarkerIndex--;
+                if (_menuMarkerIndex < 0)
+                {
+                    _menuMarkerIndex = 4;
+                }
+                if ((_menuMarkerIndex == 2 && _saveData.isAttemptsLimit == false) ||
+                    (_menuMarkerIndex == 4 && _saveData.isTimeLimit == false))
+                {
+                    _menuMarkerIndex--;
+                }
+                MoveMarker(_menuMarkerIndex);
+                _game1.PlaySoundEffect(_menuUpDownSoundEffect);
+                _keyUpReleased = false;
+            }
+            else if ((keyboardState.IsKeyUp(Keys.Up) && keyboardState.IsKeyUp(Keys.W) && gamePadState.DPad.Up == ButtonState.Released)
+                && _keyUpReleased == false)
+            {
+                _keyUpReleased = true;
+            }
+
+            if ((keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S) || gamePadState.DPad.Down == ButtonState.Pressed)
+                && _keyDownReleased == true)
+            {
+                _menuMarkerIndex++;
+                if ((_menuMarkerIndex == 2 && _saveData.isAttemptsLimit == false) ||
+                    (_menuMarkerIndex == 4 && _saveData.isTimeLimit == false))
+                {
+                    _menuMarkerIndex++;
+                }
+                if (_menuMarkerIndex > 4)
+                {
+                    _menuMarkerIndex = 0;
+                }
+                MoveMarker(_menuMarkerIndex);
+                _game1.PlaySoundEffect(_menuUpDownSoundEffect);
+                _keyDownReleased = false;
+            }
+            else if ((keyboardState.IsKeyUp(Keys.Down) && keyboardState.IsKeyUp(Keys.S) && gamePadState.DPad.Down == ButtonState.Released)
+               && _keyDownReleased == false)
+            {
+                _keyDownReleased = true;
+            }
         }
         public void MoveMarker(int index)
         {

@@ -4,8 +4,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Reflection;
 
 namespace CodeBreaker_MonoGame.Screen
 {
@@ -105,7 +103,7 @@ namespace CodeBreaker_MonoGame.Screen
                     default:
                         break;
                 }
-                _game1.musicAndSounds.PlaySoundEffect(_menuSideSoundEffect);
+                _game1.PlaySoundEffect(_menuSideSoundEffect);
                 _keyRightUp = false;
             }
             else if ((keyboardState.IsKeyUp(Keys.Right) && keyboardState.IsKeyUp(Keys.D) && gamePadState.DPad.Right == ButtonState.Released)
@@ -135,7 +133,7 @@ namespace CodeBreaker_MonoGame.Screen
                     default:
                         break;
                 }
-                _game1.musicAndSounds.PlaySoundEffect(_menuSideSoundEffect);
+                _game1.PlaySoundEffect(_menuSideSoundEffect);
                 _keyLeftUp = false;
             }
             else if ((keyboardState.IsKeyUp(Keys.Left) && keyboardState.IsKeyUp(Keys.A) && gamePadState.DPad.Left == ButtonState.Released)
@@ -155,7 +153,7 @@ namespace CodeBreaker_MonoGame.Screen
                     _optionMarkerIndex -= 2;
                 }
                 MoveMarker(_optionMarkerIndex);
-                _game1.musicAndSounds.PlaySoundEffect(_menuUpDownSoundEffect);
+                _game1.PlaySoundEffect(_menuUpDownSoundEffect);
                 _keyUpUp = false;
             }
             else if ((keyboardState.IsKeyUp(Keys.Up) && keyboardState.IsKeyUp(Keys.W) && gamePadState.DPad.Up == ButtonState.Released)
@@ -175,7 +173,7 @@ namespace CodeBreaker_MonoGame.Screen
                     _optionMarkerIndex = 0;
                 }
                 MoveMarker(_optionMarkerIndex);
-                _game1.musicAndSounds.PlaySoundEffect(_menuUpDownSoundEffect);
+                _game1.PlaySoundEffect(_menuUpDownSoundEffect);
                 _keyDownUp = false;
             }
             else if ((keyboardState.IsKeyUp(Keys.Down) && keyboardState.IsKeyUp(Keys.S) && gamePadState.DPad.Down == ButtonState.Released)

@@ -1,12 +1,14 @@
 ﻿using CodeBreaker_MonoGame.Interface;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 
 namespace CodeBreaker_MonoGame.Screen
 {
     internal class FinishScene : IScene
     {
+        private readonly Game1 _game1;
         private readonly SpriteFont _titleFont;
         private readonly SpriteFont _otherFont;
         private readonly string _endGameInfo;
@@ -16,8 +18,9 @@ namespace CodeBreaker_MonoGame.Screen
         private readonly string attemptsText;
         private readonly string _correctCodeString;
 
-        public FinishScene(GameLogic gameLogic, SaveData saveData, SpriteFont bigFont, SpriteFont middleFont, Lang lang, double time)
+        public FinishScene(Game1 game1, GameLogic gameLogic, SaveData saveData, SpriteFont bigFont, SpriteFont middleFont, Lang lang, double time)
         {
+            _game1 = game1;
             _titleFont = bigFont;
             _otherFont = middleFont;
             _lang = lang;
@@ -63,10 +66,16 @@ namespace CodeBreaker_MonoGame.Screen
             spriteBatch.DrawString(_otherFont, _lang.GetLangText(LangKey.FinishPlayAgain), new Vector2(10, 360), Color.Black);
             spriteBatch.DrawString(_otherFont, _lang.GetLangText(LangKey.InstrucitonAndFinishGoBackMenu), new Vector2(10, 400), Color.Black);
         }
-
         public void Update()
         {
-            throw new NotImplementedException();
+            KeyboardState keyboardState = Keyboard.GetState();
+            GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
+
+            if (keyboardState.IsKeyDown(Keys.Enter) || gamePadState.Buttons.Start == ButtonState.Pressed)
+                _game1.GoToGame();
+
+            if (keyboardState.IsKeyDown(Keys.Escape) || gamePadState.Buttons.Back == ButtonState.Pressed)
+                _game1.GoToMainMenu(true);
         }
     }
 }
