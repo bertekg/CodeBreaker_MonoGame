@@ -1,18 +1,21 @@
 ﻿using CodeBreaker_MonoGame.Interface;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 
 namespace CodeBreaker_MonoGame.Screen
 {
     internal class InstructionScene : IScene
     {
+        private readonly Game1 _game1;
         private readonly SpriteFont _titleFont;
         private readonly SpriteFont _instructionFont;
         private readonly SpriteFont _navigationFont;
         private readonly Lang _lang;
-        public InstructionScene(SpriteFont titleFont, SpriteFont instructionFont, SpriteFont navigationFont, Lang lang)
+        public InstructionScene(Game1 game1, SpriteFont titleFont, SpriteFont instructionFont, SpriteFont navigationFont, Lang lang)
         {
+            _game1 = game1;
             _titleFont = titleFont;
             _instructionFont = instructionFont;
             _navigationFont = navigationFont;
@@ -37,10 +40,12 @@ namespace CodeBreaker_MonoGame.Screen
 
             spriteBatch.DrawString(_navigationFont, _lang.GetLangText(LangKey.InstrucitonAndFinishGoBackMenu), new Vector2(10, 500), Color.Black);
         }
-
         public void Update()
         {
-            throw new NotImplementedException();
+            KeyboardState keyboardState = Keyboard.GetState();
+            GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
+            if (keyboardState.IsKeyDown(Keys.Escape) || gamePadState.Buttons.Back == ButtonState.Pressed)
+                _game1.GoToMainMenu(true);
         }
     }
 }

@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
-using CodeBreaker_MonoGame.Class;
 using CodeBreaker_MonoGame.Screen;
 
 namespace CodeBreaker_MonoGame
@@ -21,7 +20,7 @@ namespace CodeBreaker_MonoGame
         private Texture2D _iconGame;
         private Texture2D _background;
 
-        private MusicAndSounds _musicAndSounds;
+        public MusicAndSounds musicAndSounds;
 
         private SoundEffect _menuUpDownSoundEffect, _menuSideSoundEffect;
         private SoundEffect _startSoundEffect, _returnMenuSoundEffect;
@@ -34,7 +33,7 @@ namespace CodeBreaker_MonoGame
 
         private GameLogic _gameLogic;
 
-        private GameState _gameState;
+        public static GameState _gameState;
 
         private int _menuMarkerIndex;
 
@@ -49,8 +48,6 @@ namespace CodeBreaker_MonoGame
 
         private Lang _lang;
 
-        private int _optionMarkerIndex;
-
         private Color _tableColor = Color.Black;
 
         private Rectangle _timeLimitBarBase;
@@ -63,7 +60,7 @@ namespace CodeBreaker_MonoGame
 
         const int MAX_NUMBER_OF_HINTS = 8;
 
-        const string VERSION_GAME = "1.4.4 (2022.10.28)";
+        const string VERSION_GAME = "1.4.5 (2022.10.29)";
 
         const int GUESS_HISTORY_START_X = 600, GUESS_HISTORY_START_Y = 115;
         const int GUESS_HISTORY_STEP_X = 40, GUESS_HISTORY_STEP_Y = 50, GUESS_HISTORY_THICKNESS = 3;
@@ -86,7 +83,6 @@ namespace CodeBreaker_MonoGame
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
-
         protected override void Initialize()
         {
             Window.Title = "Code Breaker - MonoGame";
@@ -129,8 +125,8 @@ namespace CodeBreaker_MonoGame
             _background = Content.Load<Texture2D>("background/background_820x550");
 
             Song song = Content.Load<Song>("audio/music");
-            _musicAndSounds = new MusicAndSounds(song, _saveData);
-            _musicAndSounds.Play();
+            musicAndSounds = new MusicAndSounds(song, _saveData);
+            musicAndSounds.Play();
 
             _menuUpDownSoundEffect = Content.Load<SoundEffect>("sounds/menuUpDown");
             _menuSideSoundEffect = Content.Load<SoundEffect>("sounds/menuSide");
@@ -144,7 +140,7 @@ namespace CodeBreaker_MonoGame
             _menuNaviInstr = Content.Load<SoundEffect>("sounds/menuNaviInst");
             _menuNaviOption = Content.Load<SoundEffect>("sounds/menuNaviOption");
 
-            GoToMainMenu();
+            GoToMainMenu(false);
 
             base.LoadContent();
         }
@@ -154,12 +150,30 @@ namespace CodeBreaker_MonoGame
             KeyboardState keyboardState = Keyboard.GetState();
             GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
 
+            switch (_gameState)
+            {
+                case GameState.Menu:
+                    break;
+                case GameState.GameInstructions:
+                    _instructionScene.Update();
+                    break;
+                case GameState.Option:
+                    _optionScene.Update();
+                    break;
+                case GameState.InGame:
+                    break;
+                case GameState.FinishGame:
+                    break;
+                default:
+                    break;
+            }               
+
             if ( (keyboardState.IsKeyDown(Keys.Enter) || gamePadState.Buttons.Start == ButtonState.Pressed)
                 && _keyEnterUp == true)
             {
                 if (_gameState == GameState.Menu || _gameState == GameState.FinishGame)
                 {
-                    _musicAndSounds.PlaySoundEffect(_startSoundEffect);
+                    musicAndSounds.PlaySoundEffect(_startSoundEffect);
                     StartNewGame();
                 }
                 _keyEnterUp = false;
@@ -175,10 +189,8 @@ namespace CodeBreaker_MonoGame
             {
                 if (_gameState == GameState.Menu)
                 {
-                    _instructionScene = new InstructionScene(_bigFont, _smallFont, _middleFont, _lang);
-                    _musicAndSounds.PlaySoundEffect(_menuNaviInstr);
-                    _gameState = GameState.GameInstructions;
-                }   
+                    GoToInstuction();
+                }
                 _keyHelpUp = false;
             }
             else if ( (keyboardState.IsKeyUp(Keys.H) && gamePadState.Buttons.RightShoulder == ButtonState.Released)
@@ -192,10 +204,7 @@ namespace CodeBreaker_MonoGame
             {
                 if (_gameState == GameState.Menu)
                 {
-                    _optionScene = new OptionScene(_menuMarkerSprite, _bigFont, _smallFont, _middleFont, _lang, _musicAndSounds);
-                    _musicAndSounds.PlaySoundEffect(_menuNaviOption);
-                    _gameState = GameState.Option;
-                    _optionMarkerIndex = 0;
+                    GoToOption();
                 }
                 _keyOptionUp = false;
             }
@@ -212,10 +221,9 @@ namespace CodeBreaker_MonoGame
                 {
                     Exit();
                 }
-                else
-                {
-                    _musicAndSounds.PlaySoundEffect(_returnMenuSoundEffect);
-                    GoToMainMenu();
+                else if (_gameState == GameState.InGame || _gameState == GameState.FinishGame)
+                {                    
+                    GoToMainMenu(true);
                 }
                 _keyEscapeUp = false;
             }
@@ -235,7 +243,7 @@ namespace CodeBreaker_MonoGame
                     {
                         _gameMarkerIndex = 0;
                     }
-                    _musicAndSounds.PlaySoundEffect(_gameSideSoundEffect);
+                    musicAndSounds.PlaySoundEffect(_gameSideSoundEffect);
                 }
                 else if (_gameState == GameState.Menu)
                 {
@@ -268,32 +276,7 @@ namespace CodeBreaker_MonoGame
                         default:
                             break;
                     }
-                    _musicAndSounds.PlaySoundEffect(_menuSideSoundEffect);
-                }
-                else if(_gameState == GameState.Option)
-                {
-                    switch (_optionMarkerIndex)
-                    {
-                        case 0:
-                            _musicAndSounds.EditIsSounding(true);
-                            _optionScene.SetIsSounding(_musicAndSounds.GetIsSounding());
-                            break;
-                        case 1:
-                            _musicAndSounds.IncMusicVolume();
-                            _optionScene.SetMusicVolume(_musicAndSounds.GetMusicVolumePercentString());
-                            break;
-                        case 2:
-                            _musicAndSounds.IncSoundsVolume();
-                            _optionScene.SetSoundsVolume(_musicAndSounds.GetSoundsVolumePercentString());
-                            break;
-                        case 3:
-                            _lang.IncSelection();
-                            break;
-                        default:
-                            break;
-                    }
-                    _musicAndSounds.PlaySoundEffect(_menuSideSoundEffect);
-
+                    musicAndSounds.PlaySoundEffect(_menuSideSoundEffect);
                 }
                 _keyRightUp = false;
             }
@@ -313,7 +296,7 @@ namespace CodeBreaker_MonoGame
                     {
                         _gameMarkerIndex = _saveData.codeLength - 1;
                     }
-                    _musicAndSounds.PlaySoundEffect(_gameSideSoundEffect);
+                    musicAndSounds.PlaySoundEffect(_gameSideSoundEffect);
                 }
                 else if (_gameState == GameState.Menu)
                 {
@@ -346,31 +329,7 @@ namespace CodeBreaker_MonoGame
                         default:
                             break;
                     }
-                    _musicAndSounds.PlaySoundEffect(_menuSideSoundEffect);
-                }
-                else if (_gameState == GameState.Option)
-                {
-                    switch (_optionMarkerIndex)
-                    {
-                        case 0:
-                            _musicAndSounds.EditIsSounding(false);
-                            _optionScene.SetIsSounding(_musicAndSounds.GetIsSounding());
-                            break;
-                        case 1:
-                            _musicAndSounds.DecMusicVolume();
-                            _optionScene.SetMusicVolume(_musicAndSounds.GetMusicVolumePercentString());
-                            break;
-                        case 2:
-                            _musicAndSounds.DecSoundsVolume();
-                            _optionScene.SetSoundsVolume(_musicAndSounds.GetSoundsVolumePercentString());
-                            break;
-                        case 3:
-                            _lang.DecSelection();
-                            break;
-                        default:
-                            break;
-                    }
-                    _musicAndSounds.PlaySoundEffect(_menuSideSoundEffect);
+                    musicAndSounds.PlaySoundEffect(_menuSideSoundEffect);
                 }
                 _keyLeftUp = false;
             }
@@ -392,7 +351,7 @@ namespace CodeBreaker_MonoGame
                     {
                         _gameLogic.currentCode[_gameMarkerIndex] = 0;
                     }
-                    _musicAndSounds.PlaySoundEffect(_gameUpDownSoundEffect);        
+                    musicAndSounds.PlaySoundEffect(_gameUpDownSoundEffect);        
                 }
                 else if (_gameState == GameState.Menu)
                 {
@@ -403,26 +362,12 @@ namespace CodeBreaker_MonoGame
                     }
                     if ((_menuMarkerIndex == 2 && _saveData.isAttemptsLimit == false) ||
                         (_menuMarkerIndex == 4 && _saveData.isTimeLimit == false) ||
-                        (_menuMarkerIndex == 6 && _musicAndSounds.GetIsSounding() == false))
+                        (_menuMarkerIndex == 6 && musicAndSounds.GetIsSounding() == false))
                     {
                         _menuMarkerIndex--;
                     }
                     _menuScene.MoveMarker(_menuMarkerIndex);
-                    _musicAndSounds.PlaySoundEffect(_menuUpDownSoundEffect);
-                }
-                else if (_gameState == GameState.Option)
-                {
-                    _optionMarkerIndex--;
-                    if (_optionMarkerIndex < 0)
-                    {
-                        _optionMarkerIndex = 3;
-                    }
-                    if (_optionMarkerIndex == 2 && _musicAndSounds.GetIsSounding() == false)
-                    {
-                        _optionMarkerIndex -= 2;
-                    }
-                    _optionScene.MoveMarker(_optionMarkerIndex);
-                    _musicAndSounds.PlaySoundEffect(_menuUpDownSoundEffect);
+                    musicAndSounds.PlaySoundEffect(_menuUpDownSoundEffect);
                 }
                 _keyUpUp = false;
             }
@@ -442,14 +387,14 @@ namespace CodeBreaker_MonoGame
                     {
                         _gameLogic.currentCode[_gameMarkerIndex] = 9;
                     }
-                    _musicAndSounds.PlaySoundEffect(_gameUpDownSoundEffect);
+                    musicAndSounds.PlaySoundEffect(_gameUpDownSoundEffect);
                 }
                 else if (_gameState == GameState.Menu)
                 {
                     _menuMarkerIndex++;
                     if ((_menuMarkerIndex == 2 && _saveData.isAttemptsLimit == false) ||
                         (_menuMarkerIndex == 4 && _saveData.isTimeLimit == false) ||
-                        (_menuMarkerIndex == 6 && _musicAndSounds.GetIsSounding() == false))
+                        (_menuMarkerIndex == 6 && musicAndSounds.GetIsSounding() == false))
                     {
                         _menuMarkerIndex++;
                     }
@@ -458,21 +403,7 @@ namespace CodeBreaker_MonoGame
                         _menuMarkerIndex = 0;
                     }
                     _menuScene.MoveMarker(_menuMarkerIndex);
-                    _musicAndSounds.PlaySoundEffect(_menuUpDownSoundEffect);
-                }
-                else if (_gameState == GameState.Option)
-                {
-                    _optionMarkerIndex++;
-                    if (_optionMarkerIndex == 1 && _musicAndSounds.GetIsSounding() == false)
-                    {
-                        _optionMarkerIndex += 2;
-                    }
-                    if (_optionMarkerIndex > 3)
-                    {
-                        _optionMarkerIndex = 0;
-                    }
-                    _optionScene.MoveMarker(_optionMarkerIndex);
-                    _musicAndSounds.PlaySoundEffect(_menuUpDownSoundEffect);
+                    musicAndSounds.PlaySoundEffect(_menuUpDownSoundEffect);
                 }
                 _keyDownUp = false;
             }
@@ -498,7 +429,7 @@ namespace CodeBreaker_MonoGame
                     }
                     else
                     {
-                        _musicAndSounds.PlaySoundEffect(_unlockTrySoundEffect);
+                        musicAndSounds.PlaySoundEffect(_unlockTrySoundEffect);
                     }
                 }                
                 _keySpaceUp = false;
@@ -718,14 +649,28 @@ namespace CodeBreaker_MonoGame
             }
             _gameState = GameState.InGame;
         }
-        private void GoToMainMenu()
+        public void GoToMainMenu(bool isPlaySoundEfect)
         {
-            _menuMarkerIndex = 0;
             _gameState = GameState.Menu;
             _menuScene = new MenuScene(_bigFont, _smallFont, _smallFont, _littleFont, _lang, _iconGame, VERSION_GAME,
                 _menuMarkerSprite, _saveData);
+            _keyEscapeUp = false;
+            if (isPlaySoundEfect)
+                musicAndSounds.PlaySoundEffect(_returnMenuSoundEffect);
         }
-        
+        public void GoToInstuction()
+        {
+            _instructionScene = new InstructionScene(this, _bigFont, _smallFont, _middleFont, _lang);
+            musicAndSounds.PlaySoundEffect(_menuNaviInstr);
+            _gameState = GameState.GameInstructions;
+        }
+        private void GoToOption()
+        {
+            _optionScene = new OptionScene(this, _menuMarkerSprite, _bigFont, _smallFont, _middleFont, _lang,
+                musicAndSounds, _menuSideSoundEffect, _menuUpDownSoundEffect);
+            musicAndSounds.PlaySoundEffect(_menuNaviOption);
+            _gameState = GameState.Option;
+        }
         private void ReadSaveData()
         { 
             if(System.IO.File.Exists(_saveDataPath))
@@ -758,9 +703,9 @@ namespace CodeBreaker_MonoGame
         }
         private void WriteSaveData()
         {
-            _saveData.isSounding = _musicAndSounds.GetIsSounding();
-            _saveData.musicVolumePercent = _musicAndSounds.GetMusicVolumePercent();
-            _saveData.soundsVolumePercent = _musicAndSounds.GetSoundsVolumePercent();
+            _saveData.isSounding = musicAndSounds.GetIsSounding();
+            _saveData.musicVolumePercent = musicAndSounds.GetMusicVolumePercent();
+            _saveData.soundsVolumePercent = musicAndSounds.GetSoundsVolumePercent();
             _saveData.langID = _lang.GetLangID();
 
             System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(SaveData));
@@ -771,7 +716,7 @@ namespace CodeBreaker_MonoGame
         }
         private void SwitchToFinishGame(SoundEffect soundEffect)
         {
-            _musicAndSounds.PlaySoundEffect(soundEffect);
+            musicAndSounds.PlaySoundEffect(soundEffect);
             _gameState = GameState.FinishGame;
             double time;
 

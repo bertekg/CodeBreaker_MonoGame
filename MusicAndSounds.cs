@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Media;
 
 namespace CodeBreaker_MonoGame
 {
-    internal class MusicAndSounds
+    public class MusicAndSounds
     {
         private Song _music;
         private bool _isSounding;
