@@ -11,5 +11,6 @@
         public sbyte musicVolumePercent;
         public sbyte soundsVolumePercent;
         public byte langID;
+        public short iDebugModeFromSave;
     }
 }

@@ -29,9 +29,10 @@ namespace CodeBreaker_MonoGame.Scene
         private int _menuMarkerIndex;
 
         private readonly SoundEffect _menuSideSoundEffect, _menuUpDownSoundEffect;
+        private readonly bool _isDebugMode;
         public MenuScene(Game1 game1, SpriteFont titleFont, SpriteFont navigationScene, SpriteFont optionFont,
             SpriteFont creditsFont, Lang lang, Texture2D iconGame, string versionGame, Texture2D markerSprite,
-            SaveData saveData, SoundEffect menuSideSoundEffect, SoundEffect menuUpDownSoundEffect)
+            SaveData saveData, SoundEffect menuSideSoundEffect, SoundEffect menuUpDownSoundEffect, bool isDebugMode)
         {
             _game1 = game1;
             _titleFont = titleFont;
@@ -47,6 +48,7 @@ namespace CodeBreaker_MonoGame.Scene
             _saveData = saveData;
             _menuSideSoundEffect = menuSideSoundEffect;
             _menuUpDownSoundEffect = menuUpDownSoundEffect;
+            _isDebugMode = isDebugMode;
             MoveMarker(0);
         }
 
@@ -69,6 +71,11 @@ namespace CodeBreaker_MonoGame.Scene
 
             spriteBatch.DrawString(_creditsFont, _lang.GetLangText(LangKey.CreditsStart) + "Bartłomiej Grywalski", new Vector2(20, 530), Color.Black);
             spriteBatch.DrawString(_creditsFont, _lang.GetLangText(LangKey.VersionInfo) + _versionGame, new Vector2(600, 530), Color.Black);
+
+            if (_isDebugMode)
+            {
+                spriteBatch.DrawString(_creditsFont, _lang.GetLangText(LangKey.DebuggingModeEnabled), new Vector2(300, 10), Color.Black);
+            }
 
             _menuMarker.Draw(spriteBatch);
         }

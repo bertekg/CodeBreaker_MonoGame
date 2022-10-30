@@ -12,7 +12,7 @@
         FinishRemainingAttempts, FinishNumberOfAttempts, FinishCorrectCode,
         FinishPlayAgain, InstrucitonAndFinishGoBackMenu,
         GameInstuction, ControlsInGame, GameOptionKey, GameOption,
-        GameModifiers};
+        GameModifiers, DebuggingModeEnabled};
     internal class Lang
     {
         private LangOption langOption;
@@ -534,6 +534,17 @@
                             break;
                         default:
                             returnText = "Game Modifiers:";
+                            break;
+                    }
+                    break;
+                case LangKey.DebuggingModeEnabled:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Tryb debugowania włączony".ToUpper();
+                            break;
+                        default:
+                            returnText = "Debugging mode enabled".ToUpper();
                             break;
                     }
                     break;

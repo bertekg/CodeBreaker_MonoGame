@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 using CodeBreaker_MonoGame.Scene;
+using System;
 
 namespace CodeBreaker_MonoGame
 {
@@ -38,11 +39,12 @@ namespace CodeBreaker_MonoGame
 
         SaveData _saveData;
 
-        const bool IS_DEBUG_MODE = false;
+        const bool IS_DEBUG_MODE_FROM_CODE = false;
+        private bool _isDebugMode;
 
         const int MAX_NUMBER_OF_HINTS = 8;
 
-        const string VERSION_GAME = "1.4.7 (2022.10.29)";
+        const string VERSION_GAME = "1.4.8 (2022.10.30)";
 
         MenuScene _menuScene;
         InstructionScene _instructionScene;
@@ -172,7 +174,7 @@ namespace CodeBreaker_MonoGame
         {
             _gameState = GameState.Menu;
             _menuScene = new MenuScene(this, _bigFont, _smallFont, _smallFont, _littleFont, _lang, _iconGame, VERSION_GAME,
-                _menuMarkerSprite, _saveData, _menuSideSoundEffect, _menuUpDownSoundEffect);
+                _menuMarkerSprite, _saveData, _menuSideSoundEffect, _menuUpDownSoundEffect, _isDebugMode);
             if (isPlaySoundEfect)
                 musicAndSounds.PlaySoundEffect(_returnMenuSoundEffect);
         }
@@ -195,7 +197,7 @@ namespace CodeBreaker_MonoGame
                         
             _gameState = GameState.Game;
             musicAndSounds.PlaySoundEffect(_startSoundEffect);
-            _gameScene = new GameScene(this, IS_DEBUG_MODE, _saveData, _largeFont, _smallFont, _bigFont, _gameLogic,
+            _gameScene = new GameScene(this, _isDebugMode, _saveData, _largeFont, _smallFont, _bigFont, _gameLogic,
                 _gameMarkerSprite, _lang, _attemptIconReady, _attemptIconUsed, _squereBaseSprite, _gameSideSoundEffect,
                 _gameUpDownSoundEffect, _unlockTrySoundEffect, _successSoundEffect, _failSoundEffect);
         }
@@ -238,9 +240,22 @@ namespace CodeBreaker_MonoGame
                 _saveData.musicVolumePercent = 70;
                 _saveData.soundsVolumePercent = 90;
                 _saveData.langID = 0;
+                _saveData.iDebugModeFromSave = 0;
             }
+            _isDebugMode = DetectDebugMode();
             _lang = new Lang(_saveData.langID);
         }
+
+        private bool DetectDebugMode()
+        {
+            bool isDebugMode = false;
+            if (IS_DEBUG_MODE_FROM_CODE || _saveData.iDebugModeFromSave == 1989)
+            {
+                isDebugMode = true;
+            }
+            return isDebugMode;
+        }
+
         protected override void EndRun()
         {
             WriteSaveData();
