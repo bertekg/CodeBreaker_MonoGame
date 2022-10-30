@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 
-namespace CodeBreaker_MonoGame
+namespace CodeBreaker_MonoGame.Class
 {
     public class MusicAndSounds
     {
@@ -95,7 +95,7 @@ namespace CodeBreaker_MonoGame
         }
         private float GetMusicVolume()
         {
-            return (float)_musicVolumePercent / 100.0f;
+            return _musicVolumePercent / 100.0f;
         }
 
         public void PlaySoundEffect(SoundEffect soundEffect)
@@ -111,7 +111,7 @@ namespace CodeBreaker_MonoGame
         }
         private float GetSoundsVolume()
         {
-            return (float)_soundsVolumePercent / 100.0f;
+            return _soundsVolumePercent / 100.0f;
         }
         public string GetSoundsVolumePercentString()
         {

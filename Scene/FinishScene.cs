@@ -1,4 +1,5 @@
-﻿using CodeBreaker_MonoGame.Interface;
+﻿using CodeBreaker_MonoGame.Class;
+using CodeBreaker_MonoGame.Interface;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -8,15 +9,10 @@ namespace CodeBreaker_MonoGame.Scene
     internal class FinishScene : IScene
     {
         private readonly Game1 _game1;
-        private readonly SpriteFont _titleFont;
-        private readonly SpriteFont _otherFont;
-        private readonly string _endGameInfo;
+        private readonly SpriteFont _titleFont, _otherFont;
         private readonly Lang _lang;
         private readonly Color _endGameColor;
-        private readonly string timeText;
-        private readonly string attemptsText;
-        private readonly string _correctCodeString;
-
+        private readonly string _endGameInfo, _timeText, _attemptsText, _correctCodeString;
         public FinishScene(Game1 game1, GameLogic gameLogic, SaveData saveData, SpriteFont bigFont, SpriteFont middleFont, Lang lang, double time)
         {
             _game1 = game1;
@@ -35,20 +31,20 @@ namespace CodeBreaker_MonoGame.Scene
 
             if (saveData.isTimeLimit)
             {
-                timeText = string.Format(_lang.GetLangText(LangKey.FinishRemainingTime), time);
+                _timeText = string.Format(_lang.GetLangText(LangKey.FinishRemainingTime), time);
             }
             else
             {
-                timeText = string.Format(_lang.GetLangText(LangKey.FinishPlayingTime), time);
+                _timeText = string.Format(_lang.GetLangText(LangKey.FinishPlayingTime), time);
             }
 
             if (saveData.isAttemptsLimit)
             {
-                attemptsText = _lang.GetLangText(LangKey.FinishRemainingAttempts) + (saveData.attemptsLimit - gameLogic.numberOfAttempts).ToString();
+                _attemptsText = _lang.GetLangText(LangKey.FinishRemainingAttempts) + (saveData.attemptsLimit - gameLogic.numberOfAttempts).ToString();
             }
             else
             {
-                attemptsText = _lang.GetLangText(LangKey.FinishNumberOfAttempts) + gameLogic.numberOfAttempts.ToString();
+                _attemptsText = _lang.GetLangText(LangKey.FinishNumberOfAttempts) + gameLogic.numberOfAttempts.ToString();
             }
             _correctCodeString = _lang.GetLangText(LangKey.FinishCorrectCode) + gameLogic.CorrectCodeString();
         }
@@ -56,9 +52,9 @@ namespace CodeBreaker_MonoGame.Scene
         {
             spriteBatch.DrawString(_titleFont, _endGameInfo, new Vector2(200, 40), _endGameColor);
 
-            spriteBatch.DrawString(_otherFont, timeText, new Vector2(200, 100), Color.Black);
+            spriteBatch.DrawString(_otherFont, _timeText, new Vector2(200, 100), Color.Black);
 
-            spriteBatch.DrawString(_otherFont, attemptsText, new Vector2(200, 160), Color.Black);
+            spriteBatch.DrawString(_otherFont, _attemptsText, new Vector2(200, 160), Color.Black);
 
             spriteBatch.DrawString(_otherFont, _correctCodeString, new Vector2(200, 220), Color.Black);
 

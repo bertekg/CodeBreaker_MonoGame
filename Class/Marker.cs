@@ -1,11 +1,9 @@
-﻿using CodeBreaker_MonoGame.Interface;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 
 namespace CodeBreaker_MonoGame.Class
 {
-    internal class Marker : IMarker
+    internal class Marker
     {
         private Texture2D _sprite;
         private int _index;
@@ -22,15 +20,6 @@ namespace CodeBreaker_MonoGame.Class
             _startPosition = startPosition;
             _endPosition = endPosition;
         }
-        public void ChangeSelected()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void MoveMarker(int index)
-        {
-            _index = index;
-        }
         public void Update()
         {
             _position.X = MathHelper.Lerp(_startPosition.X, _endPosition.X, CountLerpAmout());
@@ -39,6 +28,10 @@ namespace CodeBreaker_MonoGame.Class
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(_sprite, _position, Color.Purple);
+        }
+        public void MoveMarker(int index)
+        {
+            _index = index;
         }
         private float CountLerpAmout()
         {

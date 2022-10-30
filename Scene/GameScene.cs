@@ -1,9 +1,9 @@
-﻿using CodeBreaker_MonoGame.Interface;
+﻿using CodeBreaker_MonoGame.Class;
+using CodeBreaker_MonoGame.Interface;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
 
 namespace CodeBreaker_MonoGame.Scene
 {
@@ -12,21 +12,16 @@ namespace CodeBreaker_MonoGame.Scene
         private readonly Game1 _game1;
         private readonly bool _isDebugMode;
         private readonly SaveData _saveData;
-        private readonly SpriteFont _digitFont;
-        private readonly SpriteFont _instructionFont;
-        private readonly SpriteFont _modFont;
+        private readonly SpriteFont _digitFont, _instructionFont, _modFont;
         private GameLogic _gameLogic;
-        private readonly Texture2D _markerSprite;
         private readonly Lang _lang;
-        private readonly Texture2D _attemptIconReady, _attemptIconUsed;
-        private readonly Texture2D _squereBaseSprite;
-        private readonly SoundEffect _sideSoundEffect, _upDownSoundEffect, _unlockTrySoundEffect;
-        private readonly SoundEffect _successSoundEffect, _failSoundEffect;
+        private readonly Texture2D _markerSprite, _attemptIconReady, _attemptIconUsed, _squereBaseSprite;
+        private readonly SoundEffect _sideSoundEffect, _upDownSoundEffect, _unlockTrySoundEffect, _successSoundEffect, _failSoundEffect;
 
         private int _markerIndex;
         private float _markerPosition;
 
-        private int _attemptIconStartX, _attemptIconStartY, _attemptIconStepX, _attmptIconSize;
+        private readonly int _attemptIconStartX, _attemptIconStartY, _attemptIconStepX, _attmptIconSize;
         public double _playingTime, _remainingTime;
         private Rectangle _timeLimitBarBase;
 
@@ -34,8 +29,7 @@ namespace CodeBreaker_MonoGame.Scene
 
         private Color _tableColor = Color.Black;
 
-        private bool _keyRightUp, _keyLeftUp, _keyUpUp, _keyDownUp;
-        private bool _keySpaceUp;
+        private bool _keyRightReleased, _keyLeftReleased, _keyUpReleased, _keyDownReleased, _keySpaceReleased;
 
         const int CODE_POSITION_START_X = 50, CODE_POSITION_START_Y = 180, CODE_POSITION_STEP_X = 105;
         const int CODE_OFFSET_MARKER_X = -20, CODE_OFFSET_MARKER_Y = -2;
@@ -45,9 +39,8 @@ namespace CodeBreaker_MonoGame.Scene
         const int GUESS_TABLE_OFFSET_X = -11, gUESS_TABLE_OFFSET_Y = -3;
 
         const int TIME_LIMIT_BAR_START_X = 10, TIME_LIMIT_BAR_START_Y = 120, TIME_LIMIT_BAR_HEIGHT = 20, TIME_LIMIT_BAR_WIDTH_MAX = 320;
-
         public GameScene(Game1 game1, bool isDebugMode, SaveData saveData, SpriteFont digitFont, SpriteFont instructionFont,
-            SpriteFont modFont, GameLogic gameLogic, Texture2D markerSprite, Lang lang, Texture2D attemptIconReady,
+            SpriteFont modFont, GameLogic gameLogic, Lang lang, Texture2D markerSprite, Texture2D attemptIconReady,
             Texture2D attemptIconUsed, Texture2D squereBaseSprite, SoundEffect sideSoundEffect, SoundEffect upDownSoundEffect,
             SoundEffect unlockTrySoundEffect, SoundEffect successSoundEffect, SoundEffect failSoundEffect)
         {
@@ -58,8 +51,8 @@ namespace CodeBreaker_MonoGame.Scene
             _instructionFont = instructionFont;
             _modFont = modFont;
             _gameLogic = gameLogic;
-            _markerSprite = markerSprite;
             _lang = lang;
+            _markerSprite = markerSprite;
             _attemptIconReady = attemptIconReady;
             _attemptIconUsed = attemptIconUsed;
             _squereBaseSprite = squereBaseSprite;
@@ -95,7 +88,6 @@ namespace CodeBreaker_MonoGame.Scene
 
             _markerIndex = 0;
         }
-
         public void Draw(SpriteBatch spriteBatch)
         {
             for (int i = 0; i < _saveData.codeLength; i++)
@@ -180,7 +172,6 @@ namespace CodeBreaker_MonoGame.Scene
                 }
             }
         }
-
         public void Update(double deltaTime)
         {
             _markerPosition = 30.0f + (_markerIndex * 100.0f);
@@ -192,7 +183,7 @@ namespace CodeBreaker_MonoGame.Scene
                 _game1.GoToMainMenu(true);
 
             if ((keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D) || gamePadState.DPad.Right == ButtonState.Pressed)
-                && _keyRightUp == true)
+                && _keyRightReleased == true)
             {
                 _markerIndex++;
                 if (_markerIndex > _saveData.codeLength - 1)
@@ -200,16 +191,16 @@ namespace CodeBreaker_MonoGame.Scene
                     _markerIndex = 0;
                 }
                 _game1.PlaySoundEffect(_sideSoundEffect);
-                _keyRightUp = false;
+                _keyRightReleased = false;
             }
             else if ((keyboardState.IsKeyUp(Keys.Right) && keyboardState.IsKeyUp(Keys.D) && gamePadState.DPad.Right == ButtonState.Released)
-                && _keyRightUp == false)
+                && _keyRightReleased == false)
             {
-                _keyRightUp = true;
+                _keyRightReleased = true;
             }
 
             if ((keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A) || gamePadState.DPad.Left == ButtonState.Pressed)
-               && _keyLeftUp == true)
+               && _keyLeftReleased == true)
             {
                 _markerIndex--;
                 if (_markerIndex < 0)
@@ -217,16 +208,16 @@ namespace CodeBreaker_MonoGame.Scene
                     _markerIndex = _saveData.codeLength - 1;
                 }
                 _game1.PlaySoundEffect(_sideSoundEffect);
-                _keyLeftUp = false;
+                _keyLeftReleased = false;
             }
             else if ((keyboardState.IsKeyUp(Keys.Left) && keyboardState.IsKeyUp(Keys.A) && gamePadState.DPad.Left == ButtonState.Released)
-                && _keyLeftUp == false)
+                && _keyLeftReleased == false)
             {
-                _keyLeftUp = true;
+                _keyLeftReleased = true;
             }
 
             if ((keyboardState.IsKeyDown(Keys.Up) || keyboardState.IsKeyDown(Keys.W) || gamePadState.DPad.Up == ButtonState.Pressed)
-                && _keyUpUp == true)
+                && _keyUpReleased == true)
             {
                 _gameLogic.currentCode[_markerIndex]++;
                 if (_gameLogic.currentCode[_markerIndex] > 9)
@@ -234,16 +225,16 @@ namespace CodeBreaker_MonoGame.Scene
                     _gameLogic.currentCode[_markerIndex] = 0;
                 }
                 _game1.PlaySoundEffect(_upDownSoundEffect);
-                _keyUpUp = false;
+                _keyUpReleased = false;
             }
             else if ((keyboardState.IsKeyUp(Keys.Up) && keyboardState.IsKeyUp(Keys.W) && gamePadState.DPad.Up == ButtonState.Released)
-                && _keyUpUp == false)
+                && _keyUpReleased == false)
             {
-                _keyUpUp = true;
+                _keyUpReleased = true;
             }
 
             if ((keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S) || gamePadState.DPad.Down == ButtonState.Pressed)
-              && _keyDownUp == true)
+              && _keyDownReleased == true)
             {
                 _gameLogic.currentCode[_markerIndex]--;
                 if (_gameLogic.currentCode[_markerIndex] < 0)
@@ -251,16 +242,16 @@ namespace CodeBreaker_MonoGame.Scene
                     _gameLogic.currentCode[_markerIndex] = 9;
                 }
                 _game1.PlaySoundEffect(_upDownSoundEffect);
-                _keyDownUp = false;
+                _keyDownReleased = false;
             }
             else if ((keyboardState.IsKeyUp(Keys.Down) && keyboardState.IsKeyUp(Keys.S) && gamePadState.DPad.Down == ButtonState.Released)
-                && _keyDownUp == false)
+                && _keyDownReleased == false)
             {
-                _keyDownUp = true;
+                _keyDownReleased = true;
             }
 
             if ((keyboardState.IsKeyDown(Keys.Space) || gamePadState.Buttons.A == ButtonState.Pressed)
-                && _keySpaceUp == true)
+                && _keySpaceReleased == true)
             {
                 bool isCodeCorrect = _gameLogic.TryCode();
                 if (isCodeCorrect)
@@ -275,12 +266,12 @@ namespace CodeBreaker_MonoGame.Scene
                 {
                     _game1.PlaySoundEffect(_unlockTrySoundEffect);
                 }
-                _keySpaceUp = false;
+                _keySpaceReleased = false;
             }
             else if ((keyboardState.IsKeyUp(Keys.Space) && gamePadState.Buttons.A == ButtonState.Released)
-                && _keySpaceUp == false)
+                && _keySpaceReleased == false)
             {
-                _keySpaceUp = true;
+                _keySpaceReleased = true;
             }
 
             if (_saveData.isTimeLimit)
@@ -297,13 +288,11 @@ namespace CodeBreaker_MonoGame.Scene
                 _playingTime += deltaTime;
             }
         }
-
         private Rectangle GetTimieLimitBarRectangel()
         {
             float barWidth = ((float)_remainingTime / (float)_saveData.timeLimit) * TIME_LIMIT_BAR_WIDTH_MAX;
             return new Rectangle(TIME_LIMIT_BAR_START_X, TIME_LIMIT_BAR_START_Y, (int)barWidth, TIME_LIMIT_BAR_HEIGHT);
         }
-
         private Color GetTimeLimitBarColor()
         {
             float remainingTimeFraction = (float)_remainingTime / (float)_saveData.timeLimit;
@@ -341,7 +330,7 @@ namespace CodeBreaker_MonoGame.Scene
                 case DigitState.Bad:
                     colorDecoded = Color.Red;
                     break;
-                case DigitState.Diffrent:
+                case DigitState.Different:
                     colorDecoded = Color.Blue;
                     break;
                 default:

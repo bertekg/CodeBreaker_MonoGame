@@ -1,7 +1,9 @@
-﻿namespace CodeBreaker_MonoGame
+﻿namespace CodeBreaker_MonoGame.Class
 {
     public enum LangOption { PL = 1 };
-    public enum LangKey { GameTitle, StartGameKey, GameInstuctionKey, ExitGameKey,
+    public enum LangKey
+    {
+        GameTitle, StartGameKey, GameInstuctionKey, ExitGameKey,
         CodeLength, IsLimitedAttempts, NumberAttempts, IsTimeLimitation, TimeLimit,
         PlayingSound, MusicVolume, SoundsVolume, LanguageSelected, CreditsStart, VersionInfo,
         HelpLeftRight, HelpUpDown, HelpSpace, HelpEsc, HelpSingleDigitOnce,
@@ -12,7 +14,8 @@
         FinishRemainingAttempts, FinishNumberOfAttempts, FinishCorrectCode,
         FinishPlayAgain, InstrucitonAndFinishGoBackMenu,
         GameInstuction, ControlsInGame, GameOptionKey, GameOption,
-        GameModifiers, DebuggingModeEnabled};
+        GameModifiers, DebuggingModeEnabled
+    };
     internal class Lang
     {
         private LangOption langOption;

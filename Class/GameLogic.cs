@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CodeBreaker_MonoGame
+namespace CodeBreaker_MonoGame.Class
 {
-    public enum DigitState { Good, Bad, Diffrent}
+    public enum DigitState { Good, Bad, Different }
     public class GameLogic
     {
         public int[] goodCode { get; set; }
@@ -71,7 +71,7 @@ namespace CodeBreaker_MonoGame
                 }
                 else if (Array.Exists(goodCode, element => element == currentCode[i]))
                 {
-                    singleDigit.digitState = DigitState.Diffrent;
+                    singleDigit.digitState = DigitState.Different;
                     correctCode = false;
                 }
                 else

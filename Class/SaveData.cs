@@ -1,4 +1,4 @@
-﻿namespace CodeBreaker_MonoGame
+﻿namespace CodeBreaker_MonoGame.Class
 {
     public class SaveData
     {

@@ -1,10 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 using CodeBreaker_MonoGame.Scene;
-using System;
+using CodeBreaker_MonoGame.Class;
 
 namespace CodeBreaker_MonoGame
 {
@@ -17,16 +16,13 @@ namespace CodeBreaker_MonoGame
         private SpriteFont _largeFont, _bigFont, _middleFont, _smallFont, _littleFont;
 
         private Texture2D _menuMarkerSprite, _gameMarkerSprite, _squereBaseSprite;
-        private Texture2D _attemptIconReady, _attemptIconUsed;
-        private Texture2D _iconGame;
-        private Texture2D _background;
+        private Texture2D _attemptIconReady, _attemptIconUsed, _iconGame, _background;
 
         public MusicAndSounds musicAndSounds;
 
-        private SoundEffect _menuUpDownSoundEffect, _menuSideSoundEffect;
-        private SoundEffect _startSoundEffect, _returnMenuSoundEffect;
-        private SoundEffect _gameUpDownSoundEffect, _gameSideSoundEffect, _unlockTrySoundEffect;
-        private SoundEffect _successSoundEffect, _failSoundEffect;
+        private SoundEffect _menuUpDownSoundEffect, _menuSideSoundEffect, _startSoundEffect;
+        private SoundEffect _returnMenuSoundEffect, _gameUpDownSoundEffect, _gameSideSoundEffect;
+        private SoundEffect _unlockTrySoundEffect, _successSoundEffect, _failSoundEffect;
         private SoundEffect _menuNaviInstr, _menuNaviOption;
 
         private GameLogic _gameLogic;
@@ -44,14 +40,13 @@ namespace CodeBreaker_MonoGame
 
         const int MAX_NUMBER_OF_HINTS = 8;
 
-        const string VERSION_GAME = "1.4.8 (2022.10.30)";
+        const string VERSION_GAME = "1.4.9 (2022.10.30)";
 
         MenuScene _menuScene;
         InstructionScene _instructionScene;
         OptionScene _optionScene;
         GameScene _gameScene;
         FinishScene _finishScene;
-
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -61,7 +56,7 @@ namespace CodeBreaker_MonoGame
         protected override void Initialize()
         {
             Window.Title = "Code Breaker - MonoGame";
-            InitializePrivatVariables();
+            _saveDataPath = System.IO.Path.Combine(System.Environment.CurrentDirectory, "SaveData.xml");
             ReadSaveData();
             _graphics.PreferredBackBufferWidth = 820;
             _graphics.PreferredBackBufferHeight = 550;
@@ -69,11 +64,6 @@ namespace CodeBreaker_MonoGame
 
             base.Initialize();
         }
-        private void InitializePrivatVariables()
-        {
-            _saveDataPath = System.IO.Path.Combine(System.Environment.CurrentDirectory, "SaveData.xml");
-        }
-
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -112,7 +102,6 @@ namespace CodeBreaker_MonoGame
 
             base.LoadContent();
         }
-
         protected override void Update(GameTime gameTime)
         {
             switch (_gameState)
@@ -145,6 +134,7 @@ namespace CodeBreaker_MonoGame
             _spriteBatch.Begin();
 
             _spriteBatch.Draw(_background, Vector2.Zero, Color.White);
+
             switch (_gameState)
             {
                 case GameState.Menu:
@@ -180,33 +170,32 @@ namespace CodeBreaker_MonoGame
         }
         public void GoToInstuction()
         {
+            _gameState = GameState.Instructions;
             _instructionScene = new InstructionScene(this, _bigFont, _smallFont, _middleFont, _lang);
             musicAndSounds.PlaySoundEffect(_menuNaviInstr);
-            _gameState = GameState.Instructions;
         }
         public void GoToOption()
         {
+            _gameState = GameState.Option;
             _optionScene = new OptionScene(this, _menuMarkerSprite, _bigFont, _smallFont, _middleFont, _lang,
                 musicAndSounds, _menuSideSoundEffect, _menuUpDownSoundEffect);
             musicAndSounds.PlaySoundEffect(_menuNaviOption);
-            _gameState = GameState.Option;
         }
         public void GoToGame()
         {
-            _gameLogic = new GameLogic(_saveData.codeLength, MAX_NUMBER_OF_HINTS);
-                        
             _gameState = GameState.Game;
+            _gameLogic = new GameLogic(_saveData.codeLength, MAX_NUMBER_OF_HINTS);
             musicAndSounds.PlaySoundEffect(_startSoundEffect);
             _gameScene = new GameScene(this, _isDebugMode, _saveData, _largeFont, _smallFont, _bigFont, _gameLogic,
-                _gameMarkerSprite, _lang, _attemptIconReady, _attemptIconUsed, _squereBaseSprite, _gameSideSoundEffect,
+                _lang, _gameMarkerSprite, _attemptIconReady, _attemptIconUsed, _squereBaseSprite, _gameSideSoundEffect,
                 _gameUpDownSoundEffect, _unlockTrySoundEffect, _successSoundEffect, _failSoundEffect);
         }
         public void GoToFinish(SoundEffect soundEffect)
         {
-            musicAndSounds.PlaySoundEffect(soundEffect);
             _gameState = GameState.Finish;
-            double time;
+            musicAndSounds.PlaySoundEffect(soundEffect);
 
+            double time;
             if (_saveData.isTimeLimit)
                 time = _gameScene._remainingTime;
             else
@@ -245,7 +234,6 @@ namespace CodeBreaker_MonoGame
             _isDebugMode = DetectDebugMode();
             _lang = new Lang(_saveData.langID);
         }
-
         private bool DetectDebugMode()
         {
             bool isDebugMode = false;
@@ -255,7 +243,6 @@ namespace CodeBreaker_MonoGame
             }
             return isDebugMode;
         }
-
         protected override void EndRun()
         {
             WriteSaveData();

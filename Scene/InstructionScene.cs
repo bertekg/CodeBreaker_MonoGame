@@ -1,17 +1,15 @@
-﻿using CodeBreaker_MonoGame.Interface;
+﻿using CodeBreaker_MonoGame.Class;
+using CodeBreaker_MonoGame.Interface;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
 
 namespace CodeBreaker_MonoGame.Scene
 {
     internal class InstructionScene : IScene
     {
         private readonly Game1 _game1;
-        private readonly SpriteFont _titleFont;
-        private readonly SpriteFont _instructionFont;
-        private readonly SpriteFont _navigationFont;
+        private readonly SpriteFont _titleFont, _instructionFont, _navigationFont;
         private readonly Lang _lang;
         public InstructionScene(Game1 game1, SpriteFont titleFont, SpriteFont instructionFont, SpriteFont navigationFont, Lang lang)
         {
@@ -21,7 +19,6 @@ namespace CodeBreaker_MonoGame.Scene
             _navigationFont = navigationFont;
             _lang = lang;
         }
-
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.DrawString(_titleFont, _lang.GetLangText(LangKey.GameInstuction), new Vector2(250, 50), Color.Black);

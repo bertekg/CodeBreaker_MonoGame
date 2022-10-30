@@ -10,10 +10,7 @@ namespace CodeBreaker_MonoGame.Scene
     internal class MenuScene : IScene
     {
         private readonly Game1 _game1;
-        private readonly SpriteFont _titleFont;
-        private readonly SpriteFont _navigationScene;
-        private readonly SpriteFont _optionFont;
-        private readonly SpriteFont _creditsFont;
+        private readonly SpriteFont _titleFont, _navigationScene, _optionFont, _creditsFont;
         private readonly Lang _lang;
 
         private readonly Texture2D _iconGame;
@@ -51,7 +48,6 @@ namespace CodeBreaker_MonoGame.Scene
             _isDebugMode = isDebugMode;
             MoveMarker(0);
         }
-
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.DrawString(_titleFont, _lang.GetLangText(LangKey.GameTitle), new Vector2(180, 50), Color.Black);
