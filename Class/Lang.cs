@@ -14,7 +14,7 @@
         FinishRemainingAttempts, FinishNumberOfAttempts, FinishCorrectCode,
         FinishPlayAgain, InstrucitonAndFinishGoBackMenu,
         GameInstuction, ControlsInGame, GameOptionKey, GameOption,
-        GameModifiers, DebuggingModeEnabled
+        GameModifiers, DebuggingModeEnabled, Start, Help, Option, Quit
     };
     internal class Lang
     {
@@ -548,6 +548,50 @@
                             break;
                         default:
                             returnText = "Debugging mode enabled".ToUpper();
+                            break;
+                    }
+                    break;
+                case LangKey.Start:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "START";
+                            break;
+                        default:
+                            returnText = "START";
+                            break;
+                    }
+                    break;
+                case LangKey.Help:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "POMOC";
+                            break;
+                        default:
+                            returnText = "HELP";
+                            break;
+                    }
+                    break;
+                case LangKey.Option:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "OPCJE";
+                            break;
+                        default:
+                            returnText = "OPTIONS";
+                            break;
+                    }
+                    break;
+                case LangKey.Quit:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "WYJŚCIE";
+                            break;
+                        default:
+                            returnText = "EXIT";
                             break;
                     }
                     break;

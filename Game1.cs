@@ -17,6 +17,7 @@ namespace CodeBreaker_MonoGame
 
         private Texture2D _menuMarkerSprite, _gameMarkerSprite, _squereBaseSprite;
         private Texture2D _attemptIconReady, _attemptIconUsed, _iconGame, _background;
+        private Texture2D _buttonSprite;
 
         public MusicAndSounds musicAndSounds;
 
@@ -40,7 +41,7 @@ namespace CodeBreaker_MonoGame
 
         const int MAX_NUMBER_OF_HINTS = 8;
 
-        const string VERSION_GAME = "1.4.9 (2022.10.30)";
+        const string VERSION_GAME = "1.5.0 (2022.11.01)";
 
         MenuScene _menuScene;
         InstructionScene _instructionScene;
@@ -81,6 +82,7 @@ namespace CodeBreaker_MonoGame
             _attemptIconUsed = Content.Load<Texture2D>("sprites/attemptIconUsed");
             _iconGame = Content.Load<Texture2D>("sprites/icon96");
             _background = Content.Load<Texture2D>("background/background_820x550");
+            _buttonSprite = Content.Load<Texture2D>("sprites/button");
 
             Song song = Content.Load<Song>("audio/music");
             musicAndSounds = new MusicAndSounds(song, _saveData);
@@ -164,7 +166,7 @@ namespace CodeBreaker_MonoGame
         {
             _gameState = GameState.Menu;
             _menuScene = new MenuScene(this, _bigFont, _smallFont, _smallFont, _littleFont, _lang, _iconGame, VERSION_GAME,
-                _menuMarkerSprite, _saveData, _menuSideSoundEffect, _menuUpDownSoundEffect, _isDebugMode);
+                _menuMarkerSprite, _saveData, _menuSideSoundEffect, _menuUpDownSoundEffect, _isDebugMode, _buttonSprite);
             if (isPlaySoundEfect)
                 musicAndSounds.PlaySoundEffect(_returnMenuSoundEffect);
         }

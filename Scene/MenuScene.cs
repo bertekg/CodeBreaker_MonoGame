@@ -1,9 +1,12 @@
 ﻿using CodeBreaker_MonoGame.Class;
+using CodeBreaker_MonoGame.Control;
 using CodeBreaker_MonoGame.Interface;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Collections.Generic;
 
 namespace CodeBreaker_MonoGame.Scene
 {
@@ -27,9 +30,14 @@ namespace CodeBreaker_MonoGame.Scene
 
         private readonly SoundEffect _menuSideSoundEffect, _menuUpDownSoundEffect;
         private readonly bool _isDebugMode;
+
+        private List<Component> _gameComponents;
+        private Texture2D _buttonSprite;
+
         public MenuScene(Game1 game1, SpriteFont titleFont, SpriteFont navigationScene, SpriteFont optionFont,
             SpriteFont creditsFont, Lang lang, Texture2D iconGame, string versionGame, Texture2D markerSprite,
-            SaveData saveData, SoundEffect menuSideSoundEffect, SoundEffect menuUpDownSoundEffect, bool isDebugMode)
+            SaveData saveData, SoundEffect menuSideSoundEffect, SoundEffect menuUpDownSoundEffect, bool isDebugMode,
+            Texture2D buttonSprite)
         {
             _game1 = game1;
             _titleFont = titleFont;
@@ -46,17 +54,66 @@ namespace CodeBreaker_MonoGame.Scene
             _menuSideSoundEffect = menuSideSoundEffect;
             _menuUpDownSoundEffect = menuUpDownSoundEffect;
             _isDebugMode = isDebugMode;
+            _buttonSprite = buttonSprite;
+            InitializeButton();
             MoveMarker(0);
+        }
+        private void InitializeButton()
+        {
+            Button startButton = new Button(_buttonSprite, _optionFont)
+            {
+                Position = new Vector2(10, 140), Text = _lang.GetLangText(LangKey.Start)
+            };
+            startButton.Click += StartButton_Click;
+
+            Button helpButton = new Button(_buttonSprite, _optionFont)
+            {
+                Position = new Vector2(10, 180), Text = _lang.GetLangText(LangKey.Help)
+            };
+            helpButton.Click += HelpButton_Click;
+
+            Button optionButton = new Button(_buttonSprite, _optionFont)
+            {
+                Position = new Vector2(10, 220), Text = _lang.GetLangText(LangKey.Option)
+            };
+            optionButton.Click += OptiontButton_Click;
+
+            Button quitButton = new Button(_buttonSprite, _optionFont)
+            {
+                Position = new Vector2(10, 260), Text = _lang.GetLangText(LangKey.Quit)
+            };
+            quitButton.Click += QuitButton_Click;
+
+            _gameComponents = new List<Component>()
+            {
+                startButton, helpButton, optionButton, quitButton
+            };
+        }
+        private void StartButton_Click(object sender, EventArgs e)
+        {
+            GoToGame();
+        }
+        private void HelpButton_Click(object sender, EventArgs e)
+        {
+            GoToInstuction();
+        }
+        private void OptiontButton_Click(object sender, EventArgs e)
+        {
+            GoToOption();
+        }
+        private void QuitButton_Click(object sender, EventArgs e)
+        {
+            ExitGame();
         }
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.DrawString(_titleFont, _lang.GetLangText(LangKey.GameTitle), new Vector2(180, 50), Color.Black);
             spriteBatch.Draw(_iconGame, _iconLocation, Color.White);
 
-            spriteBatch.DrawString(_navigationScene, _lang.GetLangText(LangKey.StartGameKey), new Vector2(120, 140), Color.Black);
-            spriteBatch.DrawString(_navigationScene, _lang.GetLangText(LangKey.GameInstuctionKey), new Vector2(120, 170), Color.Black);
-            spriteBatch.DrawString(_navigationScene, _lang.GetLangText(LangKey.GameOptionKey), new Vector2(120, 200), Color.Black);
-            spriteBatch.DrawString(_navigationScene, _lang.GetLangText(LangKey.ExitGameKey), new Vector2(120, 230), Color.Black);
+            spriteBatch.DrawString(_navigationScene, _lang.GetLangText(LangKey.StartGameKey), new Vector2(140, 140), Color.Black);
+            spriteBatch.DrawString(_navigationScene, _lang.GetLangText(LangKey.GameInstuctionKey), new Vector2(140, 180), Color.Black);
+            spriteBatch.DrawString(_navigationScene, _lang.GetLangText(LangKey.GameOptionKey), new Vector2(140, 220), Color.Black);
+            spriteBatch.DrawString(_navigationScene, _lang.GetLangText(LangKey.ExitGameKey), new Vector2(140, 260), Color.Black);
 
             spriteBatch.DrawString(_optionFont, _lang.GetLangText(LangKey.GameModifiers), GetMenuMarkerPosition(-1), Color.Black);
             spriteBatch.DrawString(_optionFont, _lang.GetLangText(LangKey.CodeLength) + _saveData.codeLength.ToString(), GetMenuMarkerPosition(0), Color.Black);
@@ -74,6 +131,9 @@ namespace CodeBreaker_MonoGame.Scene
             }
 
             _menuMarker.Draw(spriteBatch);
+
+            foreach (var component in _gameComponents)
+                component.Draw(spriteBatch);
         }
         public void Update(double deltaTime)
         {
@@ -81,22 +141,18 @@ namespace CodeBreaker_MonoGame.Scene
             GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
 
             if (keyboardState.IsKeyDown(Keys.Enter) || gamePadState.Buttons.Start == ButtonState.Pressed)
-                _game1.GoToGame();
+                GoToGame();
 
             if (keyboardState.IsKeyDown(Keys.H) || gamePadState.Buttons.RightShoulder == ButtonState.Pressed)
-            {
-                _game1.GoToInstuction();
-            }
+                GoToInstuction();
 
             if (keyboardState.IsKeyDown(Keys.O) || gamePadState.Buttons.LeftShoulder == ButtonState.Pressed)
-            {
-                _game1.GoToOption();
-            }
+                GoToOption();
 
             if ((keyboardState.IsKeyDown(Keys.Escape) || gamePadState.Buttons.Back == ButtonState.Pressed)
                 && _keyEscapeReleased == true)
             {
-                _game1.Exit();
+                ExitGame();
             }
             else if ((keyboardState.IsKeyUp(Keys.Escape) && gamePadState.Buttons.Back == ButtonState.Released)
                 && _keyEscapeReleased == false)
@@ -229,7 +285,31 @@ namespace CodeBreaker_MonoGame.Scene
             {
                 _keyDownReleased = true;
             }
+
+            foreach (var component in _gameComponents)
+                component.Update();
         }
+
+        private void ExitGame()
+        {
+            _game1.Exit();
+        }
+
+        private void GoToOption()
+        {
+            _game1.GoToOption();
+        }
+
+        private void GoToInstuction()
+        {
+            _game1.GoToInstuction();
+        }
+
+        private void GoToGame()
+        {
+            _game1.GoToGame();
+        }
+
         public void MoveMarker(int index)
         {
             _menuMarker.MoveMarker(index);
