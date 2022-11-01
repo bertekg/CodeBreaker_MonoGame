@@ -3,7 +3,7 @@
     public enum LangOption { PL = 1 };
     public enum LangKey
     {
-        GameTitle, StartGameKey, GameInstuctionKey, ExitGameKey,
+        GameTitle, StartGameKey, ModifiersKey, GameInstuctionKey, ExitGameKey,
         CodeLength, IsLimitedAttempts, NumberAttempts, IsTimeLimitation, TimeLimit,
         PlayingSound, MusicVolume, SoundsVolume, LanguageSelected, CreditsStart, VersionInfo,
         HelpLeftRight, HelpUpDown, HelpSpace, HelpEsc, HelpSingleDigitOnce,
@@ -12,9 +12,9 @@
         GameRemainingAttempts, GameNumberOfAttempts, GameRemainingTime,
         FinishWin, FinishLost, FinishRemainingTime, FinishPlayingTime,
         FinishRemainingAttempts, FinishNumberOfAttempts, FinishCorrectCode,
-        FinishPlayAgain, InstrucitonAndFinishGoBackMenu,
+        FinishPlayAgain, GoBackMenu,
         GameInstuction, ControlsInGame, GameOptionKey, GameOption,
-        GameModifiers, DebuggingModeEnabled, Start, Help, Option, Quit
+        GameModifiers, DebuggingModeEnabled, Start, Modifiers, Help, Option, Quit, Back
     };
     internal class Lang
     {
@@ -75,6 +75,17 @@
                             break;
                         default:
                             returnText = "Press [Enter or Start] to Start Game";
+                            break;
+                    }
+                    break;
+                case LangKey.ModifiersKey:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Wciśnij [M lub Y] aby ustawić modyfikatory gry";
+                            break;
+                        default:
+                            returnText = "Press [M or Y] to set Game Modifiers";
                             break;
                     }
                     break;
@@ -485,7 +496,7 @@
                             break;
                     }
                     break;
-                case LangKey.InstrucitonAndFinishGoBackMenu:
+                case LangKey.GoBackMenu:
                     switch (langOption)
                     {
                         case LangOption.PL:
@@ -533,10 +544,10 @@
                     switch (langOption)
                     {
                         case LangOption.PL:
-                            returnText = "Modyfikatory gry:";
+                            returnText = "Modyfikatory gry";
                             break;
                         default:
-                            returnText = "Game Modifiers:";
+                            returnText = "Game Modifiers";
                             break;
                     }
                     break;
@@ -559,6 +570,17 @@
                             break;
                         default:
                             returnText = "START";
+                            break;
+                    }
+                    break;
+                case LangKey.Modifiers:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "MODYFI.";
+                            break;
+                        default:
+                            returnText = "MODIFI.";
                             break;
                     }
                     break;
@@ -592,6 +614,17 @@
                             break;
                         default:
                             returnText = "EXIT";
+                            break;
+                    }
+                    break;
+                case LangKey.Back:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "WRÓĆ";
+                            break;
+                        default:
+                            returnText = "BACK";
                             break;
                     }
                     break;

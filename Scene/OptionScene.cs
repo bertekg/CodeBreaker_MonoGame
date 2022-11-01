@@ -55,7 +55,7 @@ namespace CodeBreaker_MonoGame.Scene
 
             _optionMarker.Draw(spriteBatch);
 
-            spriteBatch.DrawString(_navigationFont, _lang.GetLangText(LangKey.InstrucitonAndFinishGoBackMenu),
+            spriteBatch.DrawString(_navigationFont, _lang.GetLangText(LangKey.GoBackMenu),
                 new Vector2(10, 500), Color.Black);
         }
         public void Update(double deltaTime)

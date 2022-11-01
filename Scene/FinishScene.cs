@@ -59,7 +59,7 @@ namespace CodeBreaker_MonoGame.Scene
             spriteBatch.DrawString(_otherFont, _correctCodeString, new Vector2(200, 220), Color.Black);
 
             spriteBatch.DrawString(_otherFont, _lang.GetLangText(LangKey.FinishPlayAgain), new Vector2(10, 360), Color.Black);
-            spriteBatch.DrawString(_otherFont, _lang.GetLangText(LangKey.InstrucitonAndFinishGoBackMenu), new Vector2(10, 400), Color.Black);
+            spriteBatch.DrawString(_otherFont, _lang.GetLangText(LangKey.GoBackMenu), new Vector2(10, 400), Color.Black);
         }
         public void Update(double deltaTime)
         {

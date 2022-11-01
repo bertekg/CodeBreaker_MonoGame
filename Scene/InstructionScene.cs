@@ -35,12 +35,13 @@ namespace CodeBreaker_MonoGame.Scene
             spriteBatch.DrawString(_instructionFont, _lang.GetLangText(LangKey.HelpSpace), new Vector2(50, 390), Color.Black);
             spriteBatch.DrawString(_instructionFont, _lang.GetLangText(LangKey.HelpEsc), new Vector2(50, 420), Color.Black);
 
-            spriteBatch.DrawString(_navigationFont, _lang.GetLangText(LangKey.InstrucitonAndFinishGoBackMenu), new Vector2(10, 500), Color.Black);
+            spriteBatch.DrawString(_navigationFont, _lang.GetLangText(LangKey.GoBackMenu), new Vector2(10, 500), Color.Black);
         }
         public void Update(double deltaTime)
         {
             KeyboardState keyboardState = Keyboard.GetState();
             GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
+
             if (keyboardState.IsKeyDown(Keys.Escape) || gamePadState.Buttons.Back == ButtonState.Pressed)
                 _game1.GoToMainMenu(true);
         }

@@ -7,9 +7,12 @@ using CodeBreaker_MonoGame.Class;
 
 namespace CodeBreaker_MonoGame
 {
-    public enum GameState { Menu, Instructions, Option,  Game, Finish }
+    public enum GameState { Menu, Modifiers, Instructions, Options,  Game, Finish }
     public class Game1 : Game
     {
+        public static int ScreenWidth = 820;
+        public static int ScreenHeight = 550;
+
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
@@ -17,14 +20,14 @@ namespace CodeBreaker_MonoGame
 
         private Texture2D _menuMarkerSprite, _gameMarkerSprite, _squereBaseSprite;
         private Texture2D _attemptIconReady, _attemptIconUsed, _iconGame, _background;
-        private Texture2D _buttonSprite;
+        private Texture2D _buttonSprite, _buttonSprite_30x30;
 
         public MusicAndSounds musicAndSounds;
 
         private SoundEffect _menuUpDownSoundEffect, _menuSideSoundEffect, _startSoundEffect;
         private SoundEffect _returnMenuSoundEffect, _gameUpDownSoundEffect, _gameSideSoundEffect;
         private SoundEffect _unlockTrySoundEffect, _successSoundEffect, _failSoundEffect;
-        private SoundEffect _menuNaviInstr, _menuNaviOption;
+        private SoundEffect _menuNaviInstr, _menuNaviOption, _menuNaviModifiers;
 
         private GameLogic _gameLogic;
 
@@ -41,9 +44,10 @@ namespace CodeBreaker_MonoGame
 
         const int MAX_NUMBER_OF_HINTS = 8;
 
-        const string VERSION_GAME = "1.5.0 (2022.11.01)";
+        const string VERSION_GAME = "1.5.1 (2022.11.01)";
 
         MenuScene _menuScene;
+        ModifiersScene _modifiersScene;
         InstructionScene _instructionScene;
         OptionScene _optionScene;
         GameScene _gameScene;
@@ -59,8 +63,8 @@ namespace CodeBreaker_MonoGame
             Window.Title = "Code Breaker - MonoGame";
             _saveDataPath = System.IO.Path.Combine(System.Environment.CurrentDirectory, "SaveData.xml");
             ReadSaveData();
-            _graphics.PreferredBackBufferWidth = 820;
-            _graphics.PreferredBackBufferHeight = 550;
+            _graphics.PreferredBackBufferWidth = ScreenWidth;
+            _graphics.PreferredBackBufferHeight = ScreenHeight;
             _graphics.ApplyChanges();
 
             base.Initialize();
@@ -83,6 +87,7 @@ namespace CodeBreaker_MonoGame
             _iconGame = Content.Load<Texture2D>("sprites/icon96");
             _background = Content.Load<Texture2D>("background/background_820x550");
             _buttonSprite = Content.Load<Texture2D>("sprites/button");
+            _buttonSprite_30x30 = Content.Load<Texture2D>("sprites/button_30_30");
 
             Song song = Content.Load<Song>("audio/music");
             musicAndSounds = new MusicAndSounds(song, _saveData);
@@ -99,6 +104,7 @@ namespace CodeBreaker_MonoGame
             _failSoundEffect = Content.Load<SoundEffect>("sounds/fail");
             _menuNaviInstr = Content.Load<SoundEffect>("sounds/menuNaviInst");
             _menuNaviOption = Content.Load<SoundEffect>("sounds/menuNaviOption");
+            _menuNaviModifiers = Content.Load<SoundEffect>("sounds/menuNaviModifiers");
 
             GoToMainMenu(false);
 
@@ -111,10 +117,13 @@ namespace CodeBreaker_MonoGame
                 case GameState.Menu:
                     _menuScene.Update(gameTime.ElapsedGameTime.TotalSeconds);
                     break;
+                case GameState.Modifiers:
+                    _modifiersScene.Update(gameTime.ElapsedGameTime.TotalSeconds);
+                    break;
                 case GameState.Instructions:
                     _instructionScene.Update(gameTime.ElapsedGameTime.TotalSeconds);
                     break;
-                case GameState.Option:
+                case GameState.Options:
                     _optionScene.Update(gameTime.ElapsedGameTime.TotalSeconds);
                     break;
                 case GameState.Game:
@@ -142,10 +151,13 @@ namespace CodeBreaker_MonoGame
                 case GameState.Menu:
                     _menuScene.Draw(_spriteBatch);
                     break;
+                case GameState.Modifiers:
+                    _modifiersScene.Draw(_spriteBatch);
+                    break;
                 case GameState.Instructions:
                     _instructionScene.Draw(_spriteBatch);
                     break;
-                case GameState.Option:
+                case GameState.Options:
                     _optionScene.Draw(_spriteBatch);
                     break;
                 case GameState.Game:
@@ -166,9 +178,16 @@ namespace CodeBreaker_MonoGame
         {
             _gameState = GameState.Menu;
             _menuScene = new MenuScene(this, _bigFont, _smallFont, _smallFont, _littleFont, _lang, _iconGame, VERSION_GAME,
-                _menuMarkerSprite, _saveData, _menuSideSoundEffect, _menuUpDownSoundEffect, _isDebugMode, _buttonSprite);
+                _isDebugMode, _buttonSprite);
             if (isPlaySoundEfect)
                 musicAndSounds.PlaySoundEffect(_returnMenuSoundEffect);
+        }
+        public void GoToModifiers()
+        {
+            _gameState = GameState.Modifiers;
+            _modifiersScene = new ModifiersScene(this, _bigFont, _smallFont, _smallFont, _lang, _menuMarkerSprite, _saveData,
+                _menuSideSoundEffect, _menuUpDownSoundEffect, _buttonSprite, _buttonSprite_30x30);
+            musicAndSounds.PlaySoundEffect(_menuNaviModifiers);
         }
         public void GoToInstuction()
         {
@@ -178,7 +197,7 @@ namespace CodeBreaker_MonoGame
         }
         public void GoToOption()
         {
-            _gameState = GameState.Option;
+            _gameState = GameState.Options;
             _optionScene = new OptionScene(this, _menuMarkerSprite, _bigFont, _smallFont, _middleFont, _lang,
                 musicAndSounds, _menuSideSoundEffect, _menuUpDownSoundEffect);
             musicAndSounds.PlaySoundEffect(_menuNaviOption);
