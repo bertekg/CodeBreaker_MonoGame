@@ -20,7 +20,7 @@ namespace CodeBreaker_MonoGame
 
         private Texture2D _menuMarkerSprite, _gameMarkerSprite, _squereBaseSprite;
         private Texture2D _attemptIconReady, _attemptIconUsed, _iconGame, _background;
-        private Texture2D _buttonSprite, _buttonSprite_30x30;
+        private Texture2D _buttonSprite, _buttonSprite_30x30, _buttonSprite_230x30;
 
         public MusicAndSounds musicAndSounds;
 
@@ -39,12 +39,12 @@ namespace CodeBreaker_MonoGame
 
         SaveData _saveData;
 
-        const bool IS_DEBUG_MODE_FROM_CODE = false;
+        const bool IS_DEBUG_MODE_FROM_CODE = true;
         private bool _isDebugMode;
 
         const int MAX_NUMBER_OF_HINTS = 8;
 
-        const string VERSION_GAME = "1.5.3 (2022.11.02)";
+        const string VERSION_GAME = "1.5.4 (2022.11.02)";
 
         MenuScene _menuScene;
         ModifiersScene _modifiersScene;
@@ -90,6 +90,7 @@ namespace CodeBreaker_MonoGame
             _background = Content.Load<Texture2D>("background/background_820x550");
             _buttonSprite = Content.Load<Texture2D>("sprites/button");
             _buttonSprite_30x30 = Content.Load<Texture2D>("sprites/button_30_30");
+            _buttonSprite_230x30 = Content.Load<Texture2D>("sprites/button_230_30");
 
             Song song = Content.Load<Song>("audio/music");
             musicAndSounds = new MusicAndSounds(song, _saveData);
@@ -180,7 +181,7 @@ namespace CodeBreaker_MonoGame
         {
             _gameState = GameState.Menu;
             _menuScene = new MenuScene(this, _bigFont, _smallFont, _smallFont, _littleFont, _lang, _iconGame, VERSION_GAME,
-                _isDebugMode, _buttonSprite);
+                _isDebugMode, _buttonSprite_230x30);
             if (isPlaySoundEfect)
                 musicAndSounds.PlaySoundEffect(_returnMenuSoundEffect);
         }
@@ -224,7 +225,8 @@ namespace CodeBreaker_MonoGame
             else
                 time = _gameScene._playingTime;
 
-            _finishScene = new FinishScene(this, _gameLogic, _saveData, _bigFont, _middleFont, _lang, time);
+            _finishScene = new FinishScene(this, _gameLogic, _saveData, _bigFont, _middleFont, _smallFont, _lang, time,
+                _buttonSprite_230x30);
         }
         public void PlaySoundEffect(SoundEffect soundEffect)
         {

@@ -14,7 +14,7 @@
         FinishRemainingAttempts, FinishNumberOfAttempts, FinishCorrectCode,
         FinishPlayAgain, GoBackMenu,
         GameInstuction, ControlsInGame, GameOptionKey, GameOption,
-        GameModifiers, DebuggingModeEnabled, Start, Modifiers, Help, Option, Quit, Back,
+        GameModifiers, DebuggingModeEnabled, Start, Modifiers, Help, Option, Quit, Back, PlayAgain, MainMenu,
         TrueSingleLetter, FalseSingleLetter
     };
     internal class Lang
@@ -578,10 +578,10 @@
                     switch (langOption)
                     {
                         case LangOption.PL:
-                            returnText = "MODYFI.";
+                            returnText = "MODYFIKATORY";
                             break;
                         default:
-                            returnText = "MODIFI.";
+                            returnText = "MODIFIERS";
                             break;
                     }
                     break;
@@ -626,6 +626,28 @@
                             break;
                         default:
                             returnText = "BACK";
+                            break;
+                    }
+                    break;
+                case LangKey.PlayAgain:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "GRAJ PONOWNIE";
+                            break;
+                        default:
+                            returnText = "PLAY AGAIN";
+                            break;
+                    }
+                    break;
+                case LangKey.MainMenu:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "MENU GŁÓWNE";
+                            break;
+                        default:
+                            returnText = "MAIN MENU";
                             break;
                     }
                     break;

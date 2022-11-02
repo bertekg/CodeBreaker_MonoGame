@@ -162,6 +162,18 @@
 /processorParam:TextureFormat=Color
 /build:sprites/attemptIconUsed.png
 
+#begin sprites/button_230_30.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:sprites/button_230_30.png
+
 #begin sprites/button_30_30.png
 /importer:TextureImporter
 /processor:TextureProcessor
