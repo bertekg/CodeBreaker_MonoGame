@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using CodeBreaker_MonoGame.Class;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace CodeBreaker_MonoGame.Control
 {
@@ -19,6 +14,7 @@ namespace CodeBreaker_MonoGame.Control
         private MouseState _previousMouse;
         private Texture2D _texture;
 
+        public bool IsDisable;
         public event EventHandler Click;
         public bool Clicked { get; private set; }
         public Color PenColour { get; set; }
@@ -42,6 +38,7 @@ namespace CodeBreaker_MonoGame.Control
         }
         public override void Draw(SpriteBatch spriteBatch)
         {
+            if (IsDisable == true) return;
             var colour = Color.White;
 
             if (_isHovering)
@@ -60,6 +57,7 @@ namespace CodeBreaker_MonoGame.Control
 
         public override void Update()
         {
+            if (IsDisable == true) return;
             _previousMouse = _currentMouse;
             _currentMouse = Mouse.GetState();
 

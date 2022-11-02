@@ -14,7 +14,8 @@
         FinishRemainingAttempts, FinishNumberOfAttempts, FinishCorrectCode,
         FinishPlayAgain, GoBackMenu,
         GameInstuction, ControlsInGame, GameOptionKey, GameOption,
-        GameModifiers, DebuggingModeEnabled, Start, Modifiers, Help, Option, Quit, Back
+        GameModifiers, DebuggingModeEnabled, Start, Modifiers, Help, Option, Quit, Back,
+        TrueSingleLetter, FalseSingleLetter
     };
     internal class Lang
     {
@@ -625,6 +626,28 @@
                             break;
                         default:
                             returnText = "BACK";
+                            break;
+                    }
+                    break;
+                case LangKey.TrueSingleLetter:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "P";
+                            break;
+                        default:
+                            returnText = "T";
+                            break;
+                    }
+                    break;
+                case LangKey.FalseSingleLetter:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "F";
+                            break;
+                        default:
+                            returnText = "F";
                             break;
                     }
                     break;

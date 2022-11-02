@@ -44,7 +44,7 @@ namespace CodeBreaker_MonoGame
 
         const int MAX_NUMBER_OF_HINTS = 8;
 
-        const string VERSION_GAME = "1.5.1 (2022.11.01)";
+        const string VERSION_GAME = "1.5.2 (2022.11.02)";
 
         MenuScene _menuScene;
         ModifiersScene _modifiersScene;
