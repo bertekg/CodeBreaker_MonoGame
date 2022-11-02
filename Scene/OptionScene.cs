@@ -1,9 +1,13 @@
 ﻿using CodeBreaker_MonoGame.Class;
+using CodeBreaker_MonoGame.Control;
 using CodeBreaker_MonoGame.Interface;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Collections.Generic;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace CodeBreaker_MonoGame.Scene
 {
@@ -19,10 +23,19 @@ namespace CodeBreaker_MonoGame.Scene
         private int _optionMarkerIndex;
         private readonly SoundEffect _menuSideSoundEffect, _menuUpDownSoundEffect;
 
+        private Vector2 _locTitle, _locBackToolTip;
+        private List<Component> _gameComponents;
+        private readonly Texture2D _buttonNavigation, _buttonOption;
+
+        private Button _goMenuButton, _isSoundingTrueButton, _isSoundingFalseButton, _musicVolumeInc, _musicVolumeDec,
+            _soundVolumeInc, _soundVolumeDec, _langSwitchLeftButton, _langSwitchRightButton;
+        private readonly Vector2 _offsetButtonOptionRight, _offsetButtonOptionLeft;
+
         const int OPTION_MARKER_START_X = 225, OPTION_MARKER_START_Y = 150, PTION_MARKER_STEP_Y = 40;
         public OptionScene(Game1 game1, Texture2D markerSprite, SpriteFont titleFont, SpriteFont optionFont,
             SpriteFont navigationFont, Lang lang, MusicAndSounds musicAndSounds, 
-            SoundEffect menuSideSoundEffect, SoundEffect menuUpDownSoundEffect)
+            SoundEffect menuSideSoundEffect, SoundEffect menuUpDownSoundEffect, Texture2D buttonNavigation,
+            Texture2D buttonOption)
         {
             _game1 = game1;
             _optionMarker = new Marker(markerSprite, 3,
@@ -39,10 +52,149 @@ namespace CodeBreaker_MonoGame.Scene
             _menuUpDownSoundEffect = menuUpDownSoundEffect;
             _optionMarkerIndex = 0;
             MoveMarker(_optionMarkerIndex);
+
+            _locTitle = new Vector2((Game1.ScreenWidth / 2) -
+                (_titleFont.MeasureString(_lang.GetLangText(LangKey.GameOption)).X / 2), 30);
+
+            _offsetButtonOptionRight = new Vector2(-55, 0);
+            _offsetButtonOptionLeft = new Vector2(-90, 0);
+            _buttonNavigation = buttonNavigation;
+            _buttonOption = buttonOption;
+            InitializeButtons();
+        }
+        private void InitializeButtons()
+        {
+            _goMenuButton = new Button(_buttonNavigation, _navigationFont)
+            {
+                Position = new Vector2((Game1.ScreenWidth / 2) - (_buttonNavigation.Width / 2), 470),
+                Text = _lang.GetLangText(LangKey.Back)
+            };
+            _goMenuButton.Click += GoMenuButton_Click;
+            _locBackToolTip = new Vector2(((Game1.ScreenWidth / 2) -
+                (_navigationFont.MeasureString(_lang.GetLangText(LangKey.GoBackMenu)).X / 2)), 500);
+
+            _isSoundingTrueButton = new Button(_buttonOption, _optionFont)
+            {
+                Position = GetOptionMarkerPosition(0) + _offsetButtonOptionRight,
+                Text = _lang.GetLangText(LangKey.TrueSingleLetter)
+            };
+            _isSoundingTrueButton.Click += IsSoundingTrue_Click;
+
+            _isSoundingFalseButton = new Button(_buttonOption, _optionFont)
+            {
+                Position = GetOptionMarkerPosition(0) + _offsetButtonOptionLeft,
+                Text = _lang.GetLangText(LangKey.FalseSingleLetter)
+            };
+            _isSoundingFalseButton.Click += IsSoundingFalse_Click;
+
+            bool isNoSounding = !_game1.musicAndSounds.GetIsSounding();
+            _musicVolumeInc = new Button(_buttonOption, _optionFont)
+            {
+                Position = GetOptionMarkerPosition(1) + _offsetButtonOptionRight,
+                Text = "+",
+                IsDisable = isNoSounding
+            };
+            _musicVolumeInc.Click += MusicVolumeInc_Click;
+
+            _musicVolumeDec = new Button(_buttonOption, _optionFont)
+            {
+                Position = GetOptionMarkerPosition(1) + _offsetButtonOptionLeft,
+                Text = "-",
+                IsDisable = isNoSounding
+            };
+            _musicVolumeDec.Click += MusicVolumeDec_Click;
+
+            _soundVolumeInc = new Button(_buttonOption, _optionFont)
+            {
+                Position = GetOptionMarkerPosition(2) + _offsetButtonOptionRight,
+                Text = "+",
+                IsDisable = isNoSounding
+            };
+            _soundVolumeInc.Click += SoundVolumeInc_Click;
+
+            _soundVolumeDec = new Button(_buttonOption, _optionFont)
+            {
+                Position = GetOptionMarkerPosition(2) + _offsetButtonOptionLeft,
+                Text = "-",
+                IsDisable = isNoSounding
+            };
+            _soundVolumeDec.Click += SoundVolumeDec_Click;
+
+            _langSwitchRightButton = new Button(_buttonOption, _optionFont)
+            {
+                Position = GetOptionMarkerPosition(3) + _offsetButtonOptionRight,
+                Text = ">"
+            };
+            _langSwitchRightButton.Click += LangSwitchRight_Click;
+
+            _langSwitchLeftButton = new Button(_buttonOption, _optionFont)
+            {
+                Position = GetOptionMarkerPosition(3) + _offsetButtonOptionLeft,
+                Text = "<"
+            };
+            _langSwitchLeftButton.Click += LangSwitchLeft_Click;
+
+            _gameComponents = new List<Component>()
+            {
+                _goMenuButton, _isSoundingTrueButton, _isSoundingFalseButton, _musicVolumeInc, _musicVolumeDec,
+                _soundVolumeInc, _soundVolumeDec, _langSwitchRightButton, _langSwitchLeftButton
+            };
+        }
+        private void GoMenuButton_Click(object sender, EventArgs e)
+        {
+            GoToMainMenu();
+        }
+        private void IsSoundingTrue_Click(object sender, EventArgs e)
+        {
+            _optionMarkerIndex = 0;
+            MoveMarker(_optionMarkerIndex);
+            IsSoundingTrue();
+        }
+        private void IsSoundingFalse_Click(object sender, EventArgs e)
+        {
+            _optionMarkerIndex = 0;
+            MoveMarker(_optionMarkerIndex);
+            IsSoundingFalse();
+        }
+        private void MusicVolumeInc_Click(object sender, EventArgs e)
+        {
+            _optionMarkerIndex = 1;
+            MoveMarker(_optionMarkerIndex);
+            MusicVolumeInc();
+        }
+        private void MusicVolumeDec_Click(object sender, EventArgs e)
+        {
+            _optionMarkerIndex = 1;
+            MoveMarker(_optionMarkerIndex);
+            MusicVolumeDec();
+        }
+        private void SoundVolumeInc_Click(object sender, EventArgs e)
+        {
+            _optionMarkerIndex = 2;
+            MoveMarker(_optionMarkerIndex);
+            SoundVolumeInc();
+        }
+        private void SoundVolumeDec_Click(object sender, EventArgs e)
+        {
+            _optionMarkerIndex = 2;
+            MoveMarker(_optionMarkerIndex);
+            SoundVolumeDec();
+        }
+        private void LangSwitchRight_Click(object sender, EventArgs e)
+        {
+            _optionMarkerIndex = 3;
+            MoveMarker(_optionMarkerIndex);
+            LangSwitchRight();
+        }
+        private void LangSwitchLeft_Click(object sender, EventArgs e)
+        {
+            _optionMarkerIndex = 3;
+            MoveMarker(_optionMarkerIndex);
+            LangSwitchLeft();
         }
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawString(_titleFont, _lang.GetLangText(LangKey.GameOption), new Vector2(300, 50), Color.Black);
+            spriteBatch.DrawString(_titleFont, _lang.GetLangText(LangKey.GameOption), _locTitle, Color.Black);
 
             spriteBatch.DrawString(_optionFont, _lang.GetLangText(LangKey.PlayingSound) + _lang.GetBoolInLang(_isSounding),
                 GetOptionMarkerPosition(0), Color.Black);
@@ -55,8 +207,10 @@ namespace CodeBreaker_MonoGame.Scene
 
             _optionMarker.Draw(spriteBatch);
 
-            spriteBatch.DrawString(_navigationFont, _lang.GetLangText(LangKey.GoBackMenu),
-                new Vector2(10, 500), Color.Black);
+            foreach (var component in _gameComponents)
+                component.Draw(spriteBatch);
+
+            spriteBatch.DrawString(_navigationFont, _lang.GetLangText(LangKey.GoBackMenu), _locBackToolTip, Color.Black);
         }
         public void Update(double deltaTime)
         {
@@ -64,7 +218,7 @@ namespace CodeBreaker_MonoGame.Scene
             GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
 
             if (keyboardState.IsKeyDown(Keys.Escape) || gamePadState.Buttons.Back == ButtonState.Pressed)
-                _game1.GoToMainMenu(true);
+                GoToMainMenu();
 
             if ((keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D) || gamePadState.DPad.Right == ButtonState.Pressed)
                 && _keyRightReleased == true)
@@ -72,24 +226,20 @@ namespace CodeBreaker_MonoGame.Scene
                 switch (_optionMarkerIndex)
                 {
                     case 0:
-                        _game1.musicAndSounds.EditIsSounding(true);
-                        SetIsSounding(_game1.musicAndSounds.GetIsSounding());
+                        IsSoundingTrue();
                         break;
                     case 1:
-                        _game1.musicAndSounds.IncMusicVolume();
-                        SetMusicVolume(_game1.musicAndSounds.GetMusicVolumePercentString());
+                        MusicVolumeInc();
                         break;
                     case 2:
-                        _game1.musicAndSounds.IncSoundsVolume();
-                        SetSoundsVolume(_game1.musicAndSounds.GetSoundsVolumePercentString());
+                        SoundVolumeInc();
                         break;
                     case 3:
-                        _lang.IncSelection();
+                        LangSwitchRight();
                         break;
                     default:
                         break;
                 }
-                _game1.PlaySoundEffect(_menuSideSoundEffect);
                 _keyRightReleased = false;
             }
             else if ((keyboardState.IsKeyUp(Keys.Right) && keyboardState.IsKeyUp(Keys.D) && gamePadState.DPad.Right == ButtonState.Released)
@@ -102,24 +252,21 @@ namespace CodeBreaker_MonoGame.Scene
                 switch (_optionMarkerIndex)
                 {
                     case 0:
-                        _game1.musicAndSounds.EditIsSounding(false);
-                        SetIsSounding(_game1.musicAndSounds.GetIsSounding());
+                        IsSoundingFalse();
                         break;
                     case 1:
-                        _game1.musicAndSounds.DecMusicVolume();
-                        SetMusicVolume(_game1.musicAndSounds.GetMusicVolumePercentString());
+                        MusicVolumeDec();
                         break;
                     case 2:
-                        _game1.musicAndSounds.DecSoundsVolume();
-                        SetSoundsVolume(_game1.musicAndSounds.GetSoundsVolumePercentString());
+                        SoundVolumeDec();
                         break;
                     case 3:
-                        _lang.DecSelection();
+                        LangSwitchLeft();
                         break;
                     default:
                         break;
                 }
-                _game1.PlaySoundEffect(_menuSideSoundEffect);
+                
                 _keyLeftReleased = false;
             }
             else if ((keyboardState.IsKeyUp(Keys.Left) && keyboardState.IsKeyUp(Keys.A) && gamePadState.DPad.Left == ButtonState.Released)
@@ -165,7 +312,91 @@ namespace CodeBreaker_MonoGame.Scene
             else if ((keyboardState.IsKeyUp(Keys.Down) && keyboardState.IsKeyUp(Keys.S) && gamePadState.DPad.Down == ButtonState.Released)
                 && _keyDownReleased == false)
                 _keyDownReleased = true;
+
+            foreach (var component in _gameComponents)
+                component.Update();
         }
+
+        private void LangSwitchLeft()
+        {
+            _lang.DecSelection();
+            UpdateLangAfterChange();
+            _game1.PlaySoundEffect(_menuSideSoundEffect);
+        }
+
+        private void LangSwitchRight()
+        {
+            _lang.IncSelection();
+            UpdateLangAfterChange();
+            _game1.PlaySoundEffect(_menuSideSoundEffect);
+        }
+
+        private void SoundVolumeDec()
+        {
+            _game1.musicAndSounds.DecSoundsVolume();
+            SetSoundsVolume(_game1.musicAndSounds.GetSoundsVolumePercentString());
+            _game1.PlaySoundEffect(_menuSideSoundEffect);
+        }
+
+        private void MusicVolumeDec()
+        {
+            _game1.musicAndSounds.DecMusicVolume();
+            SetMusicVolume(_game1.musicAndSounds.GetMusicVolumePercentString());
+            _game1.PlaySoundEffect(_menuSideSoundEffect);
+        }
+
+        private void SoundVolumeInc()
+        {
+            _game1.musicAndSounds.IncSoundsVolume();
+            SetSoundsVolume(_game1.musicAndSounds.GetSoundsVolumePercentString());
+            _game1.PlaySoundEffect(_menuSideSoundEffect);
+        }
+
+        private void MusicVolumeInc()
+        {
+            _game1.musicAndSounds.IncMusicVolume();
+            SetMusicVolume(_game1.musicAndSounds.GetMusicVolumePercentString());
+            _game1.PlaySoundEffect(_menuSideSoundEffect);
+        }
+
+        private void IsSoundingFalse()
+        {
+            _game1.musicAndSounds.EditIsSounding(false);
+            SetIsSounding(_game1.musicAndSounds.GetIsSounding());
+            _musicVolumeInc.IsDisable = true;
+            _musicVolumeDec.IsDisable = true;
+            _soundVolumeInc.IsDisable = true;
+            _soundVolumeDec.IsDisable = true;
+            _game1.PlaySoundEffect(_menuSideSoundEffect);
+        }
+
+        private void IsSoundingTrue()
+        {
+            _game1.musicAndSounds.EditIsSounding(true);
+            SetIsSounding(_game1.musicAndSounds.GetIsSounding());
+            _musicVolumeInc.IsDisable = false;
+            _musicVolumeDec.IsDisable = false;
+            _soundVolumeInc.IsDisable = false;
+            _soundVolumeDec.IsDisable = false;
+            _game1.PlaySoundEffect(_menuSideSoundEffect);
+        }
+
+        private void UpdateLangAfterChange()
+        {
+            _locTitle = new Vector2((Game1.ScreenWidth / 2) -
+                (_titleFont.MeasureString(_lang.GetLangText(LangKey.GameOption)).X / 2), 30);
+            _locBackToolTip = new Vector2(((Game1.ScreenWidth / 2) -
+               (_navigationFont.MeasureString(_lang.GetLangText(LangKey.GoBackMenu)).X / 2)), 500);
+            _goMenuButton.Text = _lang.GetLangText(LangKey.Back);
+            _isSoundingFalseButton.Text = _lang.GetLangText(LangKey.FalseSingleLetter);
+            _isSoundingTrueButton.Text = _lang.GetLangText(LangKey.TrueSingleLetter);
+        }
+
+        private void GoToMainMenu()
+        {
+            _game1.GoToMainMenu(true);
+        }
+
         public void SetIsSounding(bool isSounding)
         {
             _isSounding = isSounding;

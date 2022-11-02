@@ -44,7 +44,7 @@ namespace CodeBreaker_MonoGame
 
         const int MAX_NUMBER_OF_HINTS = 8;
 
-        const string VERSION_GAME = "1.5.2 (2022.11.02)";
+        const string VERSION_GAME = "1.5.3 (2022.11.02)";
 
         MenuScene _menuScene;
         ModifiersScene _modifiersScene;
@@ -65,6 +65,8 @@ namespace CodeBreaker_MonoGame
             ReadSaveData();
             _graphics.PreferredBackBufferWidth = ScreenWidth;
             _graphics.PreferredBackBufferHeight = ScreenHeight;
+            //_graphics.IsFullScreen = true;
+            //_graphics.ToggleFullScreen();
             _graphics.ApplyChanges();
 
             base.Initialize();
@@ -192,14 +194,14 @@ namespace CodeBreaker_MonoGame
         public void GoToInstuction()
         {
             _gameState = GameState.Instructions;
-            _instructionScene = new InstructionScene(this, _bigFont, _smallFont, _middleFont, _lang);
+            _instructionScene = new InstructionScene(this, _bigFont, _smallFont, _smallFont, _lang, _buttonSprite);
             musicAndSounds.PlaySoundEffect(_menuNaviInstr);
         }
         public void GoToOption()
         {
             _gameState = GameState.Options;
-            _optionScene = new OptionScene(this, _menuMarkerSprite, _bigFont, _smallFont, _middleFont, _lang,
-                musicAndSounds, _menuSideSoundEffect, _menuUpDownSoundEffect);
+            _optionScene = new OptionScene(this, _menuMarkerSprite, _bigFont, _smallFont, _smallFont, _lang,
+                musicAndSounds, _menuSideSoundEffect, _menuUpDownSoundEffect, _buttonSprite, _buttonSprite_30x30);
             musicAndSounds.PlaySoundEffect(_menuNaviOption);
         }
         public void GoToGame()
