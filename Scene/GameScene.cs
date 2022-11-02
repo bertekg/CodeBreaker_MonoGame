@@ -1,9 +1,12 @@
 ﻿using CodeBreaker_MonoGame.Class;
+using CodeBreaker_MonoGame.Control;
 using CodeBreaker_MonoGame.Interface;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Collections.Generic;
 
 namespace CodeBreaker_MonoGame.Scene
 {
@@ -31,18 +34,21 @@ namespace CodeBreaker_MonoGame.Scene
 
         private bool _keyRightReleased, _keyLeftReleased, _keyUpReleased, _keyDownReleased, _keySpaceReleased;
 
-        const int CODE_POSITION_START_X = 50, CODE_POSITION_START_Y = 180, CODE_POSITION_STEP_X = 105;
+        const int CODE_POSITION_START_X = 30, CODE_POSITION_START_Y = 190, CODE_POSITION_STEP_X = 105;
         const int CODE_OFFSET_MARKER_X = -20, CODE_OFFSET_MARKER_Y = -2;
 
-        const int GUESS_HISTORY_START_X = 600, GUESS_HISTORY_START_Y = 115;
+        const int GUESS_HISTORY_START_X = 600, GUESS_HISTORY_START_Y = 120;
         const int GUESS_HISTORY_STEP_X = 40, GUESS_HISTORY_STEP_Y = 50, GUESS_HISTORY_THICKNESS = 3;
         const int GUESS_TABLE_OFFSET_X = -11, gUESS_TABLE_OFFSET_Y = -3;
 
         const int TIME_LIMIT_BAR_START_X = 10, TIME_LIMIT_BAR_START_Y = 120, TIME_LIMIT_BAR_HEIGHT = 20, TIME_LIMIT_BAR_WIDTH_MAX = 320;
+
+        private List<Component> _gameComponents;
         public GameScene(Game1 game1, bool isDebugMode, SaveData saveData, SpriteFont digitFont, SpriteFont instructionFont,
             SpriteFont modFont, GameLogic gameLogic, Lang lang, Texture2D markerSprite, Texture2D attemptIconReady,
             Texture2D attemptIconUsed, Texture2D squereBaseSprite, SoundEffect sideSoundEffect, SoundEffect upDownSoundEffect,
-            SoundEffect unlockTrySoundEffect, SoundEffect successSoundEffect, SoundEffect failSoundEffect)
+            SoundEffect unlockTrySoundEffect, SoundEffect successSoundEffect, SoundEffect failSoundEffect, Texture2D buttonNavigation,
+            Texture2D buttonCodeChange, Texture2D buttonChackCode)
         {
             _game1 = game1;
             _isDebugMode = isDebugMode;
@@ -87,6 +93,63 @@ namespace CodeBreaker_MonoGame.Scene
             _timeLimitBarBase = new Rectangle(TIME_LIMIT_BAR_START_X, TIME_LIMIT_BAR_START_Y, TIME_LIMIT_BAR_WIDTH_MAX, TIME_LIMIT_BAR_HEIGHT);
 
             _markerIndex = 0;
+
+            _gameComponents = new List<Component>();
+            Button goMenuButton = new Button(buttonNavigation, instructionFont)
+            {
+                Position = new Vector2(Game1.ScreenWidth - buttonNavigation.Width - 20, Game1.ScreenHeight - buttonNavigation.Height - 20),
+                Text = _lang.GetLangText(LangKey.Back)
+            };
+            goMenuButton.Click += GoMenuButton_Click;
+            _gameComponents.Add(goMenuButton);
+
+            for (int i = 0; i < _saveData.codeLength; i++)
+            {
+                Button incButton = new Button(buttonCodeChange, instructionFont)
+                {
+                    Position = new Vector2(20 + (25 + buttonCodeChange.Width) * i, CODE_POSITION_START_Y - 35),
+                    Text = "+",
+                    Index = i
+                };
+                incButton.Click += IncCode_Click;
+                _gameComponents.Add(incButton);
+
+                Button decButton = new Button(buttonCodeChange, instructionFont)
+                {
+                    Position = new Vector2(20 + (25 + buttonCodeChange.Width) * i, CODE_POSITION_START_Y + 150),
+                    Text = "-",
+                    Index = i
+                };
+                decButton.Click  += DecCode_Click;
+                _gameComponents.Add(decButton);
+            }
+            Button checkButton = new Button(buttonChackCode, instructionFont)
+            {
+                Position = new Vector2(15 + (25 + buttonCodeChange.Width) * _saveData.codeLength, CODE_POSITION_START_Y + 5),
+                Text = "T\nE\nS\nT"
+            };
+            checkButton.Click += CheckCode_Click;
+            _gameComponents.Add(checkButton);
+        }
+        private void GoMenuButton_Click(object sender, EventArgs e)
+        {
+            GoToMainMenu();
+        }
+        private void IncCode_Click(object sender, EventArgs e)
+        {
+            Button button = (Button)sender;
+            _markerIndex = button.Index;
+            IncCode();
+        }
+        private void DecCode_Click(object sender, EventArgs e)
+        {
+            Button button = (Button)sender;
+            _markerIndex = button.Index;
+            DecCode();
+        }
+        private void CheckCode_Click(object sender, EventArgs e)
+        {
+            CheckCode();
         }
         public void Draw(SpriteBatch spriteBatch)
         {
@@ -171,6 +234,9 @@ namespace CodeBreaker_MonoGame.Scene
                     }
                 }
             }
+
+            foreach (var component in _gameComponents)
+                component.Draw(spriteBatch);
         }
         public void Update(double deltaTime)
         {
@@ -180,7 +246,7 @@ namespace CodeBreaker_MonoGame.Scene
             GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
 
             if (keyboardState.IsKeyDown(Keys.Escape) || gamePadState.Buttons.Back == ButtonState.Pressed)
-                _game1.GoToMainMenu(true);
+                GoToMainMenu();
 
             if ((keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D) || gamePadState.DPad.Right == ButtonState.Pressed)
                 && _keyRightReleased == true)
@@ -219,12 +285,7 @@ namespace CodeBreaker_MonoGame.Scene
             if ((keyboardState.IsKeyDown(Keys.Up) || keyboardState.IsKeyDown(Keys.W) || gamePadState.DPad.Up == ButtonState.Pressed)
                 && _keyUpReleased == true)
             {
-                _gameLogic.currentCode[_markerIndex]++;
-                if (_gameLogic.currentCode[_markerIndex] > 9)
-                {
-                    _gameLogic.currentCode[_markerIndex] = 0;
-                }
-                _game1.PlaySoundEffect(_upDownSoundEffect);
+                IncCode();
                 _keyUpReleased = false;
             }
             else if ((keyboardState.IsKeyUp(Keys.Up) && keyboardState.IsKeyUp(Keys.W) && gamePadState.DPad.Up == ButtonState.Released)
@@ -236,12 +297,7 @@ namespace CodeBreaker_MonoGame.Scene
             if ((keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S) || gamePadState.DPad.Down == ButtonState.Pressed)
               && _keyDownReleased == true)
             {
-                _gameLogic.currentCode[_markerIndex]--;
-                if (_gameLogic.currentCode[_markerIndex] < 0)
-                {
-                    _gameLogic.currentCode[_markerIndex] = 9;
-                }
-                _game1.PlaySoundEffect(_upDownSoundEffect);
+                DecCode();
                 _keyDownReleased = false;
             }
             else if ((keyboardState.IsKeyUp(Keys.Down) && keyboardState.IsKeyUp(Keys.S) && gamePadState.DPad.Down == ButtonState.Released)
@@ -253,19 +309,7 @@ namespace CodeBreaker_MonoGame.Scene
             if ((keyboardState.IsKeyDown(Keys.Space) || gamePadState.Buttons.A == ButtonState.Pressed)
                 && _keySpaceReleased == true)
             {
-                bool isCodeCorrect = _gameLogic.TryCode();
-                if (isCodeCorrect)
-                {
-                    _game1.GoToFinish(_successSoundEffect);
-                }
-                else if (((_gameLogic.numberOfAttempts >= _saveData.attemptsLimit) && _saveData.isAttemptsLimit))
-                {
-                    _game1.GoToFinish(_failSoundEffect);
-                }
-                else
-                {
-                    _game1.PlaySoundEffect(_unlockTrySoundEffect);
-                }
+                CheckCode();
                 _keySpaceReleased = false;
             }
             else if ((keyboardState.IsKeyUp(Keys.Space) && gamePadState.Buttons.A == ButtonState.Released)
@@ -287,7 +331,53 @@ namespace CodeBreaker_MonoGame.Scene
             {
                 _playingTime += deltaTime;
             }
+
+            foreach (var component in _gameComponents)
+                component.Update();
         }
+
+        private void CheckCode()
+        {
+            bool isCodeCorrect = _gameLogic.TryCode();
+            if (isCodeCorrect)
+            {
+                _game1.GoToFinish(_successSoundEffect);
+            }
+            else if (((_gameLogic.numberOfAttempts >= _saveData.attemptsLimit) && _saveData.isAttemptsLimit))
+            {
+                _game1.GoToFinish(_failSoundEffect);
+            }
+            else
+            {
+                _game1.PlaySoundEffect(_unlockTrySoundEffect);
+            }
+        }
+
+        private void DecCode()
+        {
+            _gameLogic.currentCode[_markerIndex]--;
+            if (_gameLogic.currentCode[_markerIndex] < 0)
+            {
+                _gameLogic.currentCode[_markerIndex] = 9;
+            }
+            _game1.PlaySoundEffect(_upDownSoundEffect);
+        }
+
+        private void IncCode()
+        {
+            _gameLogic.currentCode[_markerIndex]++;
+            if (_gameLogic.currentCode[_markerIndex] > 9)
+            {
+                _gameLogic.currentCode[_markerIndex] = 0;
+            }
+            _game1.PlaySoundEffect(_upDownSoundEffect);
+        }
+
+        private void GoToMainMenu()
+        {
+            _game1.GoToMainMenu(true);
+        }
+
         private Rectangle GetTimieLimitBarRectangel()
         {
             float barWidth = ((float)_remainingTime / (float)_saveData.timeLimit) * TIME_LIMIT_BAR_WIDTH_MAX;

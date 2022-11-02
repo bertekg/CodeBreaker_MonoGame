@@ -20,7 +20,8 @@ namespace CodeBreaker_MonoGame
 
         private Texture2D _menuMarkerSprite, _gameMarkerSprite, _squereBaseSprite;
         private Texture2D _attemptIconReady, _attemptIconUsed, _iconGame, _background;
-        private Texture2D _buttonSprite, _buttonSprite_30x30, _buttonSprite_230x30;
+        private Texture2D _buttonSprite, _buttonSprite_30x30, _buttonSprite_230x30, 
+            _buttonSprite_80x30, _buttonSprite_30x125;
 
         public MusicAndSounds musicAndSounds;
 
@@ -39,12 +40,12 @@ namespace CodeBreaker_MonoGame
 
         SaveData _saveData;
 
-        const bool IS_DEBUG_MODE_FROM_CODE = true;
+        const bool IS_DEBUG_MODE_FROM_CODE = false;
         private bool _isDebugMode;
 
-        const int MAX_NUMBER_OF_HINTS = 8;
+        const int MAX_NUMBER_OF_HINTS = 7;
 
-        const string VERSION_GAME = "1.5.4 (2022.11.02)";
+        const string VERSION_GAME = "1.5.5 (2022.11.02)";
 
         MenuScene _menuScene;
         ModifiersScene _modifiersScene;
@@ -91,6 +92,8 @@ namespace CodeBreaker_MonoGame
             _buttonSprite = Content.Load<Texture2D>("sprites/button");
             _buttonSprite_30x30 = Content.Load<Texture2D>("sprites/button_30_30");
             _buttonSprite_230x30 = Content.Load<Texture2D>("sprites/button_230_30");
+            _buttonSprite_80x30 = Content.Load<Texture2D>("sprites/button_80_30");
+            _buttonSprite_30x125 = Content.Load<Texture2D>("sprites/button_30_125");
 
             Song song = Content.Load<Song>("audio/music");
             musicAndSounds = new MusicAndSounds(song, _saveData);
@@ -212,7 +215,8 @@ namespace CodeBreaker_MonoGame
             musicAndSounds.PlaySoundEffect(_startSoundEffect);
             _gameScene = new GameScene(this, _isDebugMode, _saveData, _largeFont, _smallFont, _bigFont, _gameLogic,
                 _lang, _gameMarkerSprite, _attemptIconReady, _attemptIconUsed, _squereBaseSprite, _gameSideSoundEffect,
-                _gameUpDownSoundEffect, _unlockTrySoundEffect, _successSoundEffect, _failSoundEffect);
+                _gameUpDownSoundEffect, _unlockTrySoundEffect, _successSoundEffect, _failSoundEffect, _buttonSprite,
+                _buttonSprite_80x30, _buttonSprite_30x125);
         }
         public void GoToFinish(SoundEffect soundEffect)
         {

@@ -15,6 +15,7 @@ namespace CodeBreaker_MonoGame.Control
         private Texture2D _texture;
 
         public bool IsDisable;
+        public int Index;
         public event EventHandler Click;
         public bool Clicked { get; private set; }
         public Color PenColour { get; set; }
