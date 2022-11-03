@@ -15,7 +15,7 @@
         FinishPlayAgain, GoBackMenu,
         GameInstuction, ControlsInGame, GameOptionKey, GameOption,
         GameModifiers, DebuggingModeEnabled, Start, Modifiers, Help, Option, Quit, Back, PlayAgain, MainMenu,
-        TrueSingleLetter, FalseSingleLetter
+        TrueSingleLetter, FalseSingleLetter, DigitRange
     };
     internal class Lang
     {
@@ -670,6 +670,17 @@
                             break;
                         default:
                             returnText = "F";
+                            break;
+                    }
+                    break;
+                case LangKey.DigitRange:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Zakres cyfr";
+                            break;
+                        default:
+                            returnText = "Digit Range";
                             break;
                     }
                     break;

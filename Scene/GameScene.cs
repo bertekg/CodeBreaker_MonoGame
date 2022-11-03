@@ -34,7 +34,10 @@ namespace CodeBreaker_MonoGame.Scene
 
         private bool _keyRightReleased, _keyLeftReleased, _keyUpReleased, _keyDownReleased, _keySpaceReleased;
 
-        const int CODE_POSITION_START_X = 30, CODE_POSITION_START_Y = 190, CODE_POSITION_STEP_X = 105;
+        private readonly string _digitRangText;
+        private Vector2 _digitRangPos;
+
+        const int CODE_POSITION_START_X = 30, CODE_POSITION_START_Y = 220, CODE_POSITION_STEP_X = 105;
         const int CODE_OFFSET_MARKER_X = -20, CODE_OFFSET_MARKER_Y = -2;
 
         const int GUESS_HISTORY_START_X = 600, GUESS_HISTORY_START_Y = 120;
@@ -130,6 +133,9 @@ namespace CodeBreaker_MonoGame.Scene
             };
             checkButton.Click += CheckCode_Click;
             _gameComponents.Add(checkButton);
+
+            _digitRangText = _lang.GetLangText(LangKey.DigitRange) + ": 0 - " + _saveData.maxCodeDigit.ToString("X");
+            _digitRangPos = new Vector2(100, 150);
         }
         private void GoMenuButton_Click(object sender, EventArgs e)
         {
@@ -155,7 +161,10 @@ namespace CodeBreaker_MonoGame.Scene
         {
             for (int i = 0; i < _saveData.codeLength; i++)
             {
-                spriteBatch.DrawString(_digitFont, _gameLogic.currentCode[i].ToString(), new Vector2(CODE_POSITION_START_X + (CODE_POSITION_STEP_X * i), CODE_POSITION_START_Y), Color.Black);
+                string textDigit = _gameLogic.currentCode[i].ToString("X");
+                Vector2 textMiddlePoint = _digitFont.MeasureString(textDigit) / 2;
+                Vector2 textPosition = new Vector2(CODE_POSITION_START_X + (CODE_POSITION_STEP_X * i) + 34, CODE_POSITION_START_Y + 75);
+                spriteBatch.DrawString(_digitFont, textDigit, textPosition, Color.Black, 0, textMiddlePoint, 1.0f, SpriteEffects.None, 0.5f);
                 spriteBatch.Draw(_markerSprite, new Vector2(CODE_POSITION_START_X + CODE_OFFSET_MARKER_X + (i * CODE_POSITION_STEP_X), CODE_POSITION_START_Y + CODE_OFFSET_MARKER_Y), i == _markerIndex ? Color.Purple : Color.Gray);
             }
 
@@ -206,8 +215,8 @@ namespace CodeBreaker_MonoGame.Scene
             {
                 for (int j = 0; j < _gameLogic.guessCodeHistory[i].Count; j++)
                 {
-                    _guessCodeHistoryTextPlace = new Vector2(GUESS_HISTORY_START_X + (j * GUESS_HISTORY_STEP_X), GUESS_HISTORY_START_Y + i * GUESS_HISTORY_STEP_Y);
-                    spriteBatch.DrawString(_modFont, _gameLogic.guessCodeHistory[i][j].value.ToString(), _guessCodeHistoryTextPlace, DecodeColor(_gameLogic.guessCodeHistory[i][j].digitState));
+                    _guessCodeHistoryTextPlace = new Vector2(GUESS_HISTORY_START_X + (j * GUESS_HISTORY_STEP_X) - 3, GUESS_HISTORY_START_Y + i * GUESS_HISTORY_STEP_Y);
+                    spriteBatch.DrawString(_modFont, _gameLogic.guessCodeHistory[i][j].value.ToString("X"), _guessCodeHistoryTextPlace, DecodeColor(_gameLogic.guessCodeHistory[i][j].digitState));
                 }
             }
 
@@ -234,6 +243,8 @@ namespace CodeBreaker_MonoGame.Scene
                     }
                 }
             }
+
+            spriteBatch.DrawString(_instructionFont, _digitRangText, _digitRangPos, Color.Black);
 
             foreach (var component in _gameComponents)
                 component.Draw(spriteBatch);
@@ -358,7 +369,7 @@ namespace CodeBreaker_MonoGame.Scene
             _gameLogic.currentCode[_markerIndex]--;
             if (_gameLogic.currentCode[_markerIndex] < 0)
             {
-                _gameLogic.currentCode[_markerIndex] = 9;
+                _gameLogic.currentCode[_markerIndex] = _saveData.maxCodeDigit;
             }
             _game1.PlaySoundEffect(_upDownSoundEffect);
         }
@@ -366,7 +377,7 @@ namespace CodeBreaker_MonoGame.Scene
         private void IncCode()
         {
             _gameLogic.currentCode[_markerIndex]++;
-            if (_gameLogic.currentCode[_markerIndex] > 9)
+            if (_gameLogic.currentCode[_markerIndex] > _saveData.maxCodeDigit)
             {
                 _gameLogic.currentCode[_markerIndex] = 0;
             }

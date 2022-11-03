@@ -149,12 +149,39 @@ namespace CodeBreaker_MonoGame.Scene
             };
             _timeLimitationDecButton.Click += TimeLimitationDec_Click;
 
+            Button digitRangIncButton = new Button(_buttonOption, _instructionFont)
+            {
+                Position = GetMenuMarkerPosition(5) + _offsetButtonOptionRight,
+                Text = "+",
+            };
+            digitRangIncButton.Click += DigitRangInc_Click;
+
+            Button digitRangDecButton = new Button(_buttonOption, _instructionFont)
+            {
+                Position = GetMenuMarkerPosition(5) + _offsetButtonOptionLeft,
+                Text = "-",
+            };
+            digitRangDecButton.Click += DigitRangDec_Click;
+
             _gameComponents = new List<Component>()
             {
                 goMenuButton, startGameButton, codeLenIncButton, codeLenDecButton, isLimitedAttemptsTrueButton,
                 isLimitedAttemptsFalseButton, isTimeLimitationTrueButton, isTimeLimitationFalseButton,
-                _numberAttemptsIncButton, _numberAttemptsDecButton, _timeLimitationIncButton, _timeLimitationDecButton
+                _numberAttemptsIncButton, _numberAttemptsDecButton, _timeLimitationIncButton, _timeLimitationDecButton,
+                digitRangIncButton, digitRangDecButton
             };
+        }
+        private void DigitRangInc_Click(object sender, EventArgs e)
+        {
+            _menuMarkerIndex = 5;
+            MoveMarker(_menuMarkerIndex);
+            MaxDigitInc();
+        }
+        private void DigitRangDec_Click(object sender, EventArgs e)
+        {
+            _menuMarkerIndex = 5;
+            MoveMarker(_menuMarkerIndex);
+            MaxDigitDec();
         }
         private void GoMenuButton_Click(object sender, EventArgs e)
         {
@@ -241,7 +268,7 @@ namespace CodeBreaker_MonoGame.Scene
             spriteBatch.DrawString(_instructionFont, _lang.GetLangText(LangKey.NumberAttempts) + _saveData.attemptsLimit.ToString(), GetMenuMarkerPosition(2), _saveData.isAttemptsLimit ? Color.Black : Color.Gray);
             spriteBatch.DrawString(_instructionFont, _lang.GetLangText(LangKey.IsTimeLimitation) + _lang.GetBoolInLang(_saveData.isTimeLimit), GetMenuMarkerPosition(3), Color.Black);
             spriteBatch.DrawString(_instructionFont, _lang.GetLangText(LangKey.TimeLimit) + _saveData.timeLimit.ToString(), GetMenuMarkerPosition(4), _saveData.isTimeLimit ? Color.Black : Color.Gray);
-            spriteBatch.DrawString(_instructionFont, "TODO Digit range", GetMenuMarkerPosition(5), Color.Black);
+            spriteBatch.DrawString(_instructionFont, _lang.GetLangText(LangKey.DigitRange) + ": 0 - " + _saveData.maxCodeDigit.ToString("X"), GetMenuMarkerPosition(5), Color.Black);
             spriteBatch.DrawString(_instructionFont, "TODO History length", GetMenuMarkerPosition(6), Color.Black);
 
             _menuMarker.Draw(spriteBatch);
@@ -276,7 +303,9 @@ namespace CodeBreaker_MonoGame.Scene
                         break;
                     case 4:
                         TimeLimitationInc();
-                       
+                        break;
+                    case 5:
+                        MaxDigitInc();
                         break;
                     default:
                         break;
@@ -309,6 +338,9 @@ namespace CodeBreaker_MonoGame.Scene
                     case 4:
                         TimeLimitationDec();
                         break;
+                    case 5:
+                        MaxDigitDec();
+                        break;
                     default:
                         break;
                 }
@@ -326,7 +358,7 @@ namespace CodeBreaker_MonoGame.Scene
                 _menuMarkerIndex--;
                 if (_menuMarkerIndex < 0)
                 {
-                    _menuMarkerIndex = 4;
+                    _menuMarkerIndex = 5;
                 }
                 if ((_menuMarkerIndex == 2 && _saveData.isAttemptsLimit == false) ||
                     (_menuMarkerIndex == 4 && _saveData.isTimeLimit == false))
@@ -352,7 +384,7 @@ namespace CodeBreaker_MonoGame.Scene
                 {
                     _menuMarkerIndex++;
                 }
-                if (_menuMarkerIndex > 4)
+                if (_menuMarkerIndex > 5)
                 {
                     _menuMarkerIndex = 0;
                 }
@@ -374,6 +406,24 @@ namespace CodeBreaker_MonoGame.Scene
 
             if (keyboardState.IsKeyDown(Keys.Escape) || gamePadState.Buttons.Back == ButtonState.Pressed)
                 GoToMainMenu();
+        }
+        private void MaxDigitDec()
+        {
+            _saveData.maxCodeDigit -= 2;
+            if (_saveData.maxCodeDigit < 5)
+            {
+                _saveData.maxCodeDigit = 5;
+            }
+            PlaySideSound();
+        }
+        private void MaxDigitInc()
+        {
+            _saveData.maxCodeDigit += 2;
+            if (_saveData.maxCodeDigit > 15)
+            {
+                _saveData.maxCodeDigit = 15;
+            }
+            PlaySideSound();
         }
 
         private void TimeLimitationDec()

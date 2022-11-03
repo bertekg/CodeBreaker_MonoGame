@@ -9,21 +9,21 @@ namespace CodeBreaker_MonoGame.Class
         public int[] goodCode { get; set; }
         public int[] currentCode { get; set; }
         public List<List<SingleDigit>> guessCodeHistory;
-        int maxHistoryLength;
+        int _maxHistoryLength;
         public int numberOfAttempts { get; set; }
         public bool codeGuessed { get; set; }
-        public GameLogic(int codeLength, int maxNumberOfHints)
+        public GameLogic(int codeLength, int maxNumberOfHints, int maxDigit)
         {
-            InitRandomCode(codeLength);
+            InitRandomCode(codeLength, maxDigit);
             guessCodeHistory = new List<List<SingleDigit>>();
-            maxHistoryLength = maxNumberOfHints;
+            _maxHistoryLength = maxNumberOfHints;
             codeGuessed = false;
         }
-        public void InitRandomCode(int codeLength)
+        public void InitRandomCode(int codeLength, int maxDigit)
         {
             goodCode = new int[codeLength];
             List<int> possibleDigits = new List<int>();
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i <= maxDigit; i++)
             {
                 possibleDigits.Add(i);
             }
@@ -43,7 +43,7 @@ namespace CodeBreaker_MonoGame.Class
             string currentCodeString = "";
             for (int i = 0; i < goodCode.Length; i++)
             {
-                currentCodeString += "[" + goodCode[i].ToString() + "] ";
+                currentCodeString += "[" + goodCode[i].ToString("X") + "] ";
             }
             return currentCodeString;
         }
@@ -52,7 +52,7 @@ namespace CodeBreaker_MonoGame.Class
             string correctCodeString = "";
             for (int i = 0; i < goodCode.Length; i++)
             {
-                correctCodeString += goodCode[i].ToString();
+                correctCodeString += goodCode[i].ToString("X");
             }
             return correctCodeString;
         }
@@ -81,7 +81,7 @@ namespace CodeBreaker_MonoGame.Class
                 }
                 rowDigits.Add(singleDigit);
             }
-            if (guessCodeHistory.Count >= maxHistoryLength)
+            if (guessCodeHistory.Count >= _maxHistoryLength)
             {
                 guessCodeHistory.RemoveAt(0);
             }
