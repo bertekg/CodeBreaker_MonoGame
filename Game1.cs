@@ -43,9 +43,7 @@ namespace CodeBreaker_MonoGame
         const bool IS_DEBUG_MODE_FROM_CODE = false;
         private bool _isDebugMode;
 
-        const int MAX_NUMBER_OF_HINTS = 7;
-
-        const string VERSION_GAME = "1.5.6 (2022.11.03)";
+        const string VERSION_GAME = "1.5.7 (2022.11.03)";
 
         MenuScene _menuScene;
         ModifiersScene _modifiersScene;
@@ -211,7 +209,7 @@ namespace CodeBreaker_MonoGame
         public void GoToGame()
         {
             _gameState = GameState.Game;
-            _gameLogic = new GameLogic(_saveData.codeLength, MAX_NUMBER_OF_HINTS, _saveData.maxCodeDigit);
+            _gameLogic = new GameLogic(_saveData.codeLength, _saveData.historyCount, _saveData.maxCodeDigit);
             musicAndSounds.PlaySoundEffect(_startSoundEffect);
             _gameScene = new GameScene(this, _isDebugMode, _saveData, _largeFont, _smallFont, _bigFont, _gameLogic,
                 _lang, _gameMarkerSprite, _attemptIconReady, _attemptIconUsed, _squereBaseSprite, _gameSideSoundEffect,
@@ -260,6 +258,7 @@ namespace CodeBreaker_MonoGame
                 _saveData.langID = 0;
                 _saveData.iDebugModeFromSave = 0;
                 _saveData.maxCodeDigit = 9;
+                _saveData.historyCount = 7;
             }
             _isDebugMode = DetectDebugMode();
             _lang = new Lang(_saveData.langID);

@@ -13,5 +13,6 @@
         public byte langID;
         public short iDebugModeFromSave;
         public byte maxCodeDigit;
+        public byte historyCount;
     }
 }

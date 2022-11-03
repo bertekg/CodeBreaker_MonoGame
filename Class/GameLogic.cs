@@ -83,9 +83,9 @@ namespace CodeBreaker_MonoGame.Class
             }
             if (guessCodeHistory.Count >= _maxHistoryLength)
             {
-                guessCodeHistory.RemoveAt(0);
+                guessCodeHistory.RemoveAt(guessCodeHistory.Count - 1);
             }
-            guessCodeHistory.Add(rowDigits);
+            guessCodeHistory.Insert(0,rowDigits);
             numberOfAttempts++;
             codeGuessed = correctCode;
             return correctCode;

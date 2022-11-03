@@ -220,27 +220,24 @@ namespace CodeBreaker_MonoGame.Scene
                 }
             }
 
-            if (_gameLogic.guessCodeHistory.Count > 0)
+            for (int i = 0; i < _saveData.historyCount; i++)
             {
-                for (int i = 0; i < _gameLogic.guessCodeHistory.Count; i++)
+                spriteBatch.Draw(_squereBaseSprite, new Rectangle(GUESS_HISTORY_START_X + GUESS_TABLE_OFFSET_X, (GUESS_HISTORY_START_Y + gUESS_TABLE_OFFSET_Y) + i * GUESS_HISTORY_STEP_Y,
+                                    GUESS_HISTORY_STEP_X * _saveData.codeLength, GUESS_HISTORY_THICKNESS), _tableColor);
+                if (i == _saveData.historyCount - 1)
                 {
-                    spriteBatch.Draw(_squereBaseSprite, new Rectangle(GUESS_HISTORY_START_X + GUESS_TABLE_OFFSET_X, (GUESS_HISTORY_START_Y + gUESS_TABLE_OFFSET_Y) + i * GUESS_HISTORY_STEP_Y,
-                                        GUESS_HISTORY_STEP_X * _gameLogic.guessCodeHistory[0].Count, GUESS_HISTORY_THICKNESS), _tableColor);
-                    if (i == _gameLogic.guessCodeHistory.Count - 1)
-                    {
-                        spriteBatch.Draw(_squereBaseSprite, new Rectangle(GUESS_HISTORY_START_X + GUESS_TABLE_OFFSET_X, (GUESS_HISTORY_START_Y + gUESS_TABLE_OFFSET_Y) + (i + 1) * GUESS_HISTORY_STEP_Y,
-                                            GUESS_HISTORY_STEP_X * _gameLogic.guessCodeHistory[0].Count, GUESS_HISTORY_THICKNESS), _tableColor);
-                    }
+                    spriteBatch.Draw(_squereBaseSprite, new Rectangle(GUESS_HISTORY_START_X + GUESS_TABLE_OFFSET_X, (GUESS_HISTORY_START_Y + gUESS_TABLE_OFFSET_Y) + (i + 1) * GUESS_HISTORY_STEP_Y,
+                                        GUESS_HISTORY_STEP_X * _saveData.codeLength, GUESS_HISTORY_THICKNESS), _tableColor);
                 }
-                for (int i = 0; i < _gameLogic.guessCodeHistory[0].Count; i++)
+            }
+            for (int i = 0; i < _saveData.codeLength; i++)
+            {
+                spriteBatch.Draw(_squereBaseSprite, new Rectangle(GUESS_HISTORY_START_X + GUESS_TABLE_OFFSET_X + (i * GUESS_HISTORY_STEP_X), (GUESS_HISTORY_START_Y + gUESS_TABLE_OFFSET_Y),
+                                    GUESS_HISTORY_THICKNESS, GUESS_HISTORY_STEP_Y * _saveData.historyCount), _tableColor);
+                if (i == _saveData.codeLength - 1)
                 {
-                    spriteBatch.Draw(_squereBaseSprite, new Rectangle(GUESS_HISTORY_START_X + GUESS_TABLE_OFFSET_X + (i * GUESS_HISTORY_STEP_X), (GUESS_HISTORY_START_Y + gUESS_TABLE_OFFSET_Y),
-                                        GUESS_HISTORY_THICKNESS, GUESS_HISTORY_STEP_Y * _gameLogic.guessCodeHistory.Count), _tableColor);
-                    if (i == _gameLogic.guessCodeHistory[0].Count - 1)
-                    {
-                        spriteBatch.Draw(_squereBaseSprite, new Rectangle(GUESS_HISTORY_START_X + GUESS_TABLE_OFFSET_X + ((i + 1) * GUESS_HISTORY_STEP_X), (GUESS_HISTORY_START_Y + gUESS_TABLE_OFFSET_Y),
-                                        GUESS_HISTORY_THICKNESS, (GUESS_HISTORY_STEP_Y * _gameLogic.guessCodeHistory.Count) + GUESS_HISTORY_THICKNESS), _tableColor);
-                    }
+                    spriteBatch.Draw(_squereBaseSprite, new Rectangle(GUESS_HISTORY_START_X + GUESS_TABLE_OFFSET_X + ((i + 1) * GUESS_HISTORY_STEP_X), (GUESS_HISTORY_START_Y + gUESS_TABLE_OFFSET_Y),
+                                    GUESS_HISTORY_THICKNESS, (GUESS_HISTORY_STEP_Y * _saveData.historyCount) + GUESS_HISTORY_THICKNESS), _tableColor);
                 }
             }
 

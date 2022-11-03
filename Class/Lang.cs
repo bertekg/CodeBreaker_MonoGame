@@ -15,7 +15,7 @@
         FinishPlayAgain, GoBackMenu,
         GameInstuction, ControlsInGame, GameOptionKey, GameOption,
         GameModifiers, DebuggingModeEnabled, Start, Modifiers, Help, Option, Quit, Back, PlayAgain, MainMenu,
-        TrueSingleLetter, FalseSingleLetter, DigitRange
+        TrueSingleLetter, FalseSingleLetter, DigitRange, HistoryCount
     };
     internal class Lang
     {
@@ -681,6 +681,17 @@
                             break;
                         default:
                             returnText = "Digit Range";
+                            break;
+                    }
+                    break;
+                case LangKey.HistoryCount:
+                    switch (langOption)
+                    {
+                        case LangOption.PL:
+                            returnText = "Ilość odgadniętych kodów: ";
+                            break;
+                        default:
+                            returnText = "Number of codes guessed: ";
                             break;
                     }
                     break;

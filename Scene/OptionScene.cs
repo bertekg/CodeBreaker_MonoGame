@@ -7,7 +7,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace CodeBreaker_MonoGame.Scene
 {
@@ -19,7 +18,9 @@ namespace CodeBreaker_MonoGame.Scene
         private Marker _optionMarker;
         private bool _isSounding;
         private string _musicVolume, _soundsVolume;
-        private bool _keyRightReleased, _keyLeftReleased, _keyUpReleased, _keyDownReleased;
+        KeyboardState keyboardState, _previousKS;
+        GamePadState gamePadState, _previousGPS;
+        private bool _keyLeftReleased, _keyUpReleased, _keyDownReleased;
         private int _optionMarkerIndex;
         private readonly SoundEffect _menuSideSoundEffect, _menuUpDownSoundEffect;
 
@@ -214,14 +215,17 @@ namespace CodeBreaker_MonoGame.Scene
         }
         public void Update(double deltaTime)
         {
-            KeyboardState keyboardState = Keyboard.GetState();
-            GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
+            _previousKS = keyboardState;
+            keyboardState = Keyboard.GetState();
+            _previousGPS = gamePadState;
+            gamePadState = GamePad.GetState(PlayerIndex.One);
 
             if (keyboardState.IsKeyDown(Keys.Escape) || gamePadState.Buttons.Back == ButtonState.Pressed)
                 GoToMainMenu();
 
-            if ((keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D) || gamePadState.DPad.Right == ButtonState.Pressed)
-                && _keyRightReleased == true)
+            if ( (keyboardState.IsKeyDown(Keys.Right) && _previousKS.IsKeyUp(Keys.Right)) ||
+                (keyboardState.IsKeyDown(Keys.D) && _previousKS.IsKeyUp(Keys.D)) ||
+                (gamePadState.IsButtonDown(Buttons.DPadRight) && _previousGPS.IsButtonUp(Buttons.DPadRight) ) )
             {
                 switch (_optionMarkerIndex)
                 {
@@ -240,11 +244,7 @@ namespace CodeBreaker_MonoGame.Scene
                     default:
                         break;
                 }
-                _keyRightReleased = false;
             }
-            else if ((keyboardState.IsKeyUp(Keys.Right) && keyboardState.IsKeyUp(Keys.D) && gamePadState.DPad.Right == ButtonState.Released)
-                && _keyRightReleased == false)
-                _keyRightReleased = true;
 
             if ((keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A) || gamePadState.DPad.Left == ButtonState.Pressed)
                 && _keyLeftReleased == true)
