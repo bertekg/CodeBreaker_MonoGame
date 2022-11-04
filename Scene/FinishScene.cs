@@ -29,7 +29,7 @@ namespace CodeBreaker_MonoGame.Scene
             _navigationFont = smallFont;
             _lang = lang;
 
-            if (gameLogic.codeGuessed)
+            if (gameLogic.CodeGuessed)
             {
                 _textGameResult = _lang.GetLangText(LangKey.FinishWin); _endGameColor = Color.Green;
             }
@@ -51,15 +51,15 @@ namespace CodeBreaker_MonoGame.Scene
 
             if (saveData.isAttemptsLimit)
             {
-                _textAttempts = _lang.GetLangText(LangKey.FinishRemainingAttempts) + (saveData.attemptsLimit - gameLogic.numberOfAttempts).ToString();
+                _textAttempts = _lang.GetLangText(LangKey.FinishRemainingAttempts) + (saveData.attemptsLimit - gameLogic.NumberOfAttempts).ToString();
             }
             else
             {
-                _textAttempts = _lang.GetLangText(LangKey.FinishNumberOfAttempts) + gameLogic.numberOfAttempts.ToString();
+                _textAttempts = _lang.GetLangText(LangKey.FinishNumberOfAttempts) + gameLogic.NumberOfAttempts.ToString();
             }
             _locAttempts = new Vector2((Game1.ScreenWidth / 2) - (_otherFont.MeasureString(_textAttempts).X / 2), 160);
 
-            _textCode = _lang.GetLangText(LangKey.FinishCorrectCode) + gameLogic.CorrectCodeString();
+            _textCode = _lang.GetLangText(LangKey.FinishCorrectCode) + gameLogic.GoodCodeString();
             _locCode = new Vector2((Game1.ScreenWidth / 2) - (_otherFont.MeasureString(_textCode).X / 2), 220);
 
             Button playAgainButon = new Button(buttonNavigation, smallFont)

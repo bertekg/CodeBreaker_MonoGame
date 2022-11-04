@@ -2,7 +2,7 @@
 {
     public class SingleDigit
     {
-        public DigitState digitState;
-        public int value;
+        public DigitState DigitState;
+        public int Value;
     }
 }

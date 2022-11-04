@@ -32,7 +32,8 @@ namespace CodeBreaker_MonoGame.Scene
 
         private Color _tableColor = Color.Black;
 
-        private bool _keyRightReleased, _keyLeftReleased, _keyUpReleased, _keyDownReleased, _keySpaceReleased;
+        KeyboardState _currentKS, _previousKS;
+        GamePadState _currentGPS, _previousGPS;
 
         private readonly string _digitRangText;
         private Vector2 _digitRangPos;
@@ -161,7 +162,7 @@ namespace CodeBreaker_MonoGame.Scene
         {
             for (int i = 0; i < _saveData.codeLength; i++)
             {
-                string textDigit = _gameLogic.currentCode[i].ToString("X");
+                string textDigit = _gameLogic.CurrentCode[i].ToString("X");
                 Vector2 textMiddlePoint = _digitFont.MeasureString(textDigit) / 2;
                 Vector2 textPosition = new Vector2(CODE_POSITION_START_X + (CODE_POSITION_STEP_X * i) + 34, CODE_POSITION_START_Y + 75);
                 spriteBatch.DrawString(_digitFont, textDigit, textPosition, Color.Black, 0, textMiddlePoint, 1.0f, SpriteEffects.None, 0.5f);
@@ -185,7 +186,7 @@ namespace CodeBreaker_MonoGame.Scene
 
             if (_saveData.isAttemptsLimit)
             {
-                int remainingAttempt = _saveData.attemptsLimit - _gameLogic.numberOfAttempts;
+                int remainingAttempt = _saveData.attemptsLimit - _gameLogic.NumberOfAttempts;
                 spriteBatch.DrawString(_modFont, _lang.GetLangText(LangKey.GameRemainingAttempts) + remainingAttempt.ToString(), new Vector2(360, 10), Color.Black);
                 for (int i = 0; i < _saveData.attemptsLimit; i++)
                 {
@@ -201,7 +202,7 @@ namespace CodeBreaker_MonoGame.Scene
             }
             else
             {
-                spriteBatch.DrawString(_modFont, _lang.GetLangText(LangKey.GameNumberOfAttempts) + _gameLogic.numberOfAttempts.ToString(), new Vector2(360, 10), Color.Black);
+                spriteBatch.DrawString(_modFont, _lang.GetLangText(LangKey.GameNumberOfAttempts) + _gameLogic.NumberOfAttempts.ToString(), new Vector2(360, 10), Color.Black);
             }
 
             if (_saveData.isTimeLimit)
@@ -211,12 +212,12 @@ namespace CodeBreaker_MonoGame.Scene
                 spriteBatch.Draw(_squereBaseSprite, GetTimieLimitBarRectangel(), GetTimeLimitBarColor());
             }
 
-            for (int i = 0; i < _gameLogic.guessCodeHistory.Count; i++)
+            for (int i = 0; i < _gameLogic.GuessCodeHistory.Count; i++)
             {
-                for (int j = 0; j < _gameLogic.guessCodeHistory[i].Count; j++)
+                for (int j = 0; j < _gameLogic.GuessCodeHistory[i].Count; j++)
                 {
                     _guessCodeHistoryTextPlace = new Vector2(GUESS_HISTORY_START_X + (j * GUESS_HISTORY_STEP_X) - 3, GUESS_HISTORY_START_Y + i * GUESS_HISTORY_STEP_Y);
-                    spriteBatch.DrawString(_modFont, _gameLogic.guessCodeHistory[i][j].value.ToString("X"), _guessCodeHistoryTextPlace, DecodeColor(_gameLogic.guessCodeHistory[i][j].digitState));
+                    spriteBatch.DrawString(_modFont, _gameLogic.GuessCodeHistory[i][j].Value.ToString("X"), _guessCodeHistoryTextPlace, DecodeColor(_gameLogic.GuessCodeHistory[i][j].DigitState));
                 }
             }
 
@@ -248,16 +249,17 @@ namespace CodeBreaker_MonoGame.Scene
         }
         public void Update(double deltaTime)
         {
-            _markerPosition = 30.0f + (_markerIndex * 100.0f);
+            _previousKS = _currentKS;
+            _currentKS = Keyboard.GetState();
+            _previousGPS = _currentGPS;
+            _currentGPS = GamePad.GetState(PlayerIndex.One);
 
-            KeyboardState keyboardState = Keyboard.GetState();
-            GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
-
-            if (keyboardState.IsKeyDown(Keys.Escape) || gamePadState.Buttons.Back == ButtonState.Pressed)
+            if (_currentKS.IsKeyDown(Keys.Escape) || _currentGPS.Buttons.Back == ButtonState.Pressed)
                 GoToMainMenu();
 
-            if ((keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D) || gamePadState.DPad.Right == ButtonState.Pressed)
-                && _keyRightReleased == true)
+            if ((_currentKS.IsKeyDown(Keys.Right) && _previousKS.IsKeyUp(Keys.Right)) ||
+                (_currentKS.IsKeyDown(Keys.D) && _previousKS.IsKeyUp(Keys.D)) ||
+                (_currentGPS.IsButtonDown(Buttons.DPadRight) && _previousGPS.IsButtonUp(Buttons.DPadRight)))
             {
                 _markerIndex++;
                 if (_markerIndex > _saveData.codeLength - 1)
@@ -265,16 +267,11 @@ namespace CodeBreaker_MonoGame.Scene
                     _markerIndex = 0;
                 }
                 _game1.PlaySoundEffect(_sideSoundEffect);
-                _keyRightReleased = false;
-            }
-            else if ((keyboardState.IsKeyUp(Keys.Right) && keyboardState.IsKeyUp(Keys.D) && gamePadState.DPad.Right == ButtonState.Released)
-                && _keyRightReleased == false)
-            {
-                _keyRightReleased = true;
             }
 
-            if ((keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A) || gamePadState.DPad.Left == ButtonState.Pressed)
-               && _keyLeftReleased == true)
+            if ((_currentKS.IsKeyDown(Keys.Left) && _previousKS.IsKeyUp(Keys.Left)) ||
+                 (_currentKS.IsKeyDown(Keys.A) && _previousKS.IsKeyUp(Keys.A)) ||
+                 (_currentGPS.IsButtonDown(Buttons.DPadLeft) && _previousGPS.IsButtonUp(Buttons.DPadLeft)))
             {
                 _markerIndex--;
                 if (_markerIndex < 0)
@@ -282,49 +279,21 @@ namespace CodeBreaker_MonoGame.Scene
                     _markerIndex = _saveData.codeLength - 1;
                 }
                 _game1.PlaySoundEffect(_sideSoundEffect);
-                _keyLeftReleased = false;
-            }
-            else if ((keyboardState.IsKeyUp(Keys.Left) && keyboardState.IsKeyUp(Keys.A) && gamePadState.DPad.Left == ButtonState.Released)
-                && _keyLeftReleased == false)
-            {
-                _keyLeftReleased = true;
             }
 
-            if ((keyboardState.IsKeyDown(Keys.Up) || keyboardState.IsKeyDown(Keys.W) || gamePadState.DPad.Up == ButtonState.Pressed)
-                && _keyUpReleased == true)
-            {
+            if ((_currentKS.IsKeyDown(Keys.Up) && _previousKS.IsKeyUp(Keys.Up)) ||
+                (_currentKS.IsKeyDown(Keys.W) && _previousKS.IsKeyUp(Keys.W)) ||
+                (_currentGPS.IsButtonDown(Buttons.DPadUp) && _previousGPS.IsButtonUp(Buttons.DPadUp)))
                 IncCode();
-                _keyUpReleased = false;
-            }
-            else if ((keyboardState.IsKeyUp(Keys.Up) && keyboardState.IsKeyUp(Keys.W) && gamePadState.DPad.Up == ButtonState.Released)
-                && _keyUpReleased == false)
-            {
-                _keyUpReleased = true;
-            }
 
-            if ((keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S) || gamePadState.DPad.Down == ButtonState.Pressed)
-              && _keyDownReleased == true)
-            {
+            if ((_currentKS.IsKeyDown(Keys.Down) && _previousKS.IsKeyUp(Keys.Down)) ||
+                (_currentKS.IsKeyDown(Keys.S) && _previousKS.IsKeyUp(Keys.S)) ||
+                (_currentGPS.IsButtonDown(Buttons.DPadDown) && _previousGPS.IsButtonUp(Buttons.DPadDown)))
                 DecCode();
-                _keyDownReleased = false;
-            }
-            else if ((keyboardState.IsKeyUp(Keys.Down) && keyboardState.IsKeyUp(Keys.S) && gamePadState.DPad.Down == ButtonState.Released)
-                && _keyDownReleased == false)
-            {
-                _keyDownReleased = true;
-            }
 
-            if ((keyboardState.IsKeyDown(Keys.Space) || gamePadState.Buttons.A == ButtonState.Pressed)
-                && _keySpaceReleased == true)
-            {
+            if ((_currentKS.IsKeyDown(Keys.Space) && _previousKS.IsKeyUp(Keys.Space)) ||
+                (_currentGPS.IsButtonDown(Buttons.A) && _previousGPS.IsButtonUp(Buttons.A)))
                 CheckCode();
-                _keySpaceReleased = false;
-            }
-            else if ((keyboardState.IsKeyUp(Keys.Space) && gamePadState.Buttons.A == ButtonState.Released)
-                && _keySpaceReleased == false)
-            {
-                _keySpaceReleased = true;
-            }
 
             if (_saveData.isTimeLimit)
             {
@@ -342,6 +311,8 @@ namespace CodeBreaker_MonoGame.Scene
 
             foreach (var component in _gameComponents)
                 component.Update();
+
+            _markerPosition = 30.0f + (_markerIndex * 100.0f);
         }
 
         private void CheckCode()
@@ -351,7 +322,7 @@ namespace CodeBreaker_MonoGame.Scene
             {
                 _game1.GoToFinish(_successSoundEffect);
             }
-            else if (((_gameLogic.numberOfAttempts >= _saveData.attemptsLimit) && _saveData.isAttemptsLimit))
+            else if (((_gameLogic.NumberOfAttempts >= _saveData.attemptsLimit) && _saveData.isAttemptsLimit))
             {
                 _game1.GoToFinish(_failSoundEffect);
             }
@@ -363,20 +334,20 @@ namespace CodeBreaker_MonoGame.Scene
 
         private void DecCode()
         {
-            _gameLogic.currentCode[_markerIndex]--;
-            if (_gameLogic.currentCode[_markerIndex] < 0)
+            _gameLogic.CurrentCode[_markerIndex]--;
+            if (_gameLogic.CurrentCode[_markerIndex] < 0)
             {
-                _gameLogic.currentCode[_markerIndex] = _saveData.maxCodeDigit;
+                _gameLogic.CurrentCode[_markerIndex] = _saveData.maxCodeDigit;
             }
             _game1.PlaySoundEffect(_upDownSoundEffect);
         }
 
         private void IncCode()
         {
-            _gameLogic.currentCode[_markerIndex]++;
-            if (_gameLogic.currentCode[_markerIndex] > _saveData.maxCodeDigit)
+            _gameLogic.CurrentCode[_markerIndex]++;
+            if (_gameLogic.CurrentCode[_markerIndex] > _saveData.maxCodeDigit)
             {
-                _gameLogic.currentCode[_markerIndex] = 0;
+                _gameLogic.CurrentCode[_markerIndex] = 0;
             }
             _game1.PlaySoundEffect(_upDownSoundEffect);
         }

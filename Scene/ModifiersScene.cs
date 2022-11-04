@@ -16,8 +16,10 @@ namespace CodeBreaker_MonoGame.Scene
         private readonly SpriteFont _titleFont, _instructionFont, _navigationFont;
         private readonly Lang _lang;
         private Marker _menuMarker;
-        private bool _keyRightReleased, _keyLeftReleased, _keyUpReleased, _keyDownReleased;
         private int _menuMarkerIndex;
+
+        KeyboardState _currentKS, _previousKS;
+        GamePadState _currentGPS, _previousGPS;
 
         private readonly SoundEffect _menuSideSoundEffect, _menuUpDownSoundEffect;
         private SaveData _saveData;
@@ -308,11 +310,14 @@ namespace CodeBreaker_MonoGame.Scene
         }
         public void Update(double deltaTime)
         {
-            KeyboardState keyboardState = Keyboard.GetState();
-            GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
+            _previousKS = _currentKS;
+            _currentKS = Keyboard.GetState();
+            _previousGPS = _currentGPS;
+            _currentGPS = GamePad.GetState(PlayerIndex.One);
 
-            if ((keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D) || gamePadState.DPad.Right == ButtonState.Pressed)
-               && _keyRightReleased == true)
+            if ((_currentKS.IsKeyDown(Keys.Right) && _previousKS.IsKeyUp(Keys.Right)) ||
+                (_currentKS.IsKeyDown(Keys.D) && _previousKS.IsKeyUp(Keys.D)) ||
+                (_currentGPS.IsButtonDown(Buttons.DPadRight) && _previousGPS.IsButtonUp(Buttons.DPadRight)))
             {
                 switch (_menuMarkerIndex)
                 {
@@ -340,16 +345,11 @@ namespace CodeBreaker_MonoGame.Scene
                     default:
                         break;
                 }
-                _keyRightReleased = false;
-            }
-            else if ((keyboardState.IsKeyUp(Keys.Right) && keyboardState.IsKeyUp(Keys.D) && gamePadState.DPad.Right == ButtonState.Released)
-               && _keyRightReleased == false)
-            {
-                _keyRightReleased = true;
             }
 
-            if ((keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A) || gamePadState.DPad.Left == ButtonState.Pressed)
-                && _keyLeftReleased == true)
+            if ((_currentKS.IsKeyDown(Keys.Left) && _previousKS.IsKeyUp(Keys.Left)) ||
+                (_currentKS.IsKeyDown(Keys.A) && _previousKS.IsKeyUp(Keys.A)) ||
+                (_currentGPS.IsButtonDown(Buttons.DPadLeft) && _previousGPS.IsButtonUp(Buttons.DPadLeft)))
             {
                 switch (_menuMarkerIndex)
                 {
@@ -377,16 +377,11 @@ namespace CodeBreaker_MonoGame.Scene
                     default:
                         break;
                 }
-                _keyLeftReleased = false;
-            }
-            else if ((keyboardState.IsKeyUp(Keys.Left) && keyboardState.IsKeyUp(Keys.A) && gamePadState.DPad.Left == ButtonState.Released)
-                && _keyLeftReleased == false)
-            {
-                _keyLeftReleased = true;
             }
 
-            if ((keyboardState.IsKeyDown(Keys.Up) || keyboardState.IsKeyDown(Keys.W) || gamePadState.DPad.Up == ButtonState.Pressed)
-                && _keyUpReleased == true)
+            if ((_currentKS.IsKeyDown(Keys.Up) && _previousKS.IsKeyUp(Keys.Up)) ||
+                (_currentKS.IsKeyDown(Keys.W) && _previousKS.IsKeyUp(Keys.W)) ||
+                (_currentGPS.IsButtonDown(Buttons.DPadUp) && _previousGPS.IsButtonUp(Buttons.DPadUp)))
             {
                 _menuMarkerIndex--;
                 if (_menuMarkerIndex < 0)
@@ -400,16 +395,11 @@ namespace CodeBreaker_MonoGame.Scene
                 }
                 MoveMarker(_menuMarkerIndex);
                 _game1.PlaySoundEffect(_menuUpDownSoundEffect);
-                _keyUpReleased = false;
-            }
-            else if ((keyboardState.IsKeyUp(Keys.Up) && keyboardState.IsKeyUp(Keys.W) && gamePadState.DPad.Up == ButtonState.Released)
-                && _keyUpReleased == false)
-            {
-                _keyUpReleased = true;
             }
 
-            if ((keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S) || gamePadState.DPad.Down == ButtonState.Pressed)
-                && _keyDownReleased == true)
+            if ((_currentKS.IsKeyDown(Keys.Down) && _previousKS.IsKeyUp(Keys.Down)) ||
+                (_currentKS.IsKeyDown(Keys.S) && _previousKS.IsKeyUp(Keys.S)) ||
+                (_currentGPS.IsButtonDown(Buttons.DPadDown) && _previousGPS.IsButtonUp(Buttons.DPadDown)))
             {
                 _menuMarkerIndex++;
                 if ((_menuMarkerIndex == 2 && _saveData.isAttemptsLimit == false) ||
@@ -423,21 +413,15 @@ namespace CodeBreaker_MonoGame.Scene
                 }
                 MoveMarker(_menuMarkerIndex);
                 _game1.PlaySoundEffect(_menuUpDownSoundEffect);
-                _keyDownReleased = false;
-            }
-            else if ((keyboardState.IsKeyUp(Keys.Down) && keyboardState.IsKeyUp(Keys.S) && gamePadState.DPad.Down == ButtonState.Released)
-               && _keyDownReleased == false)
-            {
-                _keyDownReleased = true;
             }
 
             foreach (var component in _gameComponents)
                 component.Update();
 
-            if (keyboardState.IsKeyDown(Keys.Enter) || gamePadState.Buttons.Start == ButtonState.Pressed)
+            if (_currentKS.IsKeyDown(Keys.Enter) || _currentGPS.Buttons.Start == ButtonState.Pressed)
                 GoToGame();
 
-            if (keyboardState.IsKeyDown(Keys.Escape) || gamePadState.Buttons.Back == ButtonState.Pressed)
+            if (_currentKS.IsKeyDown(Keys.Escape) || _currentGPS.Buttons.Back == ButtonState.Pressed)
                 GoToMainMenu();
         }
         private void HistoryCountDec()
