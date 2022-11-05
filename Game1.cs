@@ -43,7 +43,7 @@ namespace CodeBreaker_MonoGame
         const bool IS_DEBUG_MODE_FROM_CODE = false;
         private bool _isDebugMode;
 
-        const string VERSION_GAME = "1.5.7 (2022.11.03)";
+        const string VERSION_GAME = "2.0.0 (2022.11.05)";
 
         MenuScene _menuScene;
         ModifiersScene _modifiersScene;

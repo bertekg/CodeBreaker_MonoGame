@@ -21,28 +21,28 @@ If you want you can download current and previous versions of builds here: https
 All screenshots from current and previous versions are available here: https://drive.google.com/drive/folders/1m8CKQG6sDc0-qGZWj7o5AKtor24r2oxB?usp=sharing
 
 ### 1. Main menu
-![alt text](Screenshots/1MainMenu.PNG)
+![alt text](Screenshots/01MainMenu.PNG)
 
 ### 2. Game instruction
-![alt text](Screenshots/2GameInstruction.PNG)
+![alt text](Screenshots/03GameInstruction.PNG)
 
 ### 3. Option game in Polish language
-![alt text](Screenshots/3OptionSupportPolish.PNG)
+![alt text](Screenshots/04OptionEN.PNG)
 
 ### 4. After game start
-![alt text](Screenshots/4AfterStartGame.PNG)
+![alt text](Screenshots/06AfterStartGame.PNG)
 
 ### 5. All possible digit clues
-![alt text](Screenshots/5AllPossibleDigitClues.PNG)
+![alt text](Screenshots/07AllPossibleDigitClues.PNG)
 
-### 6. Before game end
-![alt text](Screenshots/6BeforeGameEnd.PNG)
+### 6. Successful game
+![alt text](Screenshots/09GameFinishLose.PNG)
 
-### 7. Successful game
-![alt text](Screenshots/7GameFinishWin.PNG)
+### 7. Possible game modyfication
+![alt text](Screenshots/02GameModifiers.PNG)
 
-### 8. Possible game modyfication
-![alt text](Screenshots/8PossibleModes.PNG)
+### 8. During game with modyfications
+![alt text](Screenshots/10PossibleModes.PNG)
 
 ### 9. Unsuccessful game
-![alt text](Screenshots/9GameFinishLose.PNG)
+![alt text](Screenshots/11GameFinishLose.PNG)
